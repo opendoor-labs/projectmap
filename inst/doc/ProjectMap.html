@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Alex Hubbard" />
+
+<meta name="date" content="2018-07-01" />
+
+<title>Project Map</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Project Map</h1>
+<h4 class="author"><em>Alex Hubbard</em></h4>
+<h4 class="date"><em>July 01, 2018</em></h4>
+
+
+
+<div id="description" class="section level2">
+<h2>Description</h2>
+<p>It can be a challenge to develop a project in RStudio with multiple authors and make the results repeatable on any machine. It can be especially challenging to collaborate on a project developed in RStudio when output from one author’s scripts is used as an input by another author. It can also be frustrating when the scripts writted by one author are run on another author’s computer missing the required packages. Not to mention, shared drives may have differing names across computers, which can cause file input and output and to break if paths are hardcoded without the using paths relative to the root directory. Finally, it can be a nightmare to setting the correct working directory. All of these challenges are addressed in the <strong>projectmap</strong> package by attempting to do by standardizing folder structure, file input/output, and package version control.</p>
+</div>
+<div id="installing-the-package" class="section level2">
+<h2>Installing the Package</h2>
+<p>To install the <strong>projectmap</strong> package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;opendoor-labs/projectmap&quot;</span>)</code></pre></div>
+</div>
+<div id="setting-up-a-project" class="section level2">
+<h2>Setting up a Project</h2>
+<p>Once the installation is complete, you can now set up a new project using the package. Open RStudio and in the console type:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(projectmap)
+<span class="kw">link_to_proj</span>()</code></pre></div>
+<p>You will be prompted to select a directory to build your new project in. It is suggested that you create a new folder. Once the function finishes executing, you will see folders <em>Codes</em>, <em>Documentation</em>, <em>Functions</em>, <em>Input</em>, <em>Libary</em>, <em>Logs</em>, and <em>Output</em> along with two files <em>Example File.R</em> and <em>Project Master.R</em>. Do not change the name or move <em>Project Master.R</em>. The name and location of this file is how <strong>projectmap</strong> finds the working directory.</p>
+<p>Once the package is loaded, <strong>projectmap</strong> creates a hidden environment variable called <em>proj.env</em>, that maintains a list variables essential for the package functions to operate correctly. You should be able to delete it or edit it without unlocking it first using the <em>unlock_proj()</em> funciton. It is not recommended to make any changes to the <em>proj.env</em> variables, but if you do, make sure to lock it when you are done using the <em>lock_proj()</em> function.</p>
+<p>The <em>link_to_proj()</em> function is the workhorse function for the <strong>projectmap</strong> package. It is responsible for building the folder structure, adding a new library path to your RStudio session, installing all of the required packages into the projects directory, and building a file <em>cabinet</em> of all files in the directory. It also creates a color palette (a vector of hexidecimal strings with names called <em>od.colors</em>) and ggplot theme (<em>od_theme()</em>) based on Opendoor’s color palette from the Google Slides template.</p>
+<p>The <em>cabinet</em> maintains a list of file paths relative to the root directory (using the “./” syntax which replaces the folder path of the root directory) for all files in the directory. This list is maintained so authors do not need to hardcode file paths, and instead can use the helper functions <em>get_file_path()</em>, <em>get_file_folder()</em>, <em>save_file()</em>, <em>read_file()</em>, and <em>source_file()</em>, which only require the authors to specify the file name and extension, and optionally, a folder path. This file can be updated by calling the <em>build_cabinet()</em> function, which stores the <em>cabinet</em> in the <em>Functions</em> folder as an RData file.</p>
+<p><em>link_to_proj()</em> will search through all of the rfiles in the project directory for <em>library</em> and <em>require</em> keywords, parse the packages in these functions, and install them in the project’s library folder. The default library path is changed, which can be verified by calling <code>.libPaths()</code> and seeing the first item in the list being the path to the projects library folder. This will force RStudio to look in the project’s library folder for packages when loading them. This is <strong>projectmap’s</strong> package version control method.</p>
+<p>If any of the <strong>bigrquery</strong>, <strong>bigQueryR</strong>, <strong>googledrive</strong>, or <strong>googlesheets</strong> packages are used in any of the projects R script, it will open up a browser window or tab and prompt the user to authenticate his or her access to Google BigQuery or Google Drive. The OAuth token will be stored in the projects root directory so this step can be avoided when running the scripts in the future. The packages may automatically update stale OAuth tokens, however.</p>
+</div>
+<div id="the-project-master-file" class="section level2">
+<h2>The Project Master File</h2>
+<p>The project master file is the main file for your project. The first thing you will notice is that the <em>init</em> argument in <em>link_to_proj()</em> is to <em>T</em>. This tells the function to initialize the project.</p>
+<p>Next you will see the code chunk</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set_proj_models</span>(
+  <span class="dt">Example =</span> T,
+  <span class="dt">Model1 =</span> F
+)</code></pre></div>
+<p>The names should be set by the author representing submodels of the overall model developed in the project. Each submodel should represent a logical part of the overall model that be run on its own. Once you have partitioned your model into submodels (you can also just run your model as one partition), you need to set it equal to <em>T</em> or <em>F</em> depending on whether you want the R scripts in that submodel to execute the next time you source <em>Project Master.R</em></p>
+<p>The last item in the master file is the code chunk</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span>(<span class="kw">run_proj_model</span>(<span class="st">&quot;Example&quot;</span>)){
+  <span class="kw">source_file</span>(<span class="st">&quot;Example File.R&quot;</span>, <span class="dt">inFolder =</span> <span class="ot">NULL</span>)
+}
+<span class="cf">if</span>(<span class="kw">run_proj_model</span>(<span class="st">&quot;Model1&quot;</span>)){
+  <span class="kw">source_file</span>(<span class="st">&quot;Model1.R&quot;</span>, <span class="dt">inFolder =</span> <span class="st">&quot;Codes&quot;</span>)
+}</code></pre></div>
+<p>The <em>run_proj_model()</em> function returns <em>T</em> or <em>F</em> for the model string argument depending on what was set in the <em>set_proj_models()</em> function above. It is the authors’ responsibility to place all R scripts required to develop the model in this part of the master file in the correct order. The scripts should be called using the <em>source_file()</em> function as above. This is a wrapper to the base <em>source()</em> function, that keeps track of the overall progress of the master file’s execution. The <em>inFolder</em> argument is optional. If all your R scripts have unique names, you can leave as <em>NULL</em> which is the default. Otherwise, you can specify the folder path to the R script (i.e <em>Codes</em> or <em>Codes/Model 1</em>, if <em>Model1.R</em> lives that folder path).</p>
+<p>To see how the master file executes, set the working directory to your projects root folder and type <code>source(&quot;Project Master.R&quot;)</code> in the console. Be sure to explore the output in the <em>Output</em> folder.</p>
+</div>
+<div id="the-example-file" class="section level2">
+<h2>The Example file</h2>
+<p>This file exists as a template for authors to follow when writing R scripts for the project. The only required function is <em>link_to_proj()</em>, which should be placed at the top after loading the <strong>projectmap</strong> package. Then, load all other required libraries for the R script.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rm</span>(<span class="dt">list =</span> <span class="kw">ls</span>())
+<span class="co">#Load projectmap</span>
+<span class="kw">library</span>(projectmap)
+<span class="co">#Link this file as part of the project</span>
+<span class="kw">link_to_proj</span>()
+<span class="co">#Load other required packages</span>
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(data.table)</code></pre></div>
+<p>This will prevent the script from loading packages from your main library and only look in the project library for the pacages. You should also place <em>rm(list = ls())</em> at the very top to make sure your R script exectues in a clean environment.</p>
+<p>You will notice a couple examples of how to use the <em>save_file()</em> function for saving data and ggplot objects using _od_theme() and the <em>read_file()</em> function. You should use the <em>save_file()</em> for saving all objects as it is a wrapper function for <strong>data.table’s</strong> <em>fwrite()</em> for saving csv’s, <strong>ggplot2’s</strong> <em>ggsave()</em> for saving plots from ggplot objects, <strong>xlsx’s</strong> <em>saveWorkBook()</em> saving xls and xlsx files, and the base <em>save()</em> and <em>saveRDS()</em> for saving RData and rds files.More importantly, it runs some code on the back end to add all saved files to the <em>cabinet</em> so that they can referenced from other <strong>projectmap</strong> package helper functions.</p>
+<p>The <em>save_file()</em> function will automatically select the proper function to use based on the extension given in the <em>file</em> argument. It will also select the default output directory using the <em>get_output_dir()</em> function. This helper function is designed to set up the <em>Output</em> folder to mimic the structure of the <em>Codes</em> folder. For exmaple, if <em>Model1.R</em> exists in <em>Codes/Model 1</em> then <em>get_output_dir()</em> will replace <em>Codes</em> with <em>Output</em> while keeping the <em>Model1</em> subfolder. You can also specify an extra subfolder if you would like to separater data from images output, for example, by adding a subfolder to the file name like <em>Images/plot.png</em>.</p>
+<p>The Opendoor color names are “blue”, “navy”, “iris”, “turquoise”, “citrine”, “ruby”, “lightgrey”, “bluegrey”, “coolgrey”, “warmgrey”, and “lightgreytint”. The <em>od_theme()</em> is built with multiple palettes that can be selected by setting the <em>palette</em> argument to one of “main”, “cool”, or “warm”. The <em>main</em> color palette consists of all non-grey colors, the <em>cool</em> color palette consists of “navy”, “blue”, “bluegrey”, and “turquoise”. The <em>warm</em> color palette consists of “ruby”, “iris”, and “citrine”.</p>
+<p>You can also select a subset of the Opendoor colors or naming your own colors by setting the <em>color</em> argument to a vector of color names or hexidecimal strings. Or, you can select a set number of colors by setting the <em>n</em> argument to any positive integer. If the color palette needs to continuous, make sure to set the <em>discrete</em> argument to <em>F</em> (it is <em>T</em> by default). You can also reverse the order of the color palette by setting the <em>reverse</em> argument to <em>T</em>. If you’d like to add black to the color palette (which is absent by default), you can do so by setting the <em>addblack</em> argument to <em>T</em>.</p>
+<p>Finally, the <em>read_file()</em> function is a wrapper function for <strong>data.table’s</strong> <em>fread()</em> for reading in csv files, <strong>xlsx’s</strong> <em>read.xlsx()</em> for reading in xls and xlsx files, and the base <em>load()</em> and <em>readRDS()</em> files for reading in RData and rds files. You only need to specify the file name in the <em>file</em> argument with an extension if you know the file name is unique in the project directory. Otherwise, you can specify the folder path using the <em>inFolder</em> argument (i.e. <em>Output/Model 1/Images</em>). If you leave <em>inFolder</em> as <em>NULL</em>, <em>read_file()</em> will default to looking in the folder path decided by <em>get_output_dir()</em> for the file if multiple files exist with the same name but different folder paths.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+---
+title: "Project Map"
+author: "Alex Hubbard"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Project Map}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(rmarkdown)
+library(xtable)
+
+opts_chunk$set(eval = T, echo = F, message = F, warning = F, results = "asis", 
+               fig.cap = "", fig.align = "center", out.width = "95%", out.height = "95%")
+options(xtable.comment = FALSE)
+```
+
+## Description
+It can be a challenge to develop a project in RStudio with multiple authors and make the results repeatable on any machine. It can be especially challenging to collaborate on a project developed in RStudio when output from one author's scripts is used as an input by another author. It can also be frustrating when the scripts writted by one author are run on another author's computer missing the required packages. Not to mention, shared drives may have differing names across computers, which can cause file input and output and to break if paths are hardcoded without the using paths relative to the root directory. Finally, it can be a nightmare to setting the correct working directory. All of these challenges are addressed in the **projectmap** package by attempting to do by standardizing folder structure, file input/output, and package version control.
+
+## Installing the Package
+To install the **projectmap** package:
+```{r, echo = T, eval = F}
+devtools::install_github("opendoor-labs/projectmap")
+```
+
+## Setting up a Project
+Once the installation is complete, you can now set up a new project using the package. Open RStudio and in the console type:
+```{r, echo = T, eval = F}
+library(projectmap)
+link_to_proj()
+```
+You will be prompted to select a directory to build your new project in. It is suggested that you create a new folder. Once the function finishes executing, you will see folders _Codes_, _Documentation_, _Functions_, _Input_, _Libary_, _Logs_, and _Output_ along with two files _Example File.R_ and _Project Master.R_. Do not change the name or move _Project Master.R_. The name and location of this file is how **projectmap** finds the working directory.
+
+Once the package is loaded, **projectmap** creates a hidden environment variable called _proj.env_, that maintains a list variables essential for the package functions to operate correctly. You should be able to delete it or edit it without unlocking it first using the _unlock_proj()_ funciton. It is not recommended to make any changes to the _proj.env_ variables, but if you do, make sure to lock it when you are done using the _lock_proj()_ function.
+
+The _link_to_proj()_ function is the workhorse function for the **projectmap** package. It is responsible for building the folder structure, adding a new library path to your RStudio session, installing all of the required packages into the projects directory, and building a file _cabinet_ of all files in the directory. It also creates a color palette (a vector of hexidecimal strings with names called _od.colors_) and ggplot theme (_od_theme()_) based on Opendoor's color palette from the Google Slides template.
+
+The _cabinet_ maintains a list of file paths relative to the root directory (using the "./" syntax which replaces the folder path of the root directory) for all files in the directory. This list is maintained so authors do not need to hardcode file paths, and instead can use the helper functions _get_file_path()_, _get_file_folder()_, _save_file()_, _read_file()_, and _source_file()_, which only require the authors to specify the file name and extension, and optionally, a folder path. This file can be updated by calling the _build_cabinet()_ function, which stores the _cabinet_ in the _Functions_ folder as an RData file.
+
+_link_to_proj()_ will search through all of the rfiles in the project directory for _library_ and _require_ keywords, parse the packages in these functions, and install them in the project's library folder. The default library path is changed, which can be verified by calling `.libPaths()` and seeing the first item in the list being the path to the projects library folder. This will force RStudio to look in the project's library folder for packages when loading them. This is **projectmap's** package version control method.
+
+If any of the **bigrquery**, **bigQueryR**, **googledrive**, or **googlesheets** packages are used in any of the projects R script, it will open up a browser window or tab and prompt the user to authenticate his or her access to Google BigQuery or Google Drive. The OAuth token will be stored in the projects root directory so this step can be avoided when running the scripts in the future. The packages may automatically update stale OAuth tokens, however.
+
+## The Project Master File
+The project master file is the main file for your project. The first thing you will notice is that the _init_ argument in _link_to_proj()_ is to _T_. This tells the function to initialize the project. 
+
+Next you will see the code chunk
+```{r, echo = T, eval = F}
+set_proj_models(
+  Example = T,
+  Model1 = F
+)
+```
+The names should be set by the author representing submodels of the overall model developed in the project. Each submodel should represent a logical part of the overall model that be run on its own. Once you have partitioned your model into submodels (you can also just run your model as one partition), you need to set it equal to _T_ or _F_ depending on whether you want the R scripts in that submodel to execute the next time you source _Project Master.R_
+
+The last item in the master file is the code chunk
+```{r, echo = T, eval = F}
+if(run_proj_model("Example")){
+  source_file("Example File.R", inFolder = NULL)
+}
+if(run_proj_model("Model1")){
+  source_file("Model1.R", inFolder = "Codes")
+}
+```
+The _run_proj_model()_ function returns _T_ or _F_ for the model string argument depending on what was set in the _set_proj_models()_ function above. It is the authors' responsibility to place all R scripts required to develop the model in this part of the master file in the correct order. The scripts should be called using the _source_file()_ function as above. This is a wrapper to the base _source()_ function, that keeps track of the overall progress of the master file's execution. The _inFolder_ argument is optional. If all your R scripts have unique names, you can leave as _NULL_ which is the default. Otherwise, you can specify the folder path to the R script (i.e _Codes_ or _Codes/Model 1_, if _Model1.R_ lives that folder path).
+
+To see how the master file executes, set the working directory to your projects root folder and type `source("Project Master.R")` in the console. Be sure to explore the output in the _Output_ folder. 
+
+## The Example file
+This file exists as a template for authors to follow when writing R scripts for the project. The only required function is _link_to_proj()_, which should be placed at the top after loading the **projectmap** package. Then, load all other required libraries for the R script. 
+```{r, echo = T, eval = F}
+rm(list = ls())
+#Load projectmap
+library(projectmap)
+#Link this file as part of the project
+link_to_proj()
+#Load other required packages
+library(ggplot2)
+library(data.table)
+```
+This will prevent the script from loading packages from your main library and only look in the project library for the pacages. You should also place _rm(list = ls())_ at the very top to make sure your R script exectues in a clean environment.
+
+You will notice a couple examples of how to use the _save_file()_ function for saving data and ggplot objects using _od_theme() and the _read_file()_ function. You should use the _save_file()_ for saving all objects as it is a wrapper function for **data.table's** _fwrite()_ for saving csv's, **ggplot2's** _ggsave()_ for saving plots from ggplot objects, **xlsx's** _saveWorkBook()_ saving xls and xlsx files, and the base _save()_ and _saveRDS()_ for saving RData and rds files.More importantly, it runs some code on the back end to add all saved files to the _cabinet_ so that they can referenced from other **projectmap** package helper functions. 
+
+The _save_file()_ function will automatically select the proper function to use based on the extension given in the _file_ argument. It will also select the default output directory using the _get_output_dir()_ function. This helper function is designed to set up the _Output_ folder to mimic the structure of the _Codes_ folder. For exmaple, if _Model1.R_ exists in _Codes/Model 1_ then _get_output_dir()_ will replace _Codes_ with _Output_ while keeping the _Model1_ subfolder. You can also specify an extra subfolder if you would like to separater data from images output, for example, by adding a subfolder to the file name like _Images/plot.png_. 
+
+The Opendoor color names are "blue", "navy", "iris", "turquoise", "citrine", "ruby", "lightgrey", "bluegrey", "coolgrey", "warmgrey", and "lightgreytint". The _od_theme()_ is built with multiple palettes that can be selected by setting the _palette_ argument to one of "main", "cool", or "warm". The _main_ color palette consists of all non-grey colors, the _cool_ color palette consists of "navy", "blue", "bluegrey", and "turquoise". The _warm_ color palette consists of "ruby", "iris", and "citrine". 
+
+You can also select a subset of the Opendoor colors or naming your own colors by setting the _color_ argument to a vector of color names or hexidecimal strings. Or, you can select a set number of colors by setting the _n_ argument to any positive integer. If the color palette needs to continuous, make sure to set the _discrete_ argument to _F_ (it is _T_ by default). You can also reverse the order of the color palette by setting the _reverse_ argument to _T_. If you'd like to add black to the color palette (which is absent by default), you can do so by setting the _addblack_ argument to _T_.
+
+Finally, the _read_file()_ function is a wrapper function for **data.table's** _fread()_ for reading in csv files, **xlsx's** _read.xlsx()_ for reading in xls and xlsx files, and the base _load()_ and _readRDS()_ files for reading in RData and rds files. You only need to specify the file name in the _file_ argument with an extension if you know the file name is unique in the project directory. Otherwise, you can specify the folder path using the _inFolder_ argument (i.e. _Output/Model 1/Images_). If you leave _inFolder_ as _NULL_, _read_file()_ will default to looking in the folder path decided by _get_output_dir()_ for the file if multiple files exist with the same name but different folder paths.
