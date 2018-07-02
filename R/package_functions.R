@@ -308,26 +308,30 @@ link_to_proj = function(init = F){
       packages = foreach::foreach(i = rfiles, .combine = "c", .export = c("proj.env", "remove_file")) %dopar% {
         if(file.exists(i)){
           lines = suppressWarnings(readLines(i))
-          libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
-          requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
-          if(length(libraries) > 0){
-            for(j in 1:length(libraries)){
-              temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",")[[1]])
-              temp = temp[!grepl("=", temp)]
-              libraries[j] = temp
+          if(length(lines) > 0){
+            libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
+            requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
+            if(length(libraries) > 0){
+              for(j in 1:length(libraries)){
+                temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",")[[1]])
+                temp = temp[!grepl("=", temp)]
+                libraries[j] = temp
+              }
+              rm(temp, j)
             }
-            rm(temp, j)
-          }
-          if(length(requires) > 0){
-            for(j in 1:length(requires)){
-              temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",")[[1]])
-              temp = temp[!grepl("=", temp)]
-              requires[j] = temp
+            if(length(requires) > 0){
+              for(j in 1:length(requires)){
+                temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",")[[1]])
+                temp = temp[!grepl("=", temp)]
+                requires[j] = temp
+              }
+              rm(temp, loc, j)
             }
-            rm(temp, loc, j)
+            return(unique(c(libraries, requires)))
+          }else{
+            return(NULL)
           }
           rm(lines)
-          return(unique(c(libraries, requires)))
         }else{
           remove_file(i)
           return(NULL)
