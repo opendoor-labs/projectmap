@@ -76,11 +76,11 @@ set_proj_models = function(...){
   #Assign the models to a named list
   proj.env$models = list(...)
 
-  #Read in the Project Master.R file and parse out all the run_proj_model statuements
+  #Read in the Project Master.R file and parse out all the execute_proj_model statuements
   #to find those that are set to T or F and count the number of source_file statements
   lines = readLines(paste0(proj.env$root.dir, "/Project Master.R"))
   lines = gsub(" ", "", paste(lines, collapse = ""))
-  loc1 = gregexpr("if\\(run_proj_model\\(", lines)[[1]]
+  loc1 = gregexpr("if\\(execute_proj_model\\(", lines)[[1]]
   loc2 = sapply(loc1, function(x) {
     gregexpr("\\}", substr(lines, x + 1, nchar(lines)))[[1]][1] +
       x
@@ -118,13 +118,13 @@ set_proj_models = function(...){
 #' @return Boolean (T,F) indicator
 #' @description Returns a boolean (T, F) indicator used as a flag telling "Project Master.R" whether to run a group of R scripts.
 #' @examples
-#' if(run_proj_model("Model1")){
+#' if(execute_proj_model("Model1")){
 #'   source_file("Model1.R", inFolder = "Codes")
 #' }
 #' )
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-run_proj_model = function(model){
+execute_proj_model = function(model){
   return(proj.env$models[[model]])
 }
 
@@ -642,10 +642,10 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 #'   Model1 = T,
 #'   Model2 = T
 #' )
-#' if(run_proj_model("Model1")){
+#' if(execute_proj_model("Model1")){
 #'   source_file("Model1.R", inFolder = "Codes")
 #' }
-#' if(run_proj_model("Model2")){
+#' if(execute_proj_model("Model2")){
 #'   source_file("Model2.R", inFolder = "Codes")
 #' }
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
@@ -1158,10 +1158,10 @@ set_proj_models(
 )
 
 #Run the selected files
-if(run_proj_model("Example")){
+if(execute_proj_model("Example")){
   source_file("Example File.R", inFolder = NULL)
 }
-if(run_proj_model("Model1")){
+if(execute_proj_model("Model1")){
   source_file("Model1.R", inFolder = "Codes")
 }
 
@@ -1180,8 +1180,10 @@ rm(list = ls())
 
 #Load projectmap
 library(projectmap)
+
 #Link this file as part of the project
 link_to_proj()
+
 #Load other required packages
 library(ggplot2)
 library(data.table)

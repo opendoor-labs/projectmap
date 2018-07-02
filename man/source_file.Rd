@@ -24,10 +24,10 @@ set_proj_models(
   Model1 = T,
   Model2 = T
 )
-if(run_proj_model("Model1")){
+if(execute_proj_model("Model1")){
   source_file("Model1.R", inFolder = "Codes")
 }
-if(run_proj_model("Model2")){
+if(execute_proj_model("Model2")){
   source_file("Model2.R", inFolder = "Codes")
 }
 }
