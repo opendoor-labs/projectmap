@@ -260,6 +260,7 @@ link_to_proj = function(init = F){
       proj.env$root.dir = getwd()
     }
     setwd(proj.env$root.dir)
+    cat(proj.env$root.dir)
     message("Done.")
 
     #Create the folder structure
