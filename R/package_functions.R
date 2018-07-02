@@ -1127,7 +1127,9 @@ rm(list = ls())
 cat("\\014")
 
 #Load projectmap
-#devtools::install_github("opendoor-labs/projectmap")
+if(!"projectmap" %in% installed.packages()){
+  devtools::install_github("opendoor-labs/projectmap")
+}
 library(projectmap)
 
 #Link this file as part of the project
@@ -1161,7 +1163,9 @@ exampleFile = '#################################################################
 rm(list = ls())
 
 #Load projectmap
-#devtools::install_github("opendoor-labs/projectmap")
+if(!"projectmap" %in% installed.packages()){
+  devtools::install_github("opendoor-labs/projectmap")
+}
 library(projectmap)
 
 #Link this file as part of the project
