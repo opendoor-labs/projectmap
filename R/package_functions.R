@@ -342,7 +342,7 @@ link_to_proj = function(init = F){
     suppressWarnings(rm(rfiles, cl))
     packages = unique(packages)
 
-    #Link to BiqQuery if necessary
+
     if(any(c("bigrquery", "bigQueryR") %in% packages)){
       if(!"bigrquery" %in% installed.packages(lib.loc = proj.env$libPath)){
         install.packges("bigrquery", quietly = T, verbose = F, lib = proj.env$libPath)
@@ -358,22 +358,6 @@ link_to_proj = function(init = F){
       }
     }
 
-    #Link to Google Drive if necessary
-    if(any(c("googledrive", "googlesheets") %in% packages)){
-      if(!"googledrive" %in% installed.packages(lib.loc = proj.env$libPath)){
-        install.packges("googledrive", quietly = T, verbose = F, lib = proj.env$libPath)
-      }
-      if(!"googlesheets" %in% installed.packages(lib.loc = proj.env$libPath)){
-        install.packges("googlesheets", quietly = T, verbose = F, lib = proj.env$libPath)
-      }
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "googlesheets" %in% packages){
-        invisible(googlesheets::gs_auth())
-      }
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "googledrive" %in% packages){
-        invisible(googldedrive::drive_auth())
-      }
-    }
-
     if(!is.null(packages)){
       packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
       if(length(packages) > 0){
@@ -385,8 +369,30 @@ link_to_proj = function(init = F){
     if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
       pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
     }
-    message("Done.")
+
+    #Link to Google BiqQuery and Google Drive if necessary
+    if("bigrquery" %in% packages){
+      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+        invisible(bigrquery::bq_projects())
+      }
+    }
+    if("bigQueryR" %in% packages){
+      if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+        invisible(bigQueryR::bqr_auth())
+      }
+    }
+    if("googledrive" %in% packages){
+      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+        invisible(googldedrive::drive_auth())
+      }
+    }
+    if("googlesheets" %in% packages){
+      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+        invisible(googlesheets::gs_auth())
+      }
+    }
     rm(packages)
+    message("Done.")
 
     #Create the location of the master log and define the progress bar variables
     unlock_proj()
@@ -1195,9 +1201,9 @@ rm(data)
 read_file(file = "data.RData", inFolder = NULL)
 '
 #Call these to build the package
-#devtools::document(pkg = "projectmap")
-#devtools::build_vignettes(pkg = "projectmap")
-#devtools::install(pkg = "projectmap")
+#devtools::document()
+#devtools::build_vignettes()
+#devtools::install()
 #library(projectmap)
 
 
