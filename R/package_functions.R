@@ -286,7 +286,6 @@ link_to_proj = function(init = F){
       load(paste0(proj.env$root.dir, "/Functions/cabinet.RData"), envir = proj.env)
     }
     message("Done.")
-    cat(proj.env$root.dir)
 
     #Search the R scripts to find the required pacakges to load and install
     message("Installing packages...")
@@ -342,7 +341,7 @@ link_to_proj = function(init = F){
     }
     suppressWarnings(rm(rfiles, cl))
     packages = unique(packages)
-
+    cat(proj.env$root.dir)
 
     if(any(c("bigrquery", "bigQueryR") %in% packages)){
       if(!"bigrquery" %in% installed.packages(lib.loc = proj.env$libPath)){
