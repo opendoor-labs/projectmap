@@ -217,7 +217,7 @@ lock_proj()
 #' @export
 link_to_proj = function(init = F){
   if(Sys.getenv("RSTUDIO") != "1"){
-    stop("Must be using RStudio.")
+    warning("Should be using RStudio.")
   }
 
   if(!exists("root.dir", proj.env) | init == T){
