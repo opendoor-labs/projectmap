@@ -341,22 +341,6 @@ link_to_proj = function(init = F){
     }
     suppressWarnings(rm(rfiles, cl))
     packages = unique(packages)
-    cat(proj.env$root.dir)
-
-    if(any(c("bigrquery", "bigQueryR") %in% packages)){
-      if(!"bigrquery" %in% installed.packages(lib.loc = proj.env$libPath)){
-        install.packges("bigrquery", quietly = T, verbose = F, lib = proj.env$libPath)
-      }
-      if(!"bigQueryR" %in% installed.packages(lib.loc = proj.env$libPath)){
-        install.packges("bigQueryR", quietly = T, verbose = F, lib = proj.env$libPath)
-      }
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "bigrquery" %in% packages){
-        invisible(bigrquery::bq_projects())
-      }
-      if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "bigQueryR" %in% packages){
-        invisible(bigQueryR::bqr_auth())
-      }
-    }
 
     if(!is.null(packages)){
       packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
@@ -398,6 +382,7 @@ link_to_proj = function(init = F){
     unlock_proj()
     proj.env$logLocation = paste(proj.env$root.dir, "Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
     proj.env$startSourceLog = F
+    cat(proj.env$root.dir)
 
     lock_proj()
   }else{
