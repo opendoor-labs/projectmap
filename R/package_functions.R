@@ -260,7 +260,6 @@ link_to_proj = function(init = F){
       proj.env$root.dir = getwd()
     }
     setwd(proj.env$root.dir)
-    cat(proj.env$root.dir)
     message("Done.")
 
     #Create the folder structure
@@ -287,6 +286,7 @@ link_to_proj = function(init = F){
       load(paste0(proj.env$root.dir, "/Functions/cabinet.RData"), envir = proj.env)
     }
     message("Done.")
+    cat(proj.env$root.dir)
 
     #Search the R scripts to find the required pacakges to load and install
     message("Installing packages...")
