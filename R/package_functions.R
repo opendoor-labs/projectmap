@@ -220,10 +220,6 @@ link_to_proj = function(init = F){
     stop("Must be using RStudio.")
   }
 
-  if(!"rstudioapi" %in% installed.packages()){
-    install.packages("rstudioapi", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-  }
-
   if(!exists("root.dir", proj.env) | init == T){
     if(init == T){
       reset_proj_env()
@@ -351,7 +347,7 @@ link_to_proj = function(init = F){
       }
     }
     if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath, reload = F)
     }
 
     #Link to Google BiqQuery and Google Drive if necessary
@@ -382,7 +378,6 @@ link_to_proj = function(init = F){
     unlock_proj()
     proj.env$logLocation = paste(proj.env$root.dir, "Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
     proj.env$startSourceLog = F
-    cat(proj.env$root.dir)
 
     lock_proj()
   }else{
@@ -1131,8 +1126,10 @@ masterFile = '##################################################################
 rm(list = ls())
 cat("\\014")
 
-#Load projectmapt
+#Load projectmap
+#devtools::install_github("opendoor-labs/projectmap")
 library(projectmap)
+
 #Link this file as part of the project
 link_to_proj(init = T)
 
@@ -1164,6 +1161,7 @@ exampleFile = '#################################################################
 rm(list = ls())
 
 #Load projectmap
+#devtools::install_github("opendoor-labs/projectmap")
 library(projectmap)
 
 #Link this file as part of the project
