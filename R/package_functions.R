@@ -10,8 +10,8 @@
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-library = function(..., lib.loc = .libPaths()[1]){
-  base::library(..., lib.loc = .libPaths()[1])
+library = function(..., lib.loc = proj.env$libPath){
+  base::library(..., lib.loc = lib.loc)
 }
 #' This overwrites the base require function to only look in the user's project library to load a package
 #' for package version control
@@ -24,8 +24,8 @@ library = function(..., lib.loc = .libPaths()[1]){
 #' require(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-require = function(..., lib.loc = .libPaths()[1]){
-  base::require(..., lib.loc = .libPaths()[1])
+require = function(..., lib.loc = proj.env$libPath){
+  base::require(..., lib.loc = lib.loc)
 }
 #' This overwrites the base install.packages function to only install the function in the user's project library
 #' for package version control
@@ -38,7 +38,7 @@ require = function(..., lib.loc = .libPaths()[1]){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packges = function(..., lib = .libPaths()[1]){
+install.packges = function(..., lib = proj.env$libPath){
   utils::install.packages(..., lib = lib)
 }
 

@@ -5,7 +5,7 @@
 \title{This overwrites the base install.packages function to only install the function in the user's project library
 for package version control}
 \usage{
-install.packges(..., lib = .libPaths()[1])
+install.packges(..., lib = proj.env$libPath)
 }
 \arguments{
 \item{...}{First, package name, then other named arguments passed to the base install.packages function}
