@@ -237,7 +237,7 @@ link_to_proj = function(init = F){
                                       dirname(rstudioapi::getActiveDocumentContext()$path)
                                     }
     )
-    if(proj.env$current.dir == "."){
+    if(proj.env$current.dir == "." | is.null(proj.env$current.dir)){
       proj.env$current.dir = getwd()
     }
     proj.env$root.dir = proj.env$current.dir
@@ -256,7 +256,7 @@ link_to_proj = function(init = F){
         write(x = exampleFile, file = paste0(proj.env$root.dir, "/", "Example File.R"))
       }
     }
-    if(proj.env$root.dir == "."){
+    if(proj.env$root.dir == "." | is.null(proj.env$root.dir)){
       proj.env$root.dir = getwd()
     }
     setwd(proj.env$root.dir)
@@ -1141,7 +1141,7 @@ masterFile = '##################################################################
 #
 #This runs all files necessary to estimate the model in the proper order.
 #
-#Authors:
+#Authors: Author Name (author.name@email.com)
 ###############################################################################
 rm(list = ls())
 cat("\\014")
@@ -1173,7 +1173,7 @@ exampleFile = '#################################################################
 #
 #Example code for how to set up a file for this project
 #
-#Authors: Alex Hubbard (alex.hubbard@opendoor.com)
+#Authors: Author Name (author.name@email.com)
 ###############################################################################
 #Clear the workspace
 rm(list = ls())
