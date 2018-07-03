@@ -168,6 +168,18 @@ reset_proj_env = function(build = F, newroot = F){
   lock_proj()
 }
 
+#' Exit a project packrat mode
+#'
+#' @return No return value
+#' @description Wrapper for packrat's disable() function
+#' @examples
+#' exit_proj()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+exit_proj = function(){
+  packrat::disable()
+}
+
 #' Creates a project environment variable
 #'
 #' @description An environment variable
