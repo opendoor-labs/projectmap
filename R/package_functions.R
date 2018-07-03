@@ -458,12 +458,12 @@ link_to_proj = function(init = F){
 build_cabinet = function(){
   unlock_proj()
 
-  root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
-  cabinet = unlist(lapply(c("/Codes", "/Functions", "/Input", "/Output", "/Documentation", "/Logs"), function(x){
-    unique(gsub("//", "/", gsub(root, "\\.", list.files(path = paste0(proj.env$root.dir, x), recursive = T, full.names = T, include.dirs = F))))
-  }))
-  cabinet = unique(c(cabinet, gsub("//", "/", gsub(root, "\\.", list.files(path = proj.env$root.dir, recursive = F, full.names = T, include.dirs = F)))))
-  dirs = unique(gsub("//", "/", gsub(root, "\\.", list.dirs(proj.env$root.dir, full.names = T, recursive = F))))
+  cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input",
+                            "./Output", "./Documentation", "./Logs"), function(x) {
+                              unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
+                            }))
+  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
+  dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
