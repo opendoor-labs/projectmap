@@ -292,10 +292,14 @@ link_to_proj = function(init = F){
     if(init == T){
       reset_proj_env()
       history = list.files(pattern = "\\.Rhistory", recursive = F, all.files = T)
+      proj.history = list.files(patter = "\\.Rproj\\.user", recursive = F, all.files = T)
       if(length(history) > 0){
         invisible(file.remove(history))
       }
-      rm(history)
+      if(length(proj.history) > 0){
+        invisible(unlink(proj.history, recursive = T))
+      }
+      rm(history, proj.history)
     }
     unlock_proj()
 
