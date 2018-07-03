@@ -334,9 +334,9 @@ link_to_proj = function(init = F){
 
     #Initialize packrat
     if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
-      packrat::init(enter = T, restart = T, options = list(auto.snapshot = F))
+      packrat::init(enter = T, restart = T, options = list(auto.snapshot = F), clean.search_path = F)
     }else{
-      packrat::packrat_mode(on = T, auto.snapshot = F)
+      packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     }
 
     #Create the folder structure
