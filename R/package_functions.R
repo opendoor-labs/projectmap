@@ -332,6 +332,13 @@ link_to_proj = function(init = F){
     setwd(proj.env$root.dir)
     message("Done.")
 
+    #Initialize packrat
+    if(!"packrat" %in% list.dirs(recursive = F)){
+      packrat::init(enter = T, restart = T, options = list(auto.snapshot = F))
+    }else{
+      packrat::packrat_mode(on = T, auto.snapshot = F)
+    }
+
     #Create the folder structure
     folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs")#, "Library")
     folders = paste(proj.env$root.dir, folders, sep = "/")
@@ -425,9 +432,6 @@ link_to_proj = function(init = F){
     proj.env$startSourceLog = F
 
     lock_proj()
-
-    #Initialize packrat
-    packrat::init(enter = T, restart = T)
   }else{
     unlock_proj()
     proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
@@ -436,6 +440,7 @@ link_to_proj = function(init = F){
                                     }
     )
     setwd(proj.env$root.dir)
+    packrat::packrat_mode(on = T, auto.snapshot = F)
     #.libPaths(new = proj.env$libPath)
     lock_proj()
   }
