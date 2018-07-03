@@ -363,6 +363,7 @@ link_to_proj = function(init = F){
     #}
 
     #Find the R files to parse for required packages
+    unlock_proj()
     proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
     rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
     rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
