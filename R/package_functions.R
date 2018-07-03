@@ -396,28 +396,28 @@ link_to_proj = function(init = F){
     # }
 
     #Link to Google BiqQuery and Google Drive if necessary
-    if("bigrquery" %in% packages){
+    if("bigrquery" %in% installed.packages()){#packages){
       if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
         invisible(bigrquery::bq_projects())
       }
     }
-    if("bigQueryR" %in% packages){
+    if("bigQueryR" %in% installed.packages()){#packages){
       if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
         invisible(bigQueryR::bqr_auth())
       }
     }
-    if("googledrive" %in% packages){
+    if("googledrive" %in% installed.packages()){#packages){
       if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
         invisible(googldedrive::drive_auth())
       }
     }
-    if("googlesheets" %in% packages){
+    if("googlesheets" %in% installed.packages()){#packages){
       if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
         invisible(googlesheets::gs_auth())
       }
     }
-    rm(packages)
-    message("Done.")
+    #rm(packages)
+    #message("Done.")
 
     #Create the location of the master log and define the progress bar variables
     unlock_proj()
