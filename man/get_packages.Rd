@@ -15,6 +15,9 @@ A vector of character strings representing package names
 \description{
 Parse out packages from library and require function calls in R scripts
 }
+\examples{
+get_packages("Project Master.R")
+}
 \author{
 Alex Hubbard (hubbard.alex@gmail.com)
 }

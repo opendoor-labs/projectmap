@@ -42,14 +42,26 @@ install.packges = function(..., lib = proj.env$libPath){
   utils::install.packages(..., lib = lib)
 }
 
-#Lock all the project variables
+#' Lock all the project variables
+#'
+#' @return No return value
+#' @description Lock all project environment variablers
+#' @examples
+#' lock_proj()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
 lock_proj = function(){
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
   }
 }
 
-#Unlock all project variables
+#' Unlock all the project variables
+#'
+#' @return No return value
+#' @description Unlock all project environment variablers
+#' @examples
+#' unlock_proj()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
 unlock_proj = function(){
   for(i in names(proj.env)){
     if(bindingIsLocked(i, proj.env)){
@@ -184,7 +196,7 @@ lock_proj()
 #' @return A vector of character strings representing package names
 #' @description Parse out packages from library and require function calls in R scripts
 #' @examples
-#' get_packages("Project Master.R)
+#' get_packages("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 get_packages = function(files, parallel = T){
   if(parallel == T){
