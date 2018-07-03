@@ -333,7 +333,7 @@ link_to_proj = function(init = F){
     message("Done.")
 
     #Initialize packrat
-    if(!"packrat" %in% list.dirs(recursive = F)){
+    if(!"packrat" %in% list.dirs(path = proj.env$root.dir, recursive = F)){
       packrat::init(enter = T, restart = T, options = list(auto.snapshot = F))
     }else{
       packrat::packrat_mode(on = T, auto.snapshot = F)
