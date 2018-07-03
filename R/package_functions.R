@@ -333,11 +333,7 @@ link_to_proj = function(init = F){
     message("Done.")
 
     #Initialize packrat
-    tryCatch(packrat::status(),
-             error = function(err){
-               packrat::init(enter = T, restart = T)
-             }
-    )
+    packrat::init(enter = T, restart = T)
 
     #Create the folder structure
     folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs")#, "Library")
@@ -440,11 +436,6 @@ link_to_proj = function(init = F){
                                     }
     )
     setwd(proj.env$root.dir)
-    tryCatch(packrat::status(),
-             error = function(err){
-               packrat::init(enter = T, restart = T)
-             }
-    )
     #.libPaths(new = proj.env$libPath)
     lock_proj()
   }
