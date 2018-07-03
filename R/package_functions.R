@@ -178,6 +178,61 @@ if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version(
 #Lock the project
 lock_proj()
 
+#' Parse out packages to load
+#'
+#' @param files A vector of character strings giving the full file path to the R scripts
+#' @return A vector of character strings representing package names
+#' @description Parse out packages from library and require function calls in R scripts
+#' @examples
+#' get_packages("Project Master.R)
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+get_packages = function(files, parallel = T){
+  if(parallel == T){
+    cl = parallel::makeCluster(parallel::detectCores())
+    doSNOW::registerDoSNOW(cl)
+    `%fun%` = foreach::`%dopar%`
+  }else{
+    `%fun%` = foreach::`%do%`
+  }
+  packages = foreach::foreach(i = files, .combine = "c", .export = c("proj.env", "remove_file")) %fun% {
+    if(file.exists(i)){
+      lines = suppressWarnings(readLines(i))
+      if(length(lines) > 0){
+        libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
+        requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
+        if(length(libraries) > 0){
+          for(j in 1:length(libraries)){
+            temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",")[[1]])
+            temp = temp[!grepl("=", temp)]
+            libraries[j] = temp
+          }
+          rm(temp, j)
+        }
+        if(length(requires) > 0){
+          for(j in 1:length(requires)){
+            temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",")[[1]])
+            temp = temp[!grepl("=", temp)]
+            requires[j] = temp
+          }
+          rm(temp, loc, j)
+        }
+        return(unique(c(libraries, requires)))
+      }else{
+        return(NULL)
+      }
+      rm(lines)
+    }else{
+      remove_file(i)
+      return(NULL)
+    }
+  }
+  if(parallel == T){
+    parallel::stopCluster(cl)
+    rm(cl)
+  }
+  return(packages)
+}
+
 #' Link a script to the project
 #'
 #' @param init Boolean (T, F) indicator of wheter to reset the project environment.
@@ -296,51 +351,16 @@ link_to_proj = function(init = F){
     #}
 
     #Find the R files to parse for required packages
-    rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet)]
+    proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
+    rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
     rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
                              which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
     rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
-    packages = NULL
+    packages = proj.env$required.packages
     if(length(rfiles) > 0){
-      cl = parallel::makeCluster(parallel::detectCores())
-      doSNOW::registerDoSNOW(cl)
-      `%dopar%` = foreach::`%dopar%`
-      packages = foreach::foreach(i = rfiles, .combine = "c", .export = c("proj.env", "remove_file")) %dopar% {
-        if(file.exists(i)){
-          lines = suppressWarnings(readLines(i))
-          if(length(lines) > 0){
-            libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
-            requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
-            if(length(libraries) > 0){
-              for(j in 1:length(libraries)){
-                temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",")[[1]])
-                temp = temp[!grepl("=", temp)]
-                libraries[j] = temp
-              }
-              rm(temp, j)
-            }
-            if(length(requires) > 0){
-              for(j in 1:length(requires)){
-                temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",")[[1]])
-                temp = temp[!grepl("=", temp)]
-                requires[j] = temp
-              }
-              rm(temp, loc, j)
-            }
-            return(unique(c(libraries, requires)))
-          }else{
-            return(NULL)
-          }
-          rm(lines)
-        }else{
-          remove_file(i)
-          return(NULL)
-        }
-      }
-      parallel::stopCluster(cl)
+      packages = unique(c(packages, get_packages(rfiles, parallel = T)))
     }
     suppressWarnings(rm(rfiles, cl))
-    packages = unique(packages)
 
     if(!is.null(packages)){
       packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
