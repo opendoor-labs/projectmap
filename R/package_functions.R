@@ -332,9 +332,6 @@ link_to_proj = function(init = F){
     setwd(proj.env$root.dir)
     message("Done.")
 
-    #Initialize packrat
-    packrat::init(enter = T, restart = T)
-
     #Create the folder structure
     folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs")#, "Library")
     folders = paste(proj.env$root.dir, folders, sep = "/")
@@ -360,43 +357,43 @@ link_to_proj = function(init = F){
     }
     message("Done.")
 
-    #Search the R scripts to find the required pacakges to load and install
-    message("Installing packages...")
-    #Install the required packages
-    #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
-    #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-    #}
-    #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
-    #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
-    #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-    #  }
-    #}
-
-    #Find the R files to parse for required packages
+    # #Search the R scripts to find the required pacakges to load and install
+    # message("Installing packages...")
+    # #Install the required packages
+    # #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
+    # #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+    # #}
+    # #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
+    # #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
+    # #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+    # #  }
+    # #}
+    #
+    # #Find the R files to parse for required packages
     unlock_proj()
     proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
-    rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
-    rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-                             which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
-    rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
-    packages = proj.env$required.packages
-    if(length(rfiles) > 0){
-      packages = unique(c(packages, get_packages(rfiles, parallel = T)))
-    }
-    suppressWarnings(rm(rfiles, cl))
-
-    if(!is.null(packages)){
-      packages = packages[!packages %in% c("projectmap", installed.packages())]#lib.loc = proj.env$libPath))]
-      packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
-      if(length(packages) > 0){
-        for(i in packages){
-          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T)#, lib = proj.env$libPath)
-        }
-      }
-    }
-    if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F)#, lib = proj.env$libPath)
-    }
+    # rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
+    # rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
+    #                          which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
+    # rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
+    # packages = proj.env$required.packages
+    # if(length(rfiles) > 0){
+    #   packages = unique(c(packages, get_packages(rfiles, parallel = T)))
+    # }
+    # suppressWarnings(rm(rfiles, cl))
+    #
+    # if(!is.null(packages)){
+    #   packages = packages[!packages %in% c("projectmap", installed.packages())]#lib.loc = proj.env$libPath))]
+    #   packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+    #   if(length(packages) > 0){
+    #     for(i in packages){
+    #       pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T)#, lib = proj.env$libPath)
+    #     }
+    #   }
+    # }
+    # if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+    #   pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F)#, lib = proj.env$libPath)
+    # }
 
     #Link to Google BiqQuery and Google Drive if necessary
     if("bigrquery" %in% packages){
@@ -428,6 +425,9 @@ link_to_proj = function(init = F){
     proj.env$startSourceLog = F
 
     lock_proj()
+
+    #Initialize packrat
+    packrat::init(enter = T, restart = T)
   }else{
     unlock_proj()
     proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
