@@ -345,7 +345,7 @@ link_to_proj = function(init = F){
     }
     rm(folders, i)
     proj.env$libPath.orig = .libPaths()
-    proj.env$libPath = paste0(proj.env$root.dir, "/Library")
+    proj.env$libPath = "./Library"
     .libPaths(new = proj.env$libPath)
 
     #Build the file cabinet
