@@ -440,7 +440,7 @@ link_to_proj = function(init = F){
                                     }
     )
     setwd(proj.env$root.dir)
-    packrat::packrat_mode(on = T, auto.snapshot = F, clearn.search.path = F)
+    packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     #.libPaths(new = proj.env$libPath)
     lock_proj()
   }
