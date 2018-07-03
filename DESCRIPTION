@@ -41,5 +41,6 @@ Imports:
   plotly (>= 4.7.1),
   htmlwidgets (>= 1.2),
   shiny (>= 1.1.0),
-  shinydashboard (>= 0.7.0)
+  shinydashboard (>= 0.7.0),
+  rsconnect (>= 0.8.8)
 RoxygenNote: 6.0.1
