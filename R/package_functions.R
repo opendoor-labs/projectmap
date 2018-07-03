@@ -291,6 +291,11 @@ link_to_proj = function(init = F){
   if(!exists("root.dir", proj.env) | init == T){
     if(init == T){
       reset_proj_env()
+      history = list.files(pattern = "\\.Rhistory", recursive = F, all.files = T)
+      if(length(history) > 0){
+        invisible(file.remove(history))
+      }
+      rm(history)
     }
     unlock_proj()
 
