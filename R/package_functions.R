@@ -9,10 +9,9 @@
 #' @examples
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-library = function(..., lib.loc = proj.env$libPath){
-  base::library(..., lib.loc = lib.loc)
-}
+#library = function(..., lib.loc = proj.env$libPath){
+#  base::library(..., lib.loc = lib.loc)
+#}
 #' This overwrites the base require function to only look in the user's project library to load a package
 #' for package version control
 #'
@@ -23,10 +22,9 @@ library = function(..., lib.loc = proj.env$libPath){
 #' @examples
 #' require(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-require = function(..., lib.loc = proj.env$libPath){
-  base::require(..., lib.loc = lib.loc)
-}
+#require = function(..., lib.loc = proj.env$libPath){
+#  base::require(..., lib.loc = lib.loc)
+#}
 #' This overwrites the base install.packages function to only install the function in the user's project library
 #' for package version control
 #'
@@ -37,10 +35,9 @@ require = function(..., lib.loc = proj.env$libPath){
 #' @examples
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-install.packges = function(..., lib = proj.env$libPath){
-  utils::install.packages(..., lib = lib)
-}
+#install.packges = function(..., lib = proj.env$libPath){
+#  utils::install.packages(..., lib = lib)
+#}
 
 #' Lock all the project variables
 #'
@@ -335,6 +332,9 @@ link_to_proj = function(init = F){
     setwd(proj.env$root.dir)
     message("Done.")
 
+    #Initialize packrat
+    packrat::init(enter = T, restart = T)
+
     #Create the folder structure
     folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs", "Library")
     folders = paste(proj.env$root.dir, folders, sep = "/")
@@ -344,9 +344,9 @@ link_to_proj = function(init = F){
       }
     }
     rm(folders, i)
-    proj.env$libPath.orig = .libPaths()
-    proj.env$libPath = "./Library"
-    .libPaths(new = proj.env$libPath)
+    #proj.env$libPath.orig = .libPaths()
+    #proj.env$libPath = "./Library"
+    #.libPaths(new = proj.env$libPath)
 
     #Build the file cabinet
     if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){
@@ -386,16 +386,16 @@ link_to_proj = function(init = F){
     suppressWarnings(rm(rfiles, cl))
 
     if(!is.null(packages)){
-      packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
+      packages = packages[!packages %in% c("projectmap", installed.packages())]#lib.loc = proj.env$libPath))]
       packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
       if(length(packages) > 0){
         for(i in packages){
-          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T)#, lib = proj.env$libPath)
         }
       }
     }
     if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath, reload = F)
+      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F)#, lib = proj.env$libPath)
     }
 
     #Link to Google BiqQuery and Google Drive if necessary
@@ -436,7 +436,7 @@ link_to_proj = function(init = F){
                                     }
     )
     setwd(proj.env$root.dir)
-    .libPaths(new = proj.env$libPath)
+    #.libPaths(new = proj.env$libPath)
     lock_proj()
   }
 }
