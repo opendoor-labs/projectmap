@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_functions.R
 \name{get_file_path}
 \alias{get_file_path}
-\title{Get a full file path}
+\title{Get a file path relative to the root directory}
 \usage{
 get_file_path(file, inFolder = NULL, recall = T, allowMult = F)
 }
@@ -16,10 +16,10 @@ get_file_path(file, inFolder = NULL, recall = T, allowMult = F)
 \item{allowMult}{A boolean (T, F) indicator specifying whether to allow multiple file paths upon return. The default is F.}
 }
 \value{
-A character string giving the full file path to the specified file.
+A character string giving the file path of the specified file to the root directory.
 }
 \description{
-Returns the full file path to the file. It searches in the package environment variable cabinet for the path.
+Returns the relative file path to the file to the root directory. It searches in the package environment variable cabinet for the path.
 }
 \examples{
 get_file_path("Model1.R")

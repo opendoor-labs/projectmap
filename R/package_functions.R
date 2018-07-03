@@ -508,14 +508,14 @@ remove_file = function(files){
   lock_proj()
 }
 
-#' Get a full file path
+#' Get a file path relative to the root directory
 #'
 #' @param file A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param recall A boolean (T, F) indicator specifying whether to rebuild the cabinet if the file was not found the first time. The default is T.
 #' @param allowMult A boolean (T, F) indicator specifying whether to allow multiple file paths upon return. The default is F.
-#' @return A character string giving the full file path to the specified file.
-#' @description Returns the full file path to the file. It searches in the package environment variable cabinet for the path.
+#' @return A character string giving the file path of the specified file to the root directory.
+#' @description Returns the relative file path to the file to the root directory. It searches in the package environment variable cabinet for the path.
 #' @examples
 #' get_file_path("Model1.R")
 #' get_file_path("Model.R", inFolder = "Codes")
@@ -560,7 +560,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F){
       ret = paths
     }
   }
-  return(gsub("//", "/", gsub("\\./", "/", paste(proj.env$root.dir, ret, sep = "/"))))
+  return(gsub("//", "/", ret))
 }
 
 #' Get a full folder path
@@ -597,8 +597,8 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F){
   #folder should be the full file path to the folder not including its name
-  outputDir = paste0(substr(proj.env$current.dir, 1, nchar(proj.env$root.dir)), ifelse(doc == F, "/Output", "/Documentation"),
-                     substr(proj.env$current.dir, nchar(proj.env$root.dir) + nchar("/Codes") + 1, nchar(proj.env$current.dir)))
+  outputDir = trimws(paste0(ifelse(doc == F, "./Output", "./Documentation"),
+                            substr(proj.env$current.dir, nchar(proj.env$root.dir) + nchar("/Codes") + 1, nchar(proj.env$current.dir))))
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
     str = substr(outputDir, loc1, nchar(outputDir))
@@ -610,7 +610,8 @@ get_output_dir = function(doc = F){
     #If an output directory doesn't exist, create it
     dir.create(outputDir, showWarnings = F, recursive = T)
   }
-  return(outputDir)
+
+  return(gsub("//", "/", outputDir))
 }
 
 #' Read in a file in a standardized way
@@ -993,7 +994,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }
   #Add the file to the cabinet and save the cabinet
   add_to_cabinet(file)
-  message("File saved to ", outputDir, ".")
+  message("File saved to ", dirname(file), ".")
 }
 
 #' Creates the Opendoor color scheme
