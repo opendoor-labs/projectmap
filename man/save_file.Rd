@@ -18,6 +18,10 @@ save_file(..., file = NULL, file.override = NULL, row.names = F,
 
 \item{plot}{If wanting to save a ggplot object, plot should be assigned the ggplot object.}
 
+\item{doc}{Boolean (T, F) to change output directory to Documenation instad of Output. Default is F.}
+
+\item{app}{Boolean (T, F) to change output directory to App instead of Output. Default is F.}
+
 \item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.}
 }
 \value{

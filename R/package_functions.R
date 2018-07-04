@@ -928,6 +928,8 @@ ggplot_grid = function(g, ...){
 #' @param file A character string giving the name of the file, including the extension, to be saved.
 #' @param file.override A character string giveing the full file path if want to override the default the output directory.
 #' @param plot If wanting to save a ggplot object, plot should be assigned the ggplot object.
+#' @param doc Boolean (T, F) to change output directory to Documenation instad of Output. Default is F.
+#' @param app Boolean (T, F) to change output directory to App instead of Output. Default is F.
 #' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.
 #' @return A data object (data.table or data.frame).
 #' @description The function uses the file extension to select the appropriate save function to use. By default
