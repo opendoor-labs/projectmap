@@ -336,8 +336,8 @@ link_to_proj = function(init = F){
       proj.env$root.dir = rstudioapi::selectDirectory(caption = "Select Directory", label = "Select", path = NULL)
 
       if(!file.exists(paste(proj.env$root.dir, paste(proj.env$project.name, "Master.R"), sep = "/"))){
-        write(x = masterFile, file = paste0(proj.env$root.dir, "/", proj.env$project.name, " Master.R"))
-        write(x = exampleFile, file = paste0(proj.env$root.dir, "/", "Example File.R"))
+        write(x = masterFile, file = paste0("./", proj.env$project.name, " Master.R"))
+        write(x = exampleFile, file = paste0("./", "Example File.R"))
       }
     }
     if(proj.env$root.dir == "." | is.null(proj.env$root.dir)){
@@ -359,6 +359,11 @@ link_to_proj = function(init = F){
     for(i in folders){
       if(!dir.exists(i)){
         dir.create(i)
+        if(i == "App"){
+          write(x = globalR, file = paste0("./App", "global.R"))
+          write(x = uiR, file = paste0("./App", "ui.R"))
+          write(x = serverR, file = paste0("./App", "server.R"))
+        }
       }
     }
     rm(folders, i)
@@ -1257,11 +1262,166 @@ save_file(plot = list(g, g), file = "plot.pdf", combine = T)
 rm(data)
 read_file(file = "data.RData", inFolder = NULL)
 '
+
+globalR = paste0('###############################################################################
+#Global Script
+#
+#Script used by both server.R and ui.R
+#
+#Authors: Author Name (author.name@email.com)
+###############################################################################
+#Clear the workspace
+rm(list = ls())
+
+#Load required packages
+
+#Read in the data
+#This will assign a read in of a csv to its file name
+#Make sure all file names are unique
+#Will replace all spaces in object name to "_"
+files = c(list.files(pattern = "\\.RData"), list.files(pattern = "\\.csv"))
+for(i in files){
+  if(file_ext(i) == "RData"){
+    env = new.env()
+    load(i, envir = env)
+    if(exists(names(env), envir = .GlobalEnv)){
+      stop("An object with name", names(env), "already exists. Change the object name to be something unique.")
+    }
+    assign(names(env), get(names(env), env), .GlobalEnv)
+    rm(env)
+  }else if(file_ext(i) == "csv"){
+    name = gsub(" ", "_", basename(gsub(paste0(".", file_ext(i)), "", i)))
+    if(exists(name)){
+      stop("An object with name", name, "already exists. Change the file name to be something unique.")
+    }
+    assign(name, fread(i, showProgress = F), .GlobalEnv)
+    rm(name)
+  }
+}
+rm(i, files)
+
+plot_ht = 500
+sidebar_wd = 300
+
+#Opendoor color palette
+od.colors = c(',
+paste(paste(names(od.colors), od.colors, sep = " = "), collapse = ", "),
+')')
+
+uiR = '###############################################################################
+#UI Script
+#
+#Script used to generate the UI
+#
+#Authors: Author Name (author.name@email.com)
+###############################################################################
+library(plotly)
+library(shiny)
+library(shinydashboard)
+
+#Place "Logo.png" in a folder called "www" in the "App" folder
+#header = dashboardHeader(title = tags$a(tags$img(src = "Logo.png", height = "50", width = "50"),
+#"Title"), titleWidth = sidebar_wd)
+header = dashboardHeader(title = "Title", titleWidth = sidebar_wd)
+
+sidebar = dashboardSidebar(width = sidebar_wd,
+  #hr(),
+  sidebarMenu(
+    menuItem("Menu Item", tabName = "menu_item", icon = icon("tachometer"), selected = T,
+      selectInput(inputId = "menu_itme", label = "Input",
+                  choices = c("Choice1", "Choice2"),
+                  selected = "Choice1",
+                  multiple = F)
+    )#,
+  )
+  #hr()
+)
+
+body = dashboardBody(
+  tags$head(tags$style(HTML(paste0("
+    /* logo */
+    .skin-blue .main-header .logo {
+    background-color: ", od.colors["blue"],";
+    color: #ffffff;
+    font-style: bold;
+    }
+    /* logo */
+    .skin-blue .main-header a {
+    background-color: ", od.colors["blue"],";
+    color: #ffffff;
+    font-style: bold;
+    }
+    /* logo when hovered */
+    .skin-blue .main-header .logo:hover {
+    background-color: ", od.colors["blue"],";
+    }
+    /* navbar (rest of the header) */
+    .skin-blue .main-header .navbar {
+    background-color: ", od.colors["blue"],";
+    }
+    /* active selected tab in the sidebarmenu */
+    .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+    /*background-color: ", od.colors["blue"],";*/
+    font-size: 12pt;
+    }
+    /* other links in the sidebarmenu */
+    .skin-blue .main-sidebar .sidebar .sidebar-menu a{
+    /*background-color: #000000;*/
+    color: #ffffff;
+    font-size: 12pt;
+    }
+    /* other links in the sidebarmenu when hovered */
+    .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
+    /*background-color: ", od.colors["navy"],";*/
+    font-size: 12pt;
+    }
+    /* toggle button when hovered  */
+    .skin-blue .main-header .navbar .sidebar-toggle:hover{
+    background-color: ", od.colors["navy"],";
+    }
+    ")))),
+
+  #Plot
+  fluidRow(
+    box(width = 4, column(width = 12,
+      plotlyOutput("plot", height = plot_ht)
+    ))
+  )
+)
+
+ui = dashboardPage(
+  header, sidebar, body
+)
+'
+serverR = '###############################################################################
+#Server Script
+#
+#Script used to generate the server
+#
+#Authors: Author Name (author.name@email.com)
+###############################################################################
+library(plotly)
+library(shiny)
+library(shinydashboard)
+library(ggplot2)
+library(data.table)
+
+server = function(input, output, session){
+
+  #Clearance rate plots
+  output$plot <- renderPlotly({
+    data = data.table(x = 1:10, y = 1:10)
+    plot_ly(data, x = ~x, y = ~y, type = "scatter", mode = "lines")
+  })
+}
+'
+
 #Call these to build the package
 #devtools::document()
 #devtools::build_vignettes()
 #devtools::install()
 #library(projectmap)
+
 
 
 
