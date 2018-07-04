@@ -42,6 +42,5 @@ Imports:
   htmlwidgets (>= 1.2),
   shiny (>= 1.1.0),
   shinydashboard (>= 0.7.0),
-  rsconnect (>= 0.8.8),
-  packrat (>= 0.4.9-8)
+  rsconnect (>= 0.8.8)
 RoxygenNote: 6.0.1

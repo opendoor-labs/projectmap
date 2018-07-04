@@ -9,9 +9,10 @@
 #' @examples
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#library = function(..., lib.loc = proj.env$libPath){
-#  base::library(..., lib.loc = lib.loc)
-#}
+#' @export
+library = function(..., lib.loc = proj.env$libPath){
+  base::library(..., lib.loc = lib.loc)
+}
 #' This overwrites the base require function to only look in the user's project library to load a package
 #' for package version control
 #'
@@ -22,9 +23,10 @@
 #' @examples
 #' require(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#require = function(..., lib.loc = proj.env$libPath){
-#  base::require(..., lib.loc = lib.loc)
-#}
+#' @export
+require = function(..., lib.loc = proj.env$libPath){
+  base::require(..., lib.loc = lib.loc)
+}
 #' This overwrites the base install.packages function to only install the function in the user's project library
 #' for package version control
 #'
@@ -35,9 +37,10 @@
 #' @examples
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#install.packges = function(..., lib = proj.env$libPath){
-#  utils::install.packages(..., lib = lib)
-#}
+#' @export
+install.packges = function(..., lib = proj.env$libPath){
+  utils::install.packages(..., lib = lib)
+}
 
 #' Lock all the project variables
 #'
@@ -168,17 +171,17 @@ reset_proj_env = function(build = F, newroot = F){
   lock_proj()
 }
 
-#' Exit a project packrat mode
-#'
-#' @return No return value
-#' @description Wrapper for packrat's disable() function
-#' @examples
-#' exit_proj()
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-exit_proj = function(){
-  packrat::disable()
-}
+# #' Exit a project packrat mode
+# #'
+# #' @return No return value
+# #' @description Wrapper for packrat's disable() function
+# #' @examples
+# #' exit_proj()
+# #' @author Alex Hubbard (hubbard.alex@gmail.com)
+# #' @export
+# exit_proj = function(){
+#   packrat::disable()
+# }
 
 #' Creates a project environment variable
 #'
@@ -344,15 +347,15 @@ link_to_proj = function(init = F){
     setwd(proj.env$root.dir)
     message("Done.")
 
-    #Initialize packrat
-    if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
-      packrat::init(enter = T, restart = T, options = list(auto.snapshot = F), clean.search_path = F)
-    }else{
-      packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
-    }
+    # #Initialize packrat
+    # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
+    #   packrat::init(enter = T, restart = T, options = list(auto.snapshot = F), clean.search_path = F)
+    # }else{
+    #   packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
+    # }
 
     #Create the folder structure
-    folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs")#, "Library")
+    folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs", "Library")
     folders = paste(proj.env$root.dir, folders, sep = "/")
     for(i in folders){
       if(!dir.exists(i)){
@@ -360,11 +363,8 @@ link_to_proj = function(init = F){
       }
     }
     rm(folders, i)
-    #proj.env$libPath.orig = .libPaths()
-    #proj.env$libPath = "./Library"
-    #.libPaths(new = proj.env$libPath)
     proj.env$libPath.orig = .libPaths()
-    proj.env$libPath = paste0(proj.env$root.dir, "/Library")
+    proj.env$libPath = "./Library"
     .libPaths(new = proj.env$libPath)
 
     #Build the file cabinet
@@ -379,43 +379,43 @@ link_to_proj = function(init = F){
     }
     message("Done.")
 
-    # #Search the R scripts to find the required pacakges to load and install
-    # message("Installing packages...")
-    # #Install the required packages
-    # #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
-    # #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-    # #}
-    # #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
-    # #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
-    # #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-    # #  }
-    # #}
-    #
-    # #Find the R files to parse for required packages
+    #Search the R scripts to find the required pacakges to load and install
+    message("Installing packages...")
+    #Install the required packages
+    #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
+    #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+    #}
+    #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
+    #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
+    #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+    #  }
+    #}
+
+    #Find the R files to parse for required packages
     unlock_proj()
     proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
-    # rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
-    # rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-    #                          which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
-    # rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
-    # packages = proj.env$required.packages
-    # if(length(rfiles) > 0){
-    #   packages = unique(c(packages, get_packages(rfiles, parallel = T)))
-    # }
-    # suppressWarnings(rm(rfiles, cl))
-    #
-    # if(!is.null(packages)){
-    #   packages = packages[!packages %in% c("projectmap", installed.packages())]#lib.loc = proj.env$libPath))]
-    #   packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
-    #   if(length(packages) > 0){
-    #     for(i in packages){
-    #       pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T)#, lib = proj.env$libPath)
-    #     }
-    #   }
-    # }
-    # if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-    #   pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F)#, lib = proj.env$libPath)
-    # }
+    rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
+    rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
+                             which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
+    rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
+    packages = proj.env$required.packages
+    if(length(rfiles) > 0){
+      packages = unique(c(packages, get_packages(rfiles, parallel = T)))
+    }
+    suppressWarnings(rm(rfiles, cl))
+
+    if(!is.null(packages)){
+      packages = packages[!packages %in% c("projectmap", installed.packages())]#lib.loc = proj.env$libPath))]
+      packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+      if(length(packages) > 0){
+        for(i in packages){
+          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T)#, lib = proj.env$libPath)
+        }
+      }
+    }
+    if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F)#, lib = proj.env$libPath)
+    }
 
     #Link to Google BiqQuery and Google Drive if necessary
     if("bigrquery" %in% installed.packages()){#packages){
@@ -438,8 +438,8 @@ link_to_proj = function(init = F){
         invisible(googlesheets::gs_auth())
       }
     }
-    #rm(packages)
-    #message("Done.")
+    rm(packages)
+    message("Done.")
 
     #Create the location of the master log and define the progress bar variables
     unlock_proj()
@@ -455,8 +455,8 @@ link_to_proj = function(init = F){
                                     }
     )
     setwd(proj.env$root.dir)
-    packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
-    #.libPaths(new = proj.env$libPath)
+    #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
+    .libPaths(new = proj.env$libPath)
     lock_proj()
   }
 }

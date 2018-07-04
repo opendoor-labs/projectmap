@@ -2,59 +2,19 @@
 % Please edit documentation in R/package_functions.R
 \name{lock_proj}
 \alias{lock_proj}
-\title{Redefined library, require, and install.packages functions to only look in the project library
-This overwrites the base library function to only look in the user's project library to load a package}
+\title{Lock all the project variables}
 \usage{
 lock_proj()
 }
-\arguments{
-\item{lib.loc}{Path to users package library}
-
-\item{...}{First, package name, then other named arguments passed to the base library function}
-
-\item{lib.loc}{Path to users package library}
-
-\item{...}{First, package name, then other named arguments passed to the base require function}
-
-\item{lib}{Path to users package library}
-
-\item{...}{First, package name, then other named arguments passed to the base install.packages function}
-}
 \value{
-Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
-
-Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
-
-Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
-
 No return value
 }
 \description{
 Lock all project environment variablers
 }
-\details{
-for package version control
-}
 \examples{
-library(projectmap)
-require(projectmap)
-install.packages("packageName")
 lock_proj()
 }
 \author{
-Alex Hubbard (hubbard.alex@gmail.com)
-This overwrites the base require function to only look in the user's project library to load a package
-for package version control
-
-Alex Hubbard (hubbard.alex@gmail.com)
-This overwrites the base install.packages function to only install the function in the user's project library
-for package version control
-
-Alex Hubbard (hubbard.alex@gmail.com)
-Lock all the project variables
-
 Alex Hubbard (hubbard.alex@gmail.com)
 }
