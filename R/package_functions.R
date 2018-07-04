@@ -360,9 +360,9 @@ link_to_proj = function(init = F){
       if(!dir.exists(i)){
         dir.create(i)
         if(i == "App"){
-          write(x = globalR, file = paste0("./App", "global.R"))
-          write(x = uiR, file = paste0("./App", "ui.R"))
-          write(x = serverR, file = paste0("./App", "server.R"))
+          write(x = globalR, file = "./App/global.R")
+          write(x = uiR, file = "./App/ui.R")
+          write(x = serverR, file = "./App/server.R")
         }
       }
     }
