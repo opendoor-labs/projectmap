@@ -405,19 +405,19 @@ link_to_proj = function(init = F){
     if(length(rfiles) > 0){
       packages = unique(c(packages, get_packages(rfiles, parallel = T)))
     }
-    suppressWarnings(rm(rfiles, cl))
+    rm(rfiles)
 
     if(!is.null(packages)){
-      packages = packages[!packages %in% c("projectmap", installed.packages())]#lib.loc = proj.env$libPath))]
-      packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+      packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
+      packages = packages[!packages %in% rownames(installed.packages(priority = "base", lib.loc = proj.env$libPath))]
       if(length(packages) > 0){
         for(i in packages){
-          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T)#, lib = proj.env$libPath)
+          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
       }
     }
     if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F)#, lib = proj.env$libPath)
+      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
     }
 
     #Link to Google BiqQuery and Google Drive if necessary
