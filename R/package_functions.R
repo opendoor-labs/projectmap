@@ -480,7 +480,7 @@ build_cabinet = function(){
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
-  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
+  save(cabinet, file = "./Functions/cabinet.RData")
   proj.env$cabinet = cabinet
 
   lock_proj()
