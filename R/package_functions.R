@@ -409,7 +409,7 @@ link_to_proj = function(init = F){
 
     if(!is.null(packages)){
       packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
-      packages = packages[!packages %in% rownames(installed.packages(priority = "base", lib.loc = proj.env$libPath))]
+      packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
       if(length(packages) > 0){
         for(i in packages){
           pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
