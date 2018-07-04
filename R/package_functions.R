@@ -628,9 +628,9 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F){
+get_output_dir = function(doc = F, app = F){
   #folder should be the full file path to the folder not including its name
-  outputDir = trimws(paste0(ifelse(doc == F, "./Output", "./Documentation"),
+  outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
                             substr(proj.env$current.dir, nchar(proj.env$root.dir) + nchar("/Codes") + 1, nchar(proj.env$current.dir))))
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
