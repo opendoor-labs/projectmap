@@ -363,6 +363,9 @@ link_to_proj = function(init = F){
     #proj.env$libPath.orig = .libPaths()
     #proj.env$libPath = "./Library"
     #.libPaths(new = proj.env$libPath)
+    proj.env$libPath.orig = .libPaths()
+    proj.env$libPath = paste0(proj.env$root.dir, "/Library")
+    .libPaths(new = proj.env$libPath)
 
     #Build the file cabinet
     if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){
