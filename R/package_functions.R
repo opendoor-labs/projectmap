@@ -354,12 +354,11 @@ link_to_proj = function(init = F){
     # }
 
     #Create the folder structure
-    folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs", "Library", "App")
-    folders = paste(proj.env$root.dir, folders, sep = "/")
+    folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
     for(i in folders){
       if(!dir.exists(i)){
         dir.create(i)
-        if(i == "App"){
+        if(i == "./App"){
           write(x = globalR, file = "./App/global.R")
           write(x = uiR, file = "./App/ui.R")
           write(x = serverR, file = "./App/server.R")
