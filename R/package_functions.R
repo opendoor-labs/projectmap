@@ -950,7 +950,7 @@ ggplot_grid = function(g, ...){
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
                 width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot()){
+                append = F, plot = last_plot(), doc = F, app = F){
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
   }
@@ -971,7 +971,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }
 
   if(is.null(file.override)){
-    outputDir = gsub("//", "/", paste(get_output_dir(), gsub("\\.", "", dirname(file)), sep = "/"))
+    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc, app = app), gsub("\\.", "", dirname(file)), sep = "/"))
   }else{
     outputDir = dirname(file)
   }
