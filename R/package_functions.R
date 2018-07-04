@@ -354,7 +354,7 @@ link_to_proj = function(init = F){
     # }
 
     #Create the folder structure
-    folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs", "Library")
+    folders = c("Codes", "Functions", "Input", "Output", "Documentation", "Logs", "Library", "App")
     folders = paste(proj.env$root.dir, folders, sep = "/")
     for(i in folders){
       if(!dir.exists(i)){
