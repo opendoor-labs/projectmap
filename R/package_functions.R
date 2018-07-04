@@ -1410,7 +1410,7 @@ library(data.table)
 server = function(input, output, session){
 
   #Clearance rate plots
-  output$plot <- renderPlotly({
+  output$plot = renderPlotly({
     data = data.table(x = 1:10, y = 1:10)
     plot_ly(data, x = ~x, y = ~y, type = "scatter", mode = "lines")
   })
