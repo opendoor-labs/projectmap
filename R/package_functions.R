@@ -1523,7 +1523,7 @@ body = dashboardBody(
 
   #Plot
   fluidRow(
-    box(width = 4, column(width = 12,
+    box(width = 12, column(width = 12,
       plotlyOutput("plot", height = plot_ht)
     ))
   )
