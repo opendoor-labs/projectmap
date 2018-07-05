@@ -355,7 +355,7 @@ set_proj_lib = function(app = F){
     proj.env$libPath = "./Library"
   }
   .libPaths(new = proj.env$libPath)
-  message("Library path set to ", proj.env$libPath)
+  message("Project package library path set to ", proj.env$libPath)
 
   lock_proj()
 }
@@ -441,10 +441,9 @@ link_to_proj = function(init = F, app = F){
       unlock_proj()
 
       #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
-      message("Finding ", proj.env$project.name, " directory...")
       get_proj_root()
       setwd(proj.env$root.dir)
-      message("Done.\nProject root set to ", proj.env$root.dir, ".")
+      message("Project root directory set to ", proj.env$root.dir, ".")
 
       # #Initialize packrat
       # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
@@ -473,12 +472,13 @@ link_to_proj = function(init = F, app = F){
         #If the file cabinet does not exist, create it
         message("Building file cabinet...")
         build_cabinet()
+        message(paste0(paste(rep("\b", nchar("Building file cabinet... ")), collapse = ""), "Building file cabinet...Done."))
       }else{
         #If the file cabinet already exists, load it
         message("Loading file cabinet...")
-        load(paste0(proj.env$root.dir, "/Functions/cabinet.RData"), envir = proj.env)
+        load("./Functions/cabinet.RData", envir = proj.env)
+        message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
       }
-      message("Done.")
 
       #Search the R scripts to find the required pacakges to load and install
       #Install the required packages
@@ -513,7 +513,7 @@ link_to_proj = function(init = F, app = F){
             pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
           }
         }
-        if("projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+        if("projectmap" %in% installed.packages(lib.loc = proj.env$libPath) & length(packages) > 0){
           message("Done.")
         }
       }
