@@ -493,6 +493,7 @@ link_to_proj = function(init = F, app = F){
 
       #Find the R files to parse for required packages
       unlock_proj()
+      message("Checking for required packages...")
       proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
       rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
@@ -503,6 +504,7 @@ link_to_proj = function(init = F, app = F){
         packages = unique(c(packages, get_packages(rfiles, parallel = T)))
       }
       rm(rfiles)
+      message(paste0(paste(rep("\b", nchar("Checking for required packages... ")), collapse = ""), "Checking for required packages...Done."))
 
       if(!is.null(packages)){
         packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
