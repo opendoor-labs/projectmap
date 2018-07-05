@@ -526,22 +526,22 @@ link_to_proj = function(init = F, app = F){
       }
 
       #Link to Google BiqQuery and Google Drive if necessary
-      if("bigrquery" %in% installed.packages()){#packages){
+      if("bigrquery" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(bigrquery::bq_projects())
         }
       }
-      if("bigQueryR" %in% installed.packages()){#packages){
+      if("bigQueryR" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
         if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(bigQueryR::bqr_auth())
         }
       }
-      if("googledrive" %in% installed.packages()){#packages){
+      if("googledrive" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(googldedrive::drive_auth())
         }
       }
-      if("googlesheets" %in% installed.packages()){#packages){
+      if("googlesheets" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(googlesheets::gs_auth())
         }
@@ -1411,7 +1411,7 @@ library(shinydashboard)
 #This will assign a read in of a csv to its file name
 #Make sure all file names are unique
 #Will replace all spaces in object name to "_"
-files = c(list.files(pattern = "\\.RData"), list.files(pattern = "\\.csv"))
+files = c(list.files(pattern = "\\\\.RData"), list.files(pattern = "\\\\.csv"))
 for(i in files){
   if(file_ext(i) == "RData"){
     env = new.env()
@@ -1548,7 +1548,7 @@ serverR = '#####################################################################
 ###############################################################################
 server = function(input, output, session){
 
-  #Clearance rate plots
+  #A plotly plot
   output$plot = renderPlotly({
     data = data.table(x = 1:10, y = 1:10)
     plot_ly(data, x = ~x, y = ~y, type = "scatter", mode = "lines")
