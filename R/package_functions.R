@@ -322,7 +322,6 @@ get_proj_root = function(app = F){
 
 #' Set the path to the project library
 #'
-#' @param init Boolean (T, F) to save the original library path upon project initiation
 #' @param app Boolean (T, F) indicator to tell the function that it is being executed from within the app directory
 #' @return No return value
 #' @description Sets the path to the project library
@@ -330,10 +329,10 @@ get_proj_root = function(app = F){
 #' set_proj_lib()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-set_proj_lib = function(init = F, app = F){
+set_proj_lib = function(app = F){
   unlock_proj()
 
-  if(init == T){
+  if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
   }
   if(app == T){
@@ -348,6 +347,23 @@ set_proj_lib = function(init = F, app = F){
   .libPaths(new = proj.env$libPath)
 
   lock_proj()
+}
+
+#' Exit a project
+#'
+#' @param reset_lib Boolean (T, F) indicator to reset the library path to its original state
+#' @return No return value
+#' @description Exits a project by detaching the projectmap package and resetting the library path
+#' @examples
+#' exit_proj()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+exit_proj = function(reset_lib = T){
+  orig.lib = proj.env$libPath.orig
+  pacman::p_unload(projectmap)
+  if(reset_lib == T){
+    .libPaths(new = orig.lib)
+  }
 }
 
 #' Link a script to the project
@@ -433,7 +449,7 @@ link_to_proj = function(init = F){
       }
     }
     rm(folders, i)
-    set_proj_lib(init = T)
+    set_proj_lib()
 
     #Build the file cabinet
     if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){

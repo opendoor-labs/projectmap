@@ -4,11 +4,9 @@
 \alias{set_proj_lib}
 \title{Set the path to the project library}
 \usage{
-set_proj_lib(init = F, app = F)
+set_proj_lib(app = F)
 }
 \arguments{
-\item{init}{Boolean (T, F) to save the original library path upon project initiation}
-
 \item{app}{Boolean (T, F) indicator to tell the function that it is being executed from within the app directory}
 }
 \value{
