@@ -447,7 +447,8 @@ link_to_proj = function(init = F, app = F){
       #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
       get_proj_root()
       setwd(proj.env$root.dir)
-      message("Project root directory set to ", proj.env$root.dir, ".")
+      message("Project root directory set to ", getwd(), ".")
+      message("Directory of current script is ", proj.env$current.dir, ".")
 
       # #Initialize packrat
       # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
