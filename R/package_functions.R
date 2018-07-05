@@ -355,6 +355,7 @@ set_proj_lib = function(app = F){
     proj.env$libPath = "./Library"
   }
   .libPaths(new = proj.env$libPath)
+  message("Library path set to ", proj.env$libPath)
 
   lock_proj()
 }
@@ -440,10 +441,10 @@ link_to_proj = function(init = F, app = F){
       unlock_proj()
 
       #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
-      message("Finding ", proj.env$project.name, " drive...")
+      message("Finding ", proj.env$project.name, " directory...")
       get_proj_root()
       setwd(proj.env$root.dir)
-      message("Done.")
+      message("Done.\nProject root set to ", proj.env$root.dir, ".")
 
       # #Initialize packrat
       # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
@@ -480,7 +481,6 @@ link_to_proj = function(init = F, app = F){
       message("Done.")
 
       #Search the R scripts to find the required pacakges to load and install
-      message("Installing packages...")
       #Install the required packages
       #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
       #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
@@ -505,6 +505,7 @@ link_to_proj = function(init = F, app = F){
       rm(rfiles)
 
       if(!is.null(packages)){
+        message("Installing packages...")
         packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         if(length(packages) > 0){
@@ -512,9 +513,13 @@ link_to_proj = function(init = F, app = F){
             pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
           }
         }
+        if("projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+          message("Done.")
+        }
       }
       if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
         pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
+        message("Done.")
       }
 
       #Link to Google BiqQuery and Google Drive if necessary
@@ -539,7 +544,6 @@ link_to_proj = function(init = F, app = F){
         }
       }
       rm(packages)
-      message("Done.")
 
       #Create the location of the master log and define the progress bar variables
       unlock_proj()
