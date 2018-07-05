@@ -323,6 +323,7 @@ get_proj_root = function(app = F){
       proj.env$root.dir = getwd()
     }
   }else{
+    unlock_proj()
     proj.env$root.dir = dirname(proj.env$current.dir)
   }
 
