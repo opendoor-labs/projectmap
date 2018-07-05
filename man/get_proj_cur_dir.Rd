@@ -4,7 +4,10 @@
 \alias{get_proj_cur_dir}
 \title{Get the current directory of the project}
 \usage{
-get_proj_cur_dir()
+get_proj_cur_dir(app = F)
+}
+\arguments{
+\item{app}{Boolean (T, F) indicator to tell the function it is being executed from within the app directory}
 }
 \value{
 No return value

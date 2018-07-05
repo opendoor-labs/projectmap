@@ -259,21 +259,26 @@ get_packages = function(files, parallel = T){
 
 #' Get the current directory of the project
 #'
+#' @param app Boolean (T, F) indicator to tell the function it is being executed from within the app directory
 #' @return No return value
 #' @description Updates the project environment with the current directory
 #' @examples
 #' get_proj_cur_dir()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_proj_cur_dir = function(){
+get_proj_cur_dir = function(app = F){
   unlock_proj()
 
-  proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
-                                  error = function(err){
-                                    dirname(rstudioapi::getActiveDocumentContext()$path)
-                                  }
-  )
-  if(proj.env$current.dir == "." | is.null(proj.env$current.dir)){
+  if(app == F){
+    proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
+                                    error = function(err){
+                                      dirname(rstudioapi::getActiveDocumentContext()$path)
+                                    }
+    )
+    if(proj.env$current.dir == "." | is.null(proj.env$current.dir)){
+      proj.env$current.dir = getwd()
+    }
+  }else{
     proj.env$current.dir = getwd()
   }
 
@@ -292,7 +297,7 @@ get_proj_cur_dir = function(){
 get_proj_root = function(app = F){
   unlock_proj()
 
-  get_proj_cur_dir()
+  get_proj_cur_dir(app = app)
   if(app == F){
     unlock_proj()
     proj.env$root.dir = proj.env$current.dir
@@ -336,7 +341,7 @@ set_proj_lib = function(app = F){
     proj.env$libPath.orig = .libPaths()
   }
   if(app == T){
-    get_proj_root()
+    get_proj_root(app = app)
     setwd(proj.env$current.dir)
     unlock_proj()
     proj.env$libPath = "../Library"
