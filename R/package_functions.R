@@ -346,6 +346,7 @@ set_proj_lib = function(app = F){
     proj.env$libPath.orig = .libPaths()
   }
   if(app == T){
+    message("Project root directory set to ", getwd(), ".")
     get_proj_root(app = app)
     setwd(proj.env$current.dir)
     unlock_proj()
