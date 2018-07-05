@@ -279,7 +279,11 @@ get_proj_cur_dir = function(app = F){
       proj.env$current.dir = getwd()
     }
   }else{
-    proj.env$current.dir = getwd()
+    proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
+                                    error = function(err){
+                                      getwd()
+                                    }
+    )
   }
 
   lock_proj()
