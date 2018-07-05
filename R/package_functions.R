@@ -1378,18 +1378,36 @@ read_file(file = "data.RData", inFolder = NULL)
 '
 
 globalR = paste0('###############################################################################
-#Global Script
+#Global App Script
 #
 #Script used by both server.R and ui.R
+#Do not use projectmap functions in any app scrpts
 #
 #Authors: Author Name (author.name@email.com)
 ###############################################################################
 #Clear the workspace
 rm(list = ls())
 
-#Load required packages
+#Load all required packages for global.R, server.R, and ui.R
+if(!"projectmap" %in% installed.packages()){
+  if(!"devtools" %in% installed.packages()){
+    install.packages("devtools")
+  }
+  devtools::install_github("opendoor-labs/projectmap")
+}
+library(projectmap)
+od.colors = projectmap::od.colors
+link_to_proj(app = T)
+library(tools)
+library(data.table)
+library(plotly)
+library(ggplot2)
+library(shiny)
+library(shinydashboard)
 
+###############################################################################
 #Read in the data
+###############################################################################
 #This will assign a read in of a csv to its file name
 #Make sure all file names are unique
 #Will replace all spaces in object name to "_"
@@ -1414,13 +1432,12 @@ for(i in files){
 }
 rm(i, files)
 
+###############################################################################
+#Define parameters
+###############################################################################
 plot_ht = 500
 sidebar_wd = 300
-
-#Opendoor color palette
-od.colors = c(',
-paste(paste(names(od.colors), od.colors, sep = " = "), collapse = ", "),
-')')
+')
 
 uiR = '###############################################################################
 #UI Script
@@ -1430,15 +1447,18 @@ uiR = '#########################################################################
 #
 #Authors: Author Name (author.name@email.com)
 ###############################################################################
-library(plotly)
-library(shiny)
-library(shinydashboard)
 
+###############################################################################
+#Define the header
+###############################################################################
 #Place "Logo.png" in a folder called "www" in the "App" folder
 #header = dashboardHeader(title = tags$a(tags$img(src = "Logo.png", height = "50", width = "50"),
 #"Title"), titleWidth = sidebar_wd)
 header = dashboardHeader(title = "Title", titleWidth = sidebar_wd)
 
+###############################################################################
+#Defie the sidebar
+###############################################################################
 sidebar = dashboardSidebar(width = sidebar_wd,
   #hr(),
   sidebarMenu(
@@ -1452,6 +1472,9 @@ sidebar = dashboardSidebar(width = sidebar_wd,
   #hr()
 )
 
+###############################################################################
+#Define the body
+###############################################################################
 body = dashboardBody(
   tags$head(tags$style(HTML(paste0("
     /* logo */
@@ -1504,6 +1527,9 @@ body = dashboardBody(
   )
 )
 
+###############################################################################
+#Define the ui
+###############################################################################
 ui = dashboardPage(
   header, sidebar, body
 )
@@ -1516,24 +1542,16 @@ serverR = '#####################################################################
 #
 #Authors: Author Name (author.name@email.com)
 ###############################################################################
-library(plotly)
-library(shiny)
-library(shinydashboard)
-library(ggplot2)
-library(data.table)
 
+###############################################################################
+#Define the server
+###############################################################################
 server = function(input, output, session){
 
   #Clearance rate plots
   output$plot = renderPlotly({
     data = data.table(x = 1:10, y = 1:10)
     plot_ly(data, x = ~x, y = ~y, type = "scatter", mode = "lines")
-  })
-
-  #Clean up on app exit
-  onStop(function(){
-    rm(list = ls(envir = .GlobalEnv), envir = .GlobalEnv)
-    gc()
   })
 }
 '
