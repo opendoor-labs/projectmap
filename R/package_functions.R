@@ -566,7 +566,7 @@ link_to_proj = function(init = F, app = F){
     }
   }else{
     set_proj_lib(app = T)
-    exit_proj(reset_lib = F)
+    #exit_proj(reset_lib = F)
     message("App environment set.")
   }
 }
