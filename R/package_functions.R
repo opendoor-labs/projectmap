@@ -375,9 +375,9 @@ exit_proj = function(reset_lib = T){
   suppressMessages(pacman::p_unload(projectmap))
   if(reset_lib == T){
     .libPaths(new = orig.lib)
-    message("projectmap package detached. Library path reset to ", orig.lib, ".")
+    message("projectmap package detached. Library path reset to ", .libPaths()[1], ".")
   }else{
-    message("projectmap package detached. Library path remains", proj.lib, ".")
+    message("projectmap package detached. Library path remains ", .libPaths()[1], ".")
   }
 }
 
@@ -1425,6 +1425,7 @@ uiR = '#########################################################################
 #UI Script
 #
 #Script used to generate the UI
+#Click "Run App" at the top right to start the application correctly.
 #
 #Authors: Author Name (author.name@email.com)
 ###############################################################################
@@ -1510,6 +1511,7 @@ serverR = '#####################################################################
 #Server Script
 #
 #Script used to generate the server
+#Click "Run App" at the top right to start the application correctly.
 #
 #Authors: Author Name (author.name@email.com)
 ###############################################################################
