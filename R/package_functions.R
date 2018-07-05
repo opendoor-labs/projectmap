@@ -49,6 +49,7 @@ install.packges = function(..., lib = proj.env$libPath){
 #' @examples
 #' lock_proj()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
 lock_proj = function(){
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
@@ -62,6 +63,7 @@ lock_proj = function(){
 #' @examples
 #' unlock_proj()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
 unlock_proj = function(){
   for(i in names(proj.env)){
     if(bindingIsLocked(i, proj.env)){
@@ -526,22 +528,22 @@ link_to_proj = function(init = F, app = F){
       }
 
       #Link to Google BiqQuery and Google Drive if necessary
-      if("bigrquery" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
-        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+      if("bigrquery" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+        if(!".httr-oauth" %in% packages){#list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "bigrquery" %in% packages){
           invisible(bigrquery::bq_projects())
         }
       }
-      if("bigQueryR" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
+      if("bigQueryR" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
         if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(bigQueryR::bqr_auth())
         }
       }
-      if("googledrive" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
+      if("googledrive" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(googldedrive::drive_auth())
         }
       }
-      if("googlesheets" %in% installed.packages(lib.loc = proj.env$libPath)){#packages){
+      if("googlesheets" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(googlesheets::gs_auth())
         }
