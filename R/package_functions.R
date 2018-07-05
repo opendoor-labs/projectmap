@@ -1107,7 +1107,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }else if(ext == "csv"){
     data.table::fwrite(..., file = file, row.names = row.names, showProgress = showProgress, append = append)
   }else if(ext %in% c("jpeg","png","tiff","bmp","pdf")){
-    if(combine == F & ggplot2::is.ggplot(g)){
+    if(combine == F & (ggplot2::is.ggplot(g) | grid::is.grob(g))){
       ggsave2(filename = basename(file), plot = plot, device = ext, path = dirname(file), width = width, height = height, units = units, dpi = res)
       catch = tryCatch(grDevices::dev.off(), error = function(err){NULL})
     }
@@ -1127,7 +1127,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
       catch = tryCatch(grDevices::dev.off(), error = function(err){NULL})
     }else if(ext == "pdf"){
       #Set paper = "US" for portrait. Defaults to "USr" for landscape. "special" sets paper to width and height.
-      if(combine == T & all(sapply(plot, ggplot2::is.ggplot))){
+      if(combine == T & all(sapply(plot, function(x){ggplot2::is.ggplot(x) | grid::is.grob(x)}))){
         ggsave2(filename = basename(file), plot = plot, device = "pdf", path = dirname(file), width = width, height = height, units = units, dpi = res,
                bg = ifelse(bg == "white", "transparent", bg), fg = fg, pointsize = pointsize, paper = paper, combine = combine, ...)
         catch = tryCatch(grDevices::dev.off(), error = function(err){NULL})
