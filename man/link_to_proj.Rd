@@ -4,10 +4,12 @@
 \alias{link_to_proj}
 \title{Link a script to the project}
 \usage{
-link_to_proj(init = F)
+link_to_proj(init = F, app = F)
 }
 \arguments{
 \item{init}{Boolean (T, F) indicator of wheter to reset the project environment.}
+
+\item{app}{Boolean (T, F) indicator to tell the function that it is being executed from within the app directory}
 }
 \value{
 No return value

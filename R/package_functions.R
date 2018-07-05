@@ -379,6 +379,7 @@ exit_proj = function(reset_lib = T){
 #' Link a script to the project
 #'
 #' @param init Boolean (T, F) indicator of wheter to reset the project environment.
+#' @param app Boolean (T, F) indicator to tell the function that it is being executed from within the app directory
 #' @return No return value
 #' @description Link an R (or Rmd) script to the project environment so that it will be integrated with the
 #' "Project Master.R" script created at the set up of the project.
@@ -413,141 +414,146 @@ exit_proj = function(reset_lib = T){
 #' link_to_proj(init = F)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-link_to_proj = function(init = F){
+link_to_proj = function(init = F, app = F){
   if(Sys.getenv("RSTUDIO") != "1"){
     warning("Should be using RStudio.")
   }
 
-  if(!exists("root.dir", proj.env) | init == T){
-    if(init == T){
-      reset_proj_env()
-      history = list.files(pattern = "\\.Rhistory", recursive = F, all.files = T)
-      proj.history = list.files(patter = "\\.Rproj\\.user", recursive = F, all.files = T)
-      if(length(history) > 0){
-        invisible(file.remove(history))
+  if(app == F){
+    if(!exists("root.dir", proj.env) | init == T){
+      if(init == T){
+        reset_proj_env()
+        history = list.files(pattern = "\\.Rhistory", recursive = F, all.files = T)
+        proj.history = list.files(patter = "\\.Rproj\\.user", recursive = F, all.files = T)
+        if(length(history) > 0){
+          invisible(file.remove(history))
+        }
+        if(length(proj.history) > 0){
+          invisible(unlink(proj.history, recursive = T))
+        }
+        rm(history, proj.history)
       }
-      if(length(proj.history) > 0){
-        invisible(unlink(proj.history, recursive = T))
-      }
-      rm(history, proj.history)
-    }
-    unlock_proj()
+      unlock_proj()
 
-    #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
-    message("Finding ", proj.env$project.name, " drive...")
-    get_proj_root()
-    setwd(proj.env$root.dir)
-    message("Done.")
+      #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
+      message("Finding ", proj.env$project.name, " drive...")
+      get_proj_root()
+      setwd(proj.env$root.dir)
+      message("Done.")
 
-    # #Initialize packrat
-    # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
-    #   packrat::init(enter = T, restart = T, options = list(auto.snapshot = F), clean.search_path = F)
-    # }else{
-    #   packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
-    # }
+      # #Initialize packrat
+      # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
+      #   packrat::init(enter = T, restart = T, options = list(auto.snapshot = F), clean.search_path = F)
+      # }else{
+      #   packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
+      # }
 
-    #Create the folder structure
-    folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
-    for(i in folders){
-      if(!dir.exists(i)){
-        dir.create(i)
-        if(i == "./App"){
-          write(x = globalR, file = "./App/global.R")
-          write(x = uiR, file = "./App/ui.R")
-          write(x = serverR, file = "./App/server.R")
+      #Create the folder structure
+      folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
+      for(i in folders){
+        if(!dir.exists(i)){
+          dir.create(i)
+          if(i == "./App"){
+            write(x = globalR, file = "./App/global.R")
+            write(x = uiR, file = "./App/ui.R")
+            write(x = serverR, file = "./App/server.R")
+          }
         }
       }
-    }
-    rm(folders, i)
-    set_proj_lib()
+      rm(folders, i)
+      set_proj_lib()
 
-    #Build the file cabinet
-    if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){
-      #If the file cabinet does not exist, create it
-      message("Building file cabinet...")
-      build_cabinet()
+      #Build the file cabinet
+      if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){
+        #If the file cabinet does not exist, create it
+        message("Building file cabinet...")
+        build_cabinet()
+      }else{
+        #If the file cabinet already exists, load it
+        message("Loading file cabinet...")
+        load(paste0(proj.env$root.dir, "/Functions/cabinet.RData"), envir = proj.env)
+      }
+      message("Done.")
+
+      #Search the R scripts to find the required pacakges to load and install
+      message("Installing packages...")
+      #Install the required packages
+      #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
+      #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+      #}
+      #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
+      #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
+      #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+      #  }
+      #}
+
+      #Find the R files to parse for required packages
+      unlock_proj()
+      proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
+      rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
+      rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
+                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
+      rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
+      packages = proj.env$required.packages
+      if(length(rfiles) > 0){
+        packages = unique(c(packages, get_packages(rfiles, parallel = T)))
+      }
+      rm(rfiles)
+
+      if(!is.null(packages)){
+        packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
+        packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+        if(length(packages) > 0){
+          for(i in packages){
+            pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+          }
+        }
+      }
+      if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+        pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
+      }
+
+      #Link to Google BiqQuery and Google Drive if necessary
+      if("bigrquery" %in% installed.packages()){#packages){
+        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(bigrquery::bq_projects())
+        }
+      }
+      if("bigQueryR" %in% installed.packages()){#packages){
+        if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(bigQueryR::bqr_auth())
+        }
+      }
+      if("googledrive" %in% installed.packages()){#packages){
+        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(googldedrive::drive_auth())
+        }
+      }
+      if("googlesheets" %in% installed.packages()){#packages){
+        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(googlesheets::gs_auth())
+        }
+      }
+      rm(packages)
+      message("Done.")
+
+      #Create the location of the master log and define the progress bar variables
+      unlock_proj()
+      proj.env$logLocation = paste(proj.env$root.dir, "Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
+      proj.env$startSourceLog = F
+
+      lock_proj()
     }else{
-      #If the file cabinet already exists, load it
-      message("Loading file cabinet...")
-      load(paste0(proj.env$root.dir, "/Functions/cabinet.RData"), envir = proj.env)
+      unlock_proj()
+      get_proj_cur_dir()
+      setwd(proj.env$root.dir)
+      #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
+      set_proj_lib()
+      lock_proj()
     }
-    message("Done.")
-
-    #Search the R scripts to find the required pacakges to load and install
-    message("Installing packages...")
-    #Install the required packages
-    #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
-    #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-    #}
-    #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
-    #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
-    #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-    #  }
-    #}
-
-    #Find the R files to parse for required packages
-    unlock_proj()
-    proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R", parallel = F)))
-    rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
-    rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-                             which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
-    rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
-    packages = proj.env$required.packages
-    if(length(rfiles) > 0){
-      packages = unique(c(packages, get_packages(rfiles, parallel = T)))
-    }
-    rm(rfiles)
-
-    if(!is.null(packages)){
-      packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
-      packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
-      if(length(packages) > 0){
-        for(i in packages){
-          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-        }
-      }
-    }
-    if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
-    }
-
-    #Link to Google BiqQuery and Google Drive if necessary
-    if("bigrquery" %in% installed.packages()){#packages){
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(bigrquery::bq_projects())
-      }
-    }
-    if("bigQueryR" %in% installed.packages()){#packages){
-      if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(bigQueryR::bqr_auth())
-      }
-    }
-    if("googledrive" %in% installed.packages()){#packages){
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(googldedrive::drive_auth())
-      }
-    }
-    if("googlesheets" %in% installed.packages()){#packages){
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(googlesheets::gs_auth())
-      }
-    }
-    rm(packages)
-    message("Done.")
-
-    #Create the location of the master log and define the progress bar variables
-    unlock_proj()
-    proj.env$logLocation = paste(proj.env$root.dir, "Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
-    proj.env$startSourceLog = F
-
-    lock_proj()
   }else{
-    unlock_proj()
-    get_proj_cur_dir()
-    setwd(proj.env$root.dir)
-    #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
-    set_proj_lib()
-    lock_proj()
+    set_proj_lib(app = T)
+    exit_proj(reset_lib = F)
   }
 }
 
