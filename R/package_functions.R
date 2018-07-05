@@ -563,6 +563,7 @@ link_to_proj = function(init = F, app = F){
       get_proj_cur_dir()
       setwd(proj.env$root.dir)
       message("Project root directory set to ", getwd(), ".")
+      message("Directory of current script is ", proj.env$current.dir, ".")
       #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
       set_proj_lib()
       lock_proj()
