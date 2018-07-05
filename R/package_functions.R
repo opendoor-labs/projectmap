@@ -370,9 +370,13 @@ set_proj_lib = function(app = F){
 #' @export
 exit_proj = function(reset_lib = T){
   orig.lib = proj.env$libPath.orig
+  proj.lib = proj.env$libPath
   pacman::p_unload(projectmap)
   if(reset_lib == T){
     .libPaths(new = orig.lib)
+    message("projectmap package detached. Library path reset to ", orig.lib, ".")
+  }else{
+    message("projectmap package detached. Library path remains", proj.lib, ".")
   }
 }
 
@@ -553,7 +557,7 @@ link_to_proj = function(init = F, app = F){
     }
   }else{
     set_proj_lib(app = T)
-    #exit_proj(reset_lib = F)
+    exit_proj(reset_lib = F)
   }
 }
 
@@ -1295,6 +1299,9 @@ cat("\\014")
 
 #Load projectmap
 if(!"projectmap" %in% installed.packages()){
+  if(!"devtools" %in% installed.packages()){
+    install.packages("devtools")
+  }
   devtools::install_github("opendoor-labs/projectmap")
 }
 library(projectmap)
@@ -1331,6 +1338,9 @@ rm(list = ls())
 
 #Load projectmap
 if(!"projectmap" %in% installed.packages()){
+  if(!"devtools" %in% installed.packages()){
+    install.packages("devtools")
+  }
   devtools::install_github("opendoor-labs/projectmap")
 }
 library(projectmap)
