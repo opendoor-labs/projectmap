@@ -470,14 +470,14 @@ link_to_proj = function(init = F, app = F){
       #Build the file cabinet
       if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){
         #If the file cabinet does not exist, create it
-        message("Building file cabinet...")
+        message("Building project file cabinet...")
         build_cabinet()
-        message(paste0(paste(rep("\b", nchar("Building file cabinet... ")), collapse = ""), "Building file cabinet...Done."))
+        message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
       }else{
         #If the file cabinet already exists, load it
-        message("Loading file cabinet...")
+        #message("Loading file cabinet...")
         load("./Functions/cabinet.RData", envir = proj.env)
-        message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
+        #message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
       }
 
       #Search the R scripts to find the required pacakges to load and install
