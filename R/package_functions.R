@@ -212,6 +212,7 @@ lock_proj()
 #' @examples
 #' get_packages("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
 get_packages = function(files, parallel = T){
   if(parallel == T){
     cl = parallel::makeCluster(parallel::detectCores())
