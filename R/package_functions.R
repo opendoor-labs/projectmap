@@ -372,7 +372,7 @@ set_proj_lib = function(app = F){
 exit_proj = function(reset_lib = T){
   orig.lib = proj.env$libPath.orig
   proj.lib = proj.env$libPath
-  pacman::p_unload(projectmap)
+  suppressMessages(pacman::p_unload(projectmap))
   if(reset_lib == T){
     .libPaths(new = orig.lib)
     message("projectmap package detached. Library path reset to ", orig.lib, ".")
@@ -553,6 +553,7 @@ link_to_proj = function(init = F, app = F){
       proj.env$startSourceLog = F
 
       lock_proj()
+      message("Project environment set.")
     }else{
       unlock_proj()
       get_proj_cur_dir()
@@ -560,10 +561,12 @@ link_to_proj = function(init = F, app = F){
       #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
       set_proj_lib()
       lock_proj()
+      message("Project environment set.")
     }
   }else{
     set_proj_lib(app = T)
     exit_proj(reset_lib = F)
+    message("App environment set.")
   }
 }
 
