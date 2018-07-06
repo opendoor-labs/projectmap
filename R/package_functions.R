@@ -273,7 +273,7 @@ get_proj_cur_dir = function(app = F){
   unlock_proj()
 
   if(app == F){
-    proj.env$current.dir = tryCatch(dirname(parent.frame(5)$ofile),
+    proj.env$current.dir = tryCatch(dirname(parent.frame(6)$ofile),
                                     error = function(err){
                                       dirname(rstudioapi::getActiveDocumentContext()$path)
                                     }
@@ -745,6 +745,7 @@ get_output_dir = function(doc = F, app = F){
   #folder should be the full file path to the folder not including its name
   rootfolder = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   rootfolder = names(which(sapply(rootfolder, function(x){grepl(x, proj.env$current.dir)})))
+  cat(rootfolder, "\n")
   outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
                             substr(proj.env$current.dir, gregexpr(rootfolder, proj.env$current.dir)[[1]] + nchar(rootfolder), nchar(proj.env$current.dir))))
   if(doc == T){
