@@ -1371,7 +1371,6 @@ globalR = paste0('##############################################################
 #Global App Script
 #
 #Script used by both server.R and ui.R
-#Do not use projectmap functions in any app scrpts
 #
 #Authors: Author Name (author.name@email.com)
 ###############################################################################
@@ -1386,7 +1385,6 @@ if(!"projectmap" %in% installed.packages()){
   devtools::install_github("opendoor-labs/projectmap")
 }
 library(projectmap)
-od.colors = projectmap::od.colors
 link_to_proj()
 library(tools)
 library(data.table)
