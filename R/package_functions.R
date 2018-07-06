@@ -748,9 +748,13 @@ get_output_dir = function(doc = F, app = F){
   rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
   if(length(rootfolder) == 0){
     rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$file)})))
+    outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
+                              substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file))))
+
+  }else{
+    outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
+                              substr(proj.env$current.dir, gregexpr(rootfolder, proj.env$current.dir)[[1]] + nchar(rootfolder), nchar(proj.env$current.dir))))
   }
-  outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
-                            substr(proj.env$current.dir, gregexpr(rootfolder, proj.env$current.dir)[[1]] + nchar(rootfolder), nchar(proj.env$current.dir))))
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
     str = substr(outputDir, loc1, nchar(outputDir))
@@ -762,7 +766,6 @@ get_output_dir = function(doc = F, app = F){
     #If an output directory doesn't exist, create it
     dir.create(outputDir, showWarnings = F, recursive = T)
   }
-
   return(gsub("//", "/", outputDir))
 }
 
