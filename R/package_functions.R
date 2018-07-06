@@ -260,38 +260,6 @@ get_packages = function(files, parallel = T){
   return(packages)
 }
 
-#' Get the current directory of the project
-#'
-#' @param app Boolean (T, F) indicator to tell the function it is being executed from within the app directory
-#' @return No return value
-#' @description Updates the project environment with the current directory
-#' @examples
-#' get_proj_cur_dir()
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-get_proj_cur_dir = function(app = F){
-  unlock_proj()
-
-  if(app == F){
-    proj.env$current.dir = tryCatch(dirname(parent.frame(5)$ofile),
-                                    error = function(err){
-                                      dirname(rstudioapi::getActiveDocumentContext()$path)
-                                    }
-    )
-    if(proj.env$current.dir == "." | is.null(proj.env$current.dir)){
-      proj.env$current.dir = getwd()
-    }
-  }else{
-    proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
-                                    error = function(err){
-                                      getwd()
-                                    }
-    )
-  }
-
-  lock_proj()
-}
-
 #' Get the project root directory
 #'
 #' @param app Boolean (T, F) indicator to tell the function that it is being executed from within the app directory
@@ -304,32 +272,56 @@ get_proj_cur_dir = function(app = F){
 get_proj_root = function(app = F){
   unlock_proj()
 
-  get_proj_cur_dir(app = app)
-  if(app == F){
-    unlock_proj()
-    proj.env$root.dir = proj.env$current.dir
-    while(nchar(dirname(proj.env$root.dir)) > 1){
-      if(file.exists(paste(proj.env$root.dir, paste(proj.env$project.name, "Master.R"), sep = "/"))){
+  frames = unique(sys.parents())
+  frames = seq(min(frames), max(frames), 1)
+  found_wd = F
+  proj.env$current.dir = NULL
+  for(i in rev(frames)){
+    proj.env$current.dir = c(proj.env$current.dir, tryCatch(dirname(parent.frame(i)$ofile),
+                                          error = function(err){NULL}))
+  }
+  if(Sys.getenv("RSTUDIO") == "1"){
+    proj.env$current.dir = unique(c(proj.env$current.dir,
+                           tryCatch(dirname(rstudioapi::getActiveDocumentContext()$path),
+                                    error = function(err){NULL}),
+                           tryCatch(dirname(rstudioapi::getSourceEditorContext()$path),
+                                    error = function(err){NULL}),
+                           tryCatch(dirname(rstudioapi::getConsoleEditorContext()$path),
+                                    error = function(err){NULL})))
+  }
+  proj.env$current.dir = unique(c(proj.env$current.dir, getwd()))
+  if(!all(is.null(proj.env$current.dir))){
+    for(i in proj.env$current.dir){
+      proj.env$root.dir = i
+      for(j in 1:(length(gregexpr("/", i)[[1]]) + 1)){
+        if(file.exists(paste0(proj.env$root.dir, "/Project Master.R"))){
+          found_wd = T
+          proj.env$current.dir = i
+          break
+        }else{
+          proj.env$root.dir = dirname(proj.env$root.dir)
+        }
+      }
+      if(found_wd == T){
+        if(proj.env$root.dir == "."){
+          proj.env$root.dir = getwd()
+        }
         break
-      }else{
-        proj.env$root.dir = dirname(proj.env$root.dir)
       }
     }
-    if(!file.exists(paste(proj.env$root.dir, paste(proj.env$project.name, "Master.R"), sep = "/"))){
-      proj.env$root.dir = rstudioapi::selectDirectory(caption = "Select Directory", label = "Select", path = NULL)
-      if(!file.exists(paste(proj.env$root.dir, paste(proj.env$project.name, "Master.R"), sep = "/"))){
-        write(x = masterFile, file = paste0("./", proj.env$project.name, " Master.R"))
-        write(x = exampleFile, file = paste0("./", "Example File.R"))
-      }
-    }
-    if(proj.env$root.dir == "." | is.null(proj.env$root.dir)){
+  }
+  if(found_wd == F){
+    unlock_proj()
+    if(Sys.getenv("RSTUDIO") == "1"){
+      proj.env$root.dir = rstudioapi::selectDirectory(caption = "Select Project Directory", label = "Select", path = NULL)
+    }else{
       proj.env$root.dir = getwd()
     }
-  }else{
+  }
+  if(app == T){
     unlock_proj()
     proj.env$root.dir = dirname(proj.env$current.dir)
   }
-
   lock_proj()
 }
 
@@ -349,7 +341,7 @@ set_proj_lib = function(app = F){
     proj.env$libPath.orig = .libPaths()
   }
   if(app == T){
-    message("Project root directory set to ", getwd(), ".")
+    message("Project root directory set to ", getwd(), ".\n")
     get_proj_root(app = app)
     setwd(proj.env$current.dir)
     unlock_proj()
@@ -359,7 +351,7 @@ set_proj_lib = function(app = F){
     proj.env$libPath = "./Library"
   }
   .libPaths(new = proj.env$libPath)
-  message("Project package library path set to ", .libPaths()[1])
+  message("Project package library path set to ", .libPaths()[1], ".\n")
 
   lock_proj()
 }
@@ -379,9 +371,9 @@ exit_proj = function(reset_lib = T){
   suppressMessages(pacman::p_unload(projectmap))
   if(reset_lib == T){
     .libPaths(new = orig.lib)
-    message("projectmap package detached. Library path reset to ", .libPaths()[1], ".")
+    message("projectmap package detached. Library path reset to ", .libPaths()[1], ".\n")
   }else{
-    message("projectmap package detached. Library path remains ", .libPaths()[1], ".")
+    message("projectmap package detached. Library path remains ", .libPaths()[1], ".\n")
   }
 }
 
@@ -423,13 +415,13 @@ exit_proj = function(reset_lib = T){
 #' link_to_proj(init = F)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-link_to_proj = function(init = F, app = F, doc = F){
+link_to_proj = function(init = F, app = F){
   if(Sys.getenv("RSTUDIO") != "1"){
     warning("Should be using RStudio.")
   }
 
-  if(app == F & doc == F){
-    if(!exists("root.dir", proj.env) | init == T){
+  if(app == F){
+    if(!exists("root.dir", proj.env)){
       if(init == T){
         reset_proj_env()
         history = list.files(pattern = "\\.Rhistory", recursive = F, all.files = T)
@@ -447,15 +439,14 @@ link_to_proj = function(init = F, app = F, doc = F){
       #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
       get_proj_root()
       setwd(proj.env$root.dir)
-      message("Project root directory set to ", getwd(), ".")
-      message("Directory of current script is ", proj.env$current.dir, ".")
-
-      # #Initialize packrat
-      # if(!any(grepl("packrat", list.dirs(path = getwd(), recursive = F, full.names = F)))){
-      #   packrat::init(enter = T, restart = T, options = list(auto.snapshot = F), clean.search_path = F)
-      # }else{
-      #   packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
-      # }
+      if(!file.exists("Example.R")){
+        write(x = exampleFile, file = "Example File.R")
+      }
+      if(!file.exists("Project Master.R")){
+        write(x = masterFile, file = "Project Master.R")
+      }
+      message("Project root directory set to ", getwd(), ".\n")
+      message("Directory of current script is ", proj.env$current.dir, ".\n")
 
       #Create the folder structure
       folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
@@ -463,9 +454,15 @@ link_to_proj = function(init = F, app = F, doc = F){
         if(!dir.exists(i)){
           dir.create(i)
           if(i == "./App"){
-            write(x = globalR, file = "./App/global.R")
-            write(x = uiR, file = "./App/ui.R")
-            write(x = serverR, file = "./App/server.R")
+            if(!file.exists("./App/global.R")){
+              write(x = globalR, file = "./App/global.R")
+            }
+            if(!file.exists("./App/ui.R")){
+              write(x = uiR, file = "./App/ui.R")
+            }
+            if(!file.exists("./App/server.r")){
+              write(x = serverR, file = "./App/server.R")
+            }
           }
         }
       }
@@ -480,21 +477,10 @@ link_to_proj = function(init = F, app = F, doc = F){
         message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
       }else{
         #If the file cabinet already exists, load it
-        #message("Loading file cabinet...")
+        message("Loading file cabinet...")
         load("./Functions/cabinet.RData", envir = proj.env)
-        #message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
+        message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
       }
-
-      #Search the R scripts to find the required pacakges to load and install
-      #Install the required packages
-      #if(!"pacman" %in% installed.packages(lib.loc = proj.env$libPath)){
-      #  install.packages("pacman", quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-      #}
-      #for(i in proj.env$required.packages[!proj.env$required.packages %in% c("projectmap", "pacman", rownames(installed.packages(priority="base")))]){
-      #  if(!i %in% installed.packages(lib.loc = proj.env$libPath)){
-      #    pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-      #  }
-      #}
 
       #Find the R files to parse for required packages
       message("Checking required packages...")
@@ -558,31 +544,22 @@ link_to_proj = function(init = F, app = F, doc = F){
       proj.env$startSourceLog = F
 
       lock_proj()
-      message("Project environment set.")
+      message("Project environment set.\n")
     }else{
       unlock_proj()
-      proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
-                                      error = function(err){
-                                        dirname(rstudioapi::getActiveDocumentContext()$path)
-                                      }
-      )
+      get_proj_root()
       setwd(proj.env$root.dir)
-      message("Project root directory set to ", getwd(), ".")
-      message("Directory of current script is ", proj.env$current.dir, ".")
+      message("Project root directory set to ", getwd(), ".\n")
+      message("Directory of current script is ", proj.env$current.dir, ".\n")
       #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
       set_proj_lib()
       lock_proj()
-      message("Project environment set.")
+      message("Project environment set.\n")
     }
   }else if(app == T){
     set_proj_lib(app = T)
     exit_proj(reset_lib = F)
-    message("App environment set.")
-  }else if(doc == T){
-    proj.env$current.dir = getwd()
-    get_proj_root()
-    setwd(proj.env$root.dir)
-    load("./Functions/cabinet.RData", proj.env)
+    message("App environment set.\n")
   }
 }
 
@@ -669,6 +646,7 @@ remove_file = function(files){
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param recall A boolean (T, F) indicator specifying whether to rebuild the cabinet if the file was not found the first time. The default is T.
 #' @param allowMult A boolean (T, F) indicator specifying whether to allow multiple file paths upon return. The default is F.
+#' @param full A boolean (T, F) indicator specifying whether to return a relative or full file path. Default is F.
 #' @return A character string giving the file path of the specified file to the root directory.
 #' @description Returns the relative file path to the file to the root directory. It searches in the package environment variable cabinet for the path.
 #' @examples
@@ -676,7 +654,7 @@ remove_file = function(files){
 #' get_file_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F){
+get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F){
   #Get the file extenstion
   ext = tools::file_ext(file)
   if(ext == ""){
@@ -715,7 +693,11 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F){
       ret = paths
     }
   }
-  return(gsub("//", "/", ret))
+  if(full == F){
+    return(gsub("//", "/", ret))
+  }else{
+    gsub("//", "/", paste0(proj.env$root.dir, substr(ret, 2, nchar(ret))))
+  }
 }
 
 #' Get a full folder path
@@ -837,6 +819,7 @@ source_file = function(file, inFolder = NULL){
   }
   #Get the file path and add to the project environment variables so it won't be removed
   proj.env$file = get_file_path(file, inFolder)
+  proj.env$current.dir = dirname(proj.env$file)
   #Prevent file info from being removed
   proj.env$trace.message[[length(proj.env$trace.message) + 1]] = paste("Executing", paste0("\"", basename(proj.env$file), "\""), "...")
 
@@ -859,6 +842,7 @@ source_file = function(file, inFolder = NULL){
 
   #Log the output
   unlock_proj()
+  proj.env$current.dir = proj.env$root.dir
   proj.env$trace.message[[length(proj.env$trace.message)]] = paste0(proj.env$trace.message[[length(proj.env$trace.message)]], "Done.")
   cat(paste0("\n", proj.env$trace.message[[length(proj.env$trace.message)]]), file = paste0(proj.env$logLocation,".txt"), append = T)
   cat("\n", paste0(names(last.warning), "\n"), file = paste0(proj.env$logLocation, ".txt"), "\n", append = T)

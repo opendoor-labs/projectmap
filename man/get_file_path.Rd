@@ -4,7 +4,8 @@
 \alias{get_file_path}
 \title{Get a file path relative to the root directory}
 \usage{
-get_file_path(file, inFolder = NULL, recall = T, allowMult = F)
+get_file_path(file, inFolder = NULL, recall = T, allowMult = F,
+  full = F)
 }
 \arguments{
 \item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
@@ -14,6 +15,8 @@ get_file_path(file, inFolder = NULL, recall = T, allowMult = F)
 \item{recall}{A boolean (T, F) indicator specifying whether to rebuild the cabinet if the file was not found the first time. The default is T.}
 
 \item{allowMult}{A boolean (T, F) indicator specifying whether to allow multiple file paths upon return. The default is F.}
+
+\item{full}{A boolean (T, F) indicator specifying whether to return a relative or full file path. Default is F.}
 }
 \value{
 A character string giving the file path of the specified file to the root directory.

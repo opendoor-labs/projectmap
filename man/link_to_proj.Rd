@@ -4,7 +4,7 @@
 \alias{link_to_proj}
 \title{Link a script to the project}
 \usage{
-link_to_proj(init = F, app = F, doc = F)
+link_to_proj(init = F, app = F)
 }
 \arguments{
 \item{init}{Boolean (T, F) indicator of wheter to reset the project environment.}
