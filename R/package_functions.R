@@ -1354,12 +1354,6 @@ exampleFile = '#################################################################
 rm(list = ls())
 
 #Load projectmap
-if(!"projectmap" %in% installed.packages()){
-  if(!"devtools" %in% installed.packages()){
-    install.packages("devtools")
-  }
-  devtools::install_github("opendoor-labs/projectmap")
-}
 library(projectmap)
 
 #Link this file as part of the project
