@@ -93,6 +93,14 @@ set_proj_models = function(...){
   #Read in the Project Master.R file and parse out all the execute_proj_model statuements
   #to find those that are set to T or F and count the number of source_file statements
   lines = readLines(paste0(proj.env$root.dir, "/Project Master.R"))
+  lines = unname(sapply(lines, function(x){
+    if(grepl("#", x)){
+      loc = gregexpr("#", x)[[1]][1]
+      return(trimws(gsub("#", "", substr(x, 1, loc))))
+    }else{
+      return(trimws(x))
+    }
+  }))
   lines = gsub(" ", "", paste(lines, collapse = ""))
   loc1 = gregexpr("if\\(execute_proj_model\\(", lines)[[1]]
   loc2 = sapply(loc1, function(x) {
@@ -101,8 +109,10 @@ set_proj_models = function(...){
   })
   blocks = lapply(1:length(loc1), function(x) {
     block = substr(lines, loc1[x], loc2[x])
+    model = gsub("\"", "", gsub("\\{", "", gsub("\\)", "", gsub("if\\(execute_proj_model\\(", "",
+                                                                substr(block, 1, gregexpr("\\{", block)[[1]])))))
     models = names(which(unlist(proj.env$models)))
-    if (grepl(paste(models, collapse = "|"), block)) {
+    if (any(models == model)) {
       return(block)
     }
     else {
@@ -118,8 +128,8 @@ set_proj_models = function(...){
 
   #Set the master progress bar, counter, trace.message, and startSourceLog to their default values
   proj.env$pb = utils::txtProgressBar(min = 0,
-                               max = ifelse(proj.env$numFiles == 0, 1, proj.env$numFiles),
-                               initial = NA, char = "=", style = 3)
+                                      max = ifelse(proj.env$numFiles == 0, 1, proj.env$numFiles),
+                                      initial = NA, char = "=", style = 3)
   proj.env$pbCounter = 0
   proj.env$trace.message = list()
   proj.env$startSourceLog = F
