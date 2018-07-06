@@ -744,12 +744,11 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F, app = F){
   #folder should be the full file path to the folder not including its name
-  rootfolder = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
-  rootfolder = names(which(sapply(rootfolder, function(x){grepl(x, proj.env$current.dir)})))
+  basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
+  rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
   if(length(rootfolder) == 0){
-    rootfolder = names(which(sapply(rootfolder, function(x){grepl(x, proj.env$file)})))
+    rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$file)})))
   }
-  cat(rootfolder, "\n")
   outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
                             substr(proj.env$current.dir, gregexpr(rootfolder, proj.env$current.dir)[[1]] + nchar(rootfolder), nchar(proj.env$current.dir))))
   if(doc == T){
