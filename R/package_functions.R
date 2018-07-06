@@ -561,7 +561,7 @@ link_to_proj = function(init = F, app = F){
       message("Project environment set.")
     }else{
       unlock_proj()
-      get_proj_cur_dir()
+      get_proj_root()
       setwd(proj.env$root.dir)
       message("Project root directory set to ", getwd(), ".")
       message("Directory of current script is ", proj.env$current.dir, ".")
