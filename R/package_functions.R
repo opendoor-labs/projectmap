@@ -549,7 +549,7 @@ link_to_proj = function(init = F, app = F){
         unlock_proj()
         proj.env$root.dir = proj.env$current.dir
         setwd(proj.env$current.dir)
-        message("Project root directory reset to ", getwd(), ".\n")
+        message("\nProject root directory reset to ", getwd(), ".\n")
       }
 
       lock_proj()
