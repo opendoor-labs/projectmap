@@ -871,29 +871,6 @@ source_file = function(file, inFolder = NULL){
   lock_proj()
 }
 
-#' Convert NaN and Inf to NA
-#'
-#' @param DT A data.table object
-#' @return A data object (data.table or data.frame).
-#' @description Converts NaN, Inf, and -Inf values in a vecot to NA
-#' #' @examples
-#' data = data.table(x = c(1, 2, Inf, NaN, NA), y = c(1, 2, 3, 4, 5))
-#' data = to_na(data)
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-to_na = function(DT){
-  if(!data.table::is.data.table(DT)){
-    DT = data.table::as.data.table(DT)
-  }
-  return(DT[, lapply(.SD, function(x){
-    if(is.numeric(x)){
-      ifelse(is.nan(x), NA, ifelse(is.infinite(x), NA, x))
-    }else{
-      return(x)
-    }
-  })])
-}
-
 #' A modified sum function
 #'
 #' @param x A vector of numeric values
