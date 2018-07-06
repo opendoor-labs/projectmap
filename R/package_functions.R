@@ -480,7 +480,7 @@ link_to_proj = function(init = F, app = F){
       set_proj_lib()
 
       #Build the file cabinet
-      if(!file.exists(paste0(proj.env$root.dir, "/Functions/cabinet.RData")) | init == T){
+      if(!file.exists("./Functions/cabinet.RData") | init == T){
         #If the file cabinet does not exist, create it
         message("Building project file cabinet...")
         build_cabinet()
@@ -641,9 +641,9 @@ remove_file = function(files){
       invisible(file.remove(i))
     }
   }
-  root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
-  files = gsub(root, ".", files)
-  cabinet = gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files]))))
+  #root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
+  #files = gsub(root, "\\.", files)
+  cabinet = unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files]))
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
