@@ -833,6 +833,7 @@ source_file = function(file, inFolder = NULL){
     cat(proj.env$trace.message[[1]], file = paste0(proj.env$logLocation, ".txt"), "\n", append = F)
   }
   #Get the file path and add to the project environment variables so it won't be removed
+  unlock_proj()
   proj.env$file = get_file_path(file, inFolder)
   proj.env$current.dir = dirname(proj.env$file)
   #Prevent file info from being removed
