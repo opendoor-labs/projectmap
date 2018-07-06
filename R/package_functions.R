@@ -561,7 +561,11 @@ link_to_proj = function(init = F, app = F){
       message("Project environment set.")
     }else{
       unlock_proj()
-      get_proj_root()
+      proj.env$current.dir = tryCatch(dirname(parent.frame(3)$ofile),
+                                      error = function(err){
+                                        dirname(rstudioapi::getActiveDocumentContext()$path)
+                                      }
+      )
       setwd(proj.env$root.dir)
       message("Project root directory set to ", getwd(), ".")
       message("Directory of current script is ", proj.env$current.dir, ".")
