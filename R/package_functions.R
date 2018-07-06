@@ -748,8 +748,8 @@ get_output_dir = function(doc = F, app = F){
   rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
   if(length(rootfolder) == 0){
     rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$file)})))
-    outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
-                              substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file))))
+    outputDir = dirname(trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
+                                      substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file)))))
 
   }else{
     outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
