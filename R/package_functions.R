@@ -285,7 +285,7 @@ get_proj_root = function(app = F){
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
   found_wd = F
-  proj.env$current.dir = NULL
+  proj.env$current.dir = ifelse(!is.null(proj.env$current.file), proj.env$current.file, NULL)
   for(i in rev(frames)){
     proj.env$current.dir = c(proj.env$current.dir, tryCatch(dirname(parent.frame(i)$ofile),
                                           error = function(err){NULL}))
@@ -853,6 +853,7 @@ source_file = function(file, inFolder = NULL){
   #Log the output
   unlock_proj()
   proj.env$current.dir = proj.env$root.dir
+  proj.env$current.file = NULL
   proj.env$trace.message[[length(proj.env$trace.message)]] = paste0(proj.env$trace.message[[length(proj.env$trace.message)]], "Done.")
   cat(paste0("\n", proj.env$trace.message[[length(proj.env$trace.message)]]), file = paste0(proj.env$logLocation,".txt"), append = T)
   cat("\n", paste0(names(last.warning), "\n"), file = paste0(proj.env$logLocation, ".txt"), "\n", append = T)
