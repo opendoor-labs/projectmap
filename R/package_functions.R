@@ -273,7 +273,7 @@ get_proj_cur_dir = function(app = F){
   unlock_proj()
 
   if(app == F){
-    proj.env$current.dir = tryCatch(dirname(parent.frame(4)$ofile),
+    proj.env$current.dir = tryCatch(dirname(parent.frame(5)$ofile),
                                     error = function(err){
                                       dirname(rstudioapi::getActiveDocumentContext()$path)
                                     }
