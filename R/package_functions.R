@@ -285,7 +285,7 @@ get_proj_root = function(app = F){
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
   found_wd = F
-  proj.env$current.dir = ifelse(!is.null(proj.env$file), proj.env$file, NULL)
+  proj.env$current.dir = proj.env$file
   for(i in rev(frames)){
     proj.env$current.dir = c(proj.env$current.dir, tryCatch(dirname(parent.frame(i)$ofile),
                                           error = function(err){NULL}))
