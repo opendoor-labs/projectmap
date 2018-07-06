@@ -423,12 +423,12 @@ exit_proj = function(reset_lib = T){
 #' link_to_proj(init = F)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-link_to_proj = function(init = F, app = F){
+link_to_proj = function(init = F, app = F, doc = F){
   if(Sys.getenv("RSTUDIO") != "1"){
     warning("Should be using RStudio.")
   }
 
-  if(app == F){
+  if(app == F & doc == F){
     if(!exists("root.dir", proj.env) | init == T){
       if(init == T){
         reset_proj_env()
@@ -574,10 +574,15 @@ link_to_proj = function(init = F, app = F){
       lock_proj()
       message("Project environment set.")
     }
-  }else{
+  }else if(app == T){
     set_proj_lib(app = T)
     exit_proj(reset_lib = F)
     message("App environment set.")
+  }else if(doc == T){
+    proj.env$current.dir = getwd()
+    get_proj_root()
+    setwd(proj.env$root.dir)
+    load("./Functions/cabinet.RData")
   }
 }
 
@@ -846,7 +851,7 @@ source_file = function(file, inFolder = NULL){
   if(tools::file_ext(proj.env$file) == "R"){
     invisible(capture.output(suppressMessages(source(proj.env$file, chdir = T))))
   }else if(tools::file_ext(proj.env$file) == "Rmd"){
-    invisible(capture.output(suppressMessages(rmarkdown::render(file, quiet = T, clean = T, knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T)))))
+    invisible(capture.output(suppressMessages(rmarkdown::render(proj.env$file, quiet = T, clean = T, knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T)))))
   }else{
     stop("File extension must be either .R or .Rmd")
   }
