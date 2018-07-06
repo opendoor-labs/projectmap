@@ -1143,6 +1143,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   #Add the file to the cabinet and save the cabinet
   add_to_cabinet(file)
   message("File saved to ", dirname(file), ".")
+  Sys.sleep(0.01)
 }
 
 #' Creates the Opendoor color scheme
