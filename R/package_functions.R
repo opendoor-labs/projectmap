@@ -582,7 +582,7 @@ link_to_proj = function(init = F, app = F, doc = F){
     proj.env$current.dir = getwd()
     get_proj_root()
     setwd(proj.env$root.dir)
-    load("./Functions/cabinet.RData")
+    load("./Functions/cabinet.RData", proj.env)
   }
 }
 
