@@ -337,29 +337,19 @@ get_proj_root = function(app = F){
 
 #' Set the path to the project library
 #'
-#' @param app Boolean (T, F) indicator to tell the function that it is being executed from within the app directory
 #' @return No return value
 #' @description Sets the path to the project library
 #' @examples
 #' set_proj_lib()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-set_proj_lib = function(app = F){
+set_proj_lib = function(){
   unlock_proj()
 
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
   }
-  if(app == T){
-    message("Project root directory set to ", getwd(), ".\n")
-    get_proj_root(app = app)
-    setwd(proj.env$current.dir)
-    unlock_proj()
-    proj.env$libPath = "../Library"
-  }else{
-    unlock_proj()
-    proj.env$libPath = "./Library"
-  }
+  proj.env$libPath = paste0(proj.env$root.dir, "/Library")
   .libPaths(new = proj.env$libPath)
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
@@ -449,35 +439,37 @@ link_to_proj = function(init = F, app = F){
       #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
       get_proj_root()
       setwd(proj.env$root.dir)
-      if(!file.exists("Example.R")){
-        write(x = exampleFile, file = "Example File.R")
-      }
-      if(!file.exists("Project Master.R")){
-        write(x = masterFile, file = "Project Master.R")
-      }
       message("Project root directory set to ", getwd(), ".\n")
       message("Directory of current script is ", proj.env$current.dir, ".\n")
+      set_proj_lib()
 
       #Create the folder structure
       folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
-      for(i in folders){
-        if(!dir.exists(i)){
-          dir.create(i)
-          if(i == "./App"){
-            if(!file.exists("./App/global.R")){
-              write(x = globalR, file = "./App/global.R")
-            }
-            if(!file.exists("./App/ui.R")){
-              write(x = uiR, file = "./App/ui.R")
-            }
-            if(!file.exists("./App/server.r")){
-              write(x = serverR, file = "./App/server.R")
+      if(!basename(proj.env$root.dir) %in% gsub("\\./", "", folders)){
+        if(!file.exists("Example.R")){
+          write(x = exampleFile, file = "Example File.R")
+        }
+        if(!file.exists("Project Master.R")){
+          write(x = masterFile, file = "Project Master.R")
+        }
+        for(i in folders){
+          if(!dir.exists(i)){
+            dir.create(i)
+            if(i == "./App"){
+              if(!file.exists("./App/global.R")){
+                write(x = globalR, file = "./App/global.R")
+              }
+              if(!file.exists("./App/ui.R")){
+                write(x = uiR, file = "./App/ui.R")
+              }
+              if(!file.exists("./App/server.r")){
+                write(x = serverR, file = "./App/server.R")
+              }
             }
           }
         }
       }
-      rm(folders, i)
-      set_proj_lib()
+      suppressWarnings(rm(folders, i))
 
       #Build the file cabinet
       if(!file.exists("./Functions/cabinet.RData") | init == T){
@@ -550,8 +542,15 @@ link_to_proj = function(init = F, app = F){
 
       #Create the location of the master log and define the progress bar variables
       unlock_proj()
-      proj.env$logLocation = paste(proj.env$root.dir, "Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
+      proj.env$logLocation = paste("./Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
       proj.env$startSourceLog = F
+
+      if(basename(proj.env$current.dir) == "App"){
+        unlock_proj()
+        proj.env$root.dir = proj.env$current.dir
+        setwd(proj.env$current.dir)
+        message("Project root directory reset to ", getwd(), ".\n")
+      }
 
       lock_proj()
       message("Project environment set.\n")
@@ -563,11 +562,17 @@ link_to_proj = function(init = F, app = F){
       message("Directory of current script is ", proj.env$current.dir, ".\n")
       #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
       set_proj_lib()
+      if(basename(proj.env$current.dir) == "App"){
+        unlock_proj()
+        proj.env$root.dir = proj.env$current.dir
+        setwd(proj.env$current.dir)
+        message("Project root directory reset to ", getwd(), ".\n")
+      }
       lock_proj()
       message("Project environment set.\n")
     }
   }else if(app == T){
-    set_proj_lib(app = T)
+    #set_proj_lib(app = T)
     exit_proj(reset_lib = F)
     message("App environment set.\n")
   }

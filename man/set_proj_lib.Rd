@@ -4,10 +4,7 @@
 \alias{set_proj_lib}
 \title{Set the path to the project library}
 \usage{
-set_proj_lib(app = F)
-}
-\arguments{
-\item{app}{Boolean (T, F) indicator to tell the function that it is being executed from within the app directory}
+set_proj_lib()
 }
 \value{
 No return value
