@@ -553,8 +553,7 @@ link_to_proj = function(init = F, app = F){
 
     if(init == T){
       devtools::reload(devtools::inst("projectmap"), quiet = T)
-      suppressMessages(get_proj_root())
-      suppressMessages(set_proj_lib())
+      suppressMessages(link_to_proj(init = F))
     }
     lock_proj()
     message("\nProject environment set.\n")
