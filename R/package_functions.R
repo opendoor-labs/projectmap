@@ -505,13 +505,11 @@ link_to_proj = function(init = F, app = F){
     if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
       message("Checking required packages...")
       unlock_proj()
-      proj.env$required.packages = unique(c(proj.env$required.packages,
-                                            get_packages(paste0(gsub("/App", "", proj.env$root.dir), "/Project Master.R"), parallel = F)))
+      proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R"), parallel = F))
       rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
       rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
                                which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
       rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
-      rfiles = paste0(gsub("/App", "", proj.env$root.dir), substr(rfiles, 2, nchar(rfiles)))
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
         packages = unique(c(packages, get_packages(rfiles, parallel = T)))
