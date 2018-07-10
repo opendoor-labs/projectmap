@@ -442,7 +442,16 @@ link_to_proj = function(init = F, app = F){
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     set_proj_lib()
     if(init == T){
+      root = proj.env$root.dir
+      current = proj.env$current.dir
+      libPath = proj.env$libPath
+      libPath.orig = proj.env$libPath.orig
       devtools::reload(devtools::inst("projectmap"))
+      unlock_proj()
+      proj.env$root.dir = root
+      proj.env$current = current
+      proj.env$libPath = libPath
+      proj.env$libPath.orig = libPath.orig
     }
 
     #Create the folder structure
