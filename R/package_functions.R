@@ -441,6 +441,9 @@ link_to_proj = function(init = F, app = F){
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     set_proj_lib()
+    if(init == T){
+      devtools::reload("projectmap")
+    }
 
     #Create the folder structure
     folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
