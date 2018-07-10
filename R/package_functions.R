@@ -437,12 +437,6 @@ link_to_proj = function(init = F, app = F){
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
     get_proj_root()
-    if(file.exists(paste0(proj.env$current.dir, "/global.R")) &
-       file.exists(paste0(proj.env$current.dir, "/ui.R")) &
-       file.exists(paste0(proj.env$current.dir, "/server.R"))){
-      unlock_proj()
-      proj.env$root.dir = proj.env$current.dir
-    }
     setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
@@ -561,6 +555,12 @@ link_to_proj = function(init = F, app = F){
     #   suppressMessages(devtools::reload(devtools::inst("projectmap"), quiet = T))
     #   suppressMessages(link_to_proj(init = F))
     # }
+    if(basename(proj.env$current.dir) == "App"){
+      unlock_proj()
+      proj.env$root.dir = proj.env$current.dir
+      setwd(proj.env$current.dir)
+      message("Project root directory reset to ", getwd(), ".\n")
+    }
     lock_proj()
     message("\nProject environment set.\n")
   }else{
