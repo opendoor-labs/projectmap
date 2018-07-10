@@ -446,9 +446,10 @@ link_to_proj = function(init = F, app = F){
       current = proj.env$current.dir
       libPath = proj.env$libPath
       libPath.orig = proj.env$libPath.orig
-      devtools::reload(devtools::inst("projectmap"))
+      devtools::reload(devtools::inst("projectmap"), quiet = T)
       unlock_proj()
       proj.env$root.dir = root
+      message(proj.env$root.dir)
       proj.env$current = current
       proj.env$libPath = libPath
       proj.env$libPath.orig = libPath.orig
