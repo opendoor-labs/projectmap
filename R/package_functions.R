@@ -551,10 +551,10 @@ link_to_proj = function(init = F, app = F){
       message("\nProject root directory reset to ", getwd(), ".\n")
     }
 
-    if(init == T){
-      devtools::reload(devtools::inst("projectmap"), quiet = T)
-      suppressMessages(link_to_proj(init = F))
-    }
+    # if(init == T){
+    #   suppressMessages(devtools::reload(devtools::inst("projectmap"), quiet = T))
+    #   suppressMessages(link_to_proj(init = F))
+    # }
     lock_proj()
     message("\nProject environment set.\n")
   }else{
