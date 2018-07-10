@@ -272,7 +272,6 @@ get_packages = function(files, parallel = T){
       }else{
         return(NULL)
       }
-      rm(lines)
     }else{
       remove_file(i)
       return(NULL)
@@ -527,6 +526,7 @@ link_to_proj = function(init = F, app = F){
       if(!is.null(packages)){
         packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+        packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
           message("Installing packages...")
           for(i in packages){
