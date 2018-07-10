@@ -307,7 +307,7 @@ get_proj_root = function(app = F){
         if(file.exists(paste0(proj.env$root.dir, "/Project Master.R")) |
            (file.exists(paste0(proj.env$root.dir, "/global.R")) &
             file.exists(paste0(proj.env$root.dir, "/ui.R")) &
-            file.exists(paste0(porj.env$root.dir, "/server.R")))){
+            file.exists(paste0(proj.env$root.dir, "/server.R")))){
           found_wd = T
           proj.env$current.dir = i
           break
