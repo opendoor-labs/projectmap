@@ -455,7 +455,7 @@ link_to_proj = function(init = F, app = F){
       if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
         warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
       }
-      proj.env$root.dir = root
+      proj.env$root.dir = getwd()
       proj.env$current.dir = curr
       proj.env$libPath = lib
       proj.env$libPath.orig = lib.orig
