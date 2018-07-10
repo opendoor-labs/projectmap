@@ -442,6 +442,10 @@ link_to_proj = function(init = F, app = F){
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     set_proj_lib()
     if(init == T){
+      root = proj.env$root
+      curr = proj.env$current.dir
+      lib = proj.env$libPath
+      lib.orig = proj.env$libPath.orig
       devtools::reload(devtools::inst("projectmap"), quiet = T)
       proj.env = new.env()
       proj.env$project.name = "Project"
@@ -451,8 +455,11 @@ link_to_proj = function(init = F, app = F){
       if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
         warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
       }
-      get_proj_root()
-      set_proj_lib()
+      proj.env$root.dir = root
+      proj.env$current.dir = curr
+      proj.env$libPath = lib
+      proj.env$libPath.orig = lib.orig
+      rm(root, curr, lib, lib.orig)
     }
 
     #Create the folder structure
