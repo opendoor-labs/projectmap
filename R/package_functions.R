@@ -489,16 +489,23 @@ link_to_proj = function(init = F, app = F){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!file.exists("./Functions/cabinet.RData") | init == T){
-      #If the file cabinet does not exist, create it
-      message("Building project file cabinet...")
-      build_cabinet()
-      message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
+    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
+      if(!file.exists("./Functions/cabinet.RData") | init == T){
+        #If the file cabinet does not exist, create it
+        message("Building project file cabinet...")
+        build_cabinet()
+        message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
+      }else{
+        #If the file cabinet already exists, load it
+        message("Loading file cabinet...")
+        load("./Functions/cabinet.RData", envir = proj.env)
+        message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
+      }
     }else{
-      #If the file cabinet already exists, load it
-      message("Loading file cabinet...")
-      load(paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"), envir = proj.env)
-      message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
+      unlock_proj()
+      message("Building project file cabinet...")
+      proj.env$cabinet = list.files(recursive = T, full.names = T)
+      message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
     }
 
     #Find the R files to parse for required packages
@@ -607,13 +614,12 @@ link_to_proj = function(init = F, app = F){
 build_cabinet = function(){
   unlock_proj()
 
-  cabinet = unlist(lapply(paste0(gsub("/App", "", proj.env$root.dir), c("/Codes", "/Functions", "/Input", "/Output", "/Documentation", "/Logs")), function(x) {
+  cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs"), function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
-  cabinet = unique(c(cabinet, list.files(path = gsub("/App", "", proj.env$root.dir), recursive = F, full.names = T, include.dirs = F)))
-  dirs = unique(list.dirs(path = gsub("/App", "", proj.env$root.dir), full.names = T, recursive = F))
+  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
+  dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
-  cabinet = paste0(".", substr(cabinet, nchar(gsub("/App", "", proj.env$root.dir)) + 1, nchar(cabinet)))
   save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
