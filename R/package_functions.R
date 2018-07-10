@@ -494,6 +494,7 @@ link_to_proj = function(init = F, app = F){
     rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
                              which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
     rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
+    rfiles = paste0(gsub("/App", "", proj.env$root.dir), substr(rfiles, 2, nchar(rfiles)))
     packages = proj.env$required.packages
     if(length(rfiles) > 0){
       packages = unique(c(packages, get_packages(rfiles, parallel = T)))
