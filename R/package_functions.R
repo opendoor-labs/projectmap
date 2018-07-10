@@ -442,7 +442,7 @@ link_to_proj = function(init = F, app = F){
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     set_proj_lib()
     if(init == T){
-      root = proj.env$root
+      root = proj.env$root.dir
       curr = proj.env$current.dir
       lib = proj.env$libPath
       lib.orig = proj.env$libPath.orig
