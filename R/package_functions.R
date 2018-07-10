@@ -487,62 +487,64 @@ link_to_proj = function(init = F, app = F){
     }
 
     #Find the R files to parse for required packages
-    message("Checking required packages...")
-    unlock_proj()
-    proj.env$required.packages = unique(c(proj.env$required.packages,
-                                          get_packages(paste0(gsub("/App", "", proj.env$root.dir), "/Project Master.R"), parallel = F)))
-    rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
-    rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-                             which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
-    rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
-    rfiles = paste0(gsub("/App", "", proj.env$root.dir), substr(rfiles, 2, nchar(rfiles)))
-    packages = proj.env$required.packages
-    if(length(rfiles) > 0){
-      packages = unique(c(packages, get_packages(rfiles, parallel = T)))
-    }
-    rm(rfiles)
-    message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
+    if(basename(proj.env$root.dir) != "App"){
+      message("Checking required packages...")
+      unlock_proj()
+      proj.env$required.packages = unique(c(proj.env$required.packages,
+                                            get_packages(paste0(gsub("/App", "", proj.env$root.dir), "/Project Master.R"), parallel = F)))
+      rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
+      rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
+                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
+      rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
+      rfiles = paste0(gsub("/App", "", proj.env$root.dir), substr(rfiles, 2, nchar(rfiles)))
+      packages = proj.env$required.packages
+      if(length(rfiles) > 0){
+        packages = unique(c(packages, get_packages(rfiles, parallel = T)))
+      }
+      rm(rfiles)
+      message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
 
-    if(!is.null(packages)){
-      packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
-      packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
-      if(length(packages) > 0){
-        message("Installing packages...")
-        for(i in packages){
-          pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+      if(!is.null(packages)){
+        packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
+        packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+        if(length(packages) > 0){
+          message("Installing packages...")
+          for(i in packages){
+            pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+          }
+        }
+        if("projectmap" %in% installed.packages(lib.loc = proj.env$libPath) & length(packages) > 0){
+          message("Done.")
         }
       }
-      if("projectmap" %in% installed.packages(lib.loc = proj.env$libPath) & length(packages) > 0){
+      if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+        pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
         message("Done.")
       }
-    }
-    if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-      pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
-      message("Done.")
-    }
 
-    #Link to Google BiqQuery and Google Drive if necessary
-    if("bigrquery" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
-      if(!".httr-oauth" %in% packages){#list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "bigrquery" %in% packages){
-        invisible(bigrquery::bq_projects())
+      #Link to Google BiqQuery and Google Drive if necessary
+      if("bigrquery" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+        if(!".httr-oauth" %in% packages){#list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "bigrquery" %in% packages){
+          invisible(bigrquery::bq_projects())
+        }
       }
-    }
-    if("bigQueryR" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
-      if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(bigQueryR::bqr_auth())
+      if("bigQueryR" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+        if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(bigQueryR::bqr_auth())
+        }
       }
-    }
-    if("googledrive" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(googldedrive::drive_auth())
+      if("googledrive" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(googldedrive::drive_auth())
+        }
       }
-    }
-    if("googlesheets" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
-      if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-        invisible(googlesheets::gs_auth())
+      if("googlesheets" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+          invisible(googlesheets::gs_auth())
+        }
       }
+      rm(packages)
     }
-    rm(packages)
 
     #Create the location of the master log and define the progress bar variables
     unlock_proj()
