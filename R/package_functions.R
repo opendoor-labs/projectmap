@@ -352,7 +352,7 @@ set_proj_lib = function(){
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
   }
-  proj.env$libPath = paste0(proj.env$root.dir, "/Library")
+  proj.env$libPath = paste0(gsub("/App", "", proj.env$root.dir), "/Library")
   .libPaths(new = proj.env$libPath)
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
@@ -482,7 +482,7 @@ link_to_proj = function(init = F, app = F){
     }else{
       #If the file cabinet already exists, load it
       message("Loading file cabinet...")
-      load("./Functions/cabinet.RData", envir = proj.env)
+      load(paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"), envir = proj.env)
       message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
     }
 
@@ -590,13 +590,13 @@ link_to_proj = function(init = F, app = F){
 build_cabinet = function(){
   unlock_proj()
 
-  cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input",
-                            "./Output", "./Documentation", "./Logs"), function(x) {
+  cabinet = unlist(lapply(paste0(gsub("/App", "", proj.env$root.dir), c("/Codes", "/Functions", "/Input", "/Output", "/Documentation", "/Logs")), function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
-  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
-  dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
+  cabinet = unique(c(cabinet, list.files(path = gsub("/App", "", proj.env$root.dir), recursive = F, full.names = T, include.dirs = F)))
+  dirs = unique(list.dirs(path = gsub("/App", "", proj.env$root.dir), full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
+  cabinet = paste0(".", substr(cabinet, nchar(gsub("/App", "", proj.env$root.dir)) + 1, nchar(cabinet)))
   save(cabinet, file = "./Functions/cabinet.RData")
   proj.env$cabinet = cabinet
 
