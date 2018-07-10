@@ -440,7 +440,7 @@ link_to_proj = function(init = F, app = F){
     if(file.exists(paste0(proj.env$current.dir, "/global.R")) &
        file.exists(paste0(proj.env$current.dir, "/ui.R")) &
        file.exists(paste0(proj.env$current.dir, "/server.R"))){
-      unlock_binding()
+      unlock_proj()
       proj.env$root.dir = proj.env$current.dir
     }
     setwd(proj.env$root.dir)
