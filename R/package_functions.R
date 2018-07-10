@@ -487,7 +487,7 @@ link_to_proj = function(init = F, app = F){
     }
 
     #Find the R files to parse for required packages
-    if(basename(proj.env$root.dir) != "App"){
+    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
       message("Checking required packages...")
       unlock_proj()
       proj.env$required.packages = unique(c(proj.env$required.packages,
