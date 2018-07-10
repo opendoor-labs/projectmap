@@ -11,7 +11,12 @@
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 library = function(..., lib.loc = proj.env$libPath){
-  base::library(..., lib.loc = lib.loc)
+  if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
+    #If not in an app setting, only look in project library
+    base::library(..., lib.loc = lib.loc)
+  }else{
+    base::library(...)
+  }
 }
 #' This overwrites the base require function to only look in the user's project library to load a package
 #' for package version control
@@ -25,7 +30,12 @@ library = function(..., lib.loc = proj.env$libPath){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 require = function(..., lib.loc = proj.env$libPath){
-  base::require(..., lib.loc = lib.loc)
+  if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
+    #If not in an app setting, only look in project library
+    base::require(..., lib.loc = lib.loc)
+  }else{
+    base::require(...)
+  }
 }
 #' This overwrites the base install.packages function to only install the function in the user's project library
 #' for package version control
@@ -39,7 +49,12 @@ require = function(..., lib.loc = proj.env$libPath){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 install.packges = function(..., lib = proj.env$libPath){
-  utils::install.packages(..., lib = lib)
+  if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
+    #If not in an app setting, only look in project library
+    utils::install.packages(..., lib = lib)
+  }else{
+    utils::install.packages(...)
+  }
 }
 
 #' Lock all the project variables
