@@ -597,7 +597,7 @@ build_cabinet = function(){
   dirs = unique(list.dirs(path = gsub("/App", "", proj.env$root.dir), full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
   cabinet = paste0(".", substr(cabinet, nchar(gsub("/App", "", proj.env$root.dir)) + 1, nchar(cabinet)))
-  save(cabinet, file = "./Functions/cabinet.RData")
+  save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
   lock_proj()
