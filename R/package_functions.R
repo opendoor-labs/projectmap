@@ -304,7 +304,10 @@ get_proj_root = function(app = F){
     for(i in proj.env$current.dir){
       proj.env$root.dir = i
       for(j in 1:(length(gregexpr("/", i)[[1]]) + 1)){
-        if(file.exists(paste0(proj.env$root.dir, "/Project Master.R"))){
+        if(file.exists(paste0(proj.env$root.dir, "/Project Master.R")) |
+           (file.exists(paste0(proj.env$root.dir, "/global.R")) &
+            file.exists(paste0(proj.env$root.dir, "/ui.R")) &
+            file.exists(paste0(porj.env$root.dir, "/server.R")))){
           found_wd = T
           proj.env$current.dir = i
           break
@@ -544,23 +547,16 @@ link_to_proj = function(init = F, app = F){
     proj.env$logLocation = paste("./Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
     proj.env$startSourceLog = F
 
-    if(basename(proj.env$current.dir) == "App"){
-      unlock_proj()
-      proj.env$root.dir = proj.env$current.dir
-      setwd(proj.env$current.dir)
-      message("\nProject root directory reset to ", getwd(), ".\n")
-    }
-
     # if(init == T){
     #   suppressMessages(devtools::reload(devtools::inst("projectmap"), quiet = T))
     #   suppressMessages(link_to_proj(init = F))
     # }
-    if(basename(proj.env$current.dir) == "App"){
-      unlock_proj()
-      proj.env$root.dir = proj.env$current.dir
-      setwd(proj.env$current.dir)
-      message("Project root directory reset to ", getwd(), ".\n")
-    }
+    # if(basename(proj.env$current.dir) == "App"){
+    #   unlock_proj()
+    #   proj.env$root.dir = proj.env$current.dir
+    #   setwd(proj.env$current.dir)
+    #   message("Project root directory reset to ", getwd(), ".\n")
+    # }
     lock_proj()
     message("\nProject environment set.\n")
   }else{
@@ -571,12 +567,12 @@ link_to_proj = function(init = F, app = F){
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     set_proj_lib()
-    if(basename(proj.env$current.dir) == "App"){
-      unlock_proj()
-      proj.env$root.dir = proj.env$current.dir
-      setwd(proj.env$current.dir)
-      message("Project root directory reset to ", getwd(), ".\n")
-    }
+    # if(basename(proj.env$current.dir) == "App"){
+    #   unlock_proj()
+    #   proj.env$root.dir = proj.env$current.dir
+    #   setwd(proj.env$current.dir)
+    #   message("Project root directory reset to ", getwd(), ".\n")
+    # }
     lock_proj()
     message("\nProject environment set.\n")
   }
