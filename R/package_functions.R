@@ -554,7 +554,6 @@ link_to_proj = function(init = F, app = F){
     lock_proj()
     message("\nProject environment set.\n")
   }else{
-    message("Exists")
     unlock_proj()
     get_proj_root()
     setwd(proj.env$root.dir)
