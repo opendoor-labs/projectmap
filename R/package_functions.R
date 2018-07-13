@@ -445,7 +445,7 @@ exit_proj = function(reset_lib = T){
 #' link_to_proj(init = F)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-link_to_proj = function(init = F, app = F){
+link_to_proj = function(init = F, app = F, install = T){
   if(Sys.getenv("RSTUDIO") != "1"){
     warning("Should be using RStudio.")
   }
@@ -521,7 +521,8 @@ link_to_proj = function(init = F, app = F){
     }
 
     #Find the R files to parse for required packages
-    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
+    #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
+    if(install == T){
       message("Checking required packages...")
       unlock_proj()
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R"), parallel = F))
