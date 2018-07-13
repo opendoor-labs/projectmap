@@ -235,10 +235,10 @@ lock_proj()
 #' @return A vector of character strings representing package names
 #' @description Parse out packages from library and require function calls in R scripts
 #' @examples
-#' get_packages("Project Master.R")
+#' get_proj_packages("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_packages = function(files, parallel = T){
+get_proj_packages = function(files, parallel = T){
   if(parallel == T){
     cl = parallel::makeCluster(parallel::detectCores())
     doSNOW::registerDoSNOW(cl)
@@ -249,12 +249,17 @@ get_packages = function(files, parallel = T){
   packages = foreach::foreach(i = files, .combine = "c", .export = c("proj.env", "remove_file")) %fun% {
     if(file.exists(i)){
       lines = suppressWarnings(readLines(i))
+      lines = lines[substr(lines, 1, 1) != "#"]
       if(length(lines) > 0){
         libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
         requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
+        ploads = trimws(lines[which(sapply(gregexpr("p_load\\(", lines), function(x){x[1] != -1}))])
+        libraries = libraries[substr(libraries, 1, 1) != "#"]
+        requires = requires[substr(requires, 1, 1) != "#"]
+        ploads = ploads[substr(ploads, 1, 1) != "#"]
         if(length(libraries) > 0){
           for(j in 1:length(libraries)){
-            temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",")[[1]])
+            temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
             libraries[j] = temp
           }
@@ -262,7 +267,15 @@ get_packages = function(files, parallel = T){
         }
         if(length(requires) > 0){
           for(j in 1:length(requires)){
-            temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",")[[1]])
+            temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",|::")[[1]])
+            temp = temp[!grepl("=", temp)]
+            requires[j] = temp
+          }
+          rm(temp, loc, j)
+        }
+        if(length(ploads) > 0){
+          for(j in 1:length(ploads)){
+            temp = trimws(strsplit(gsub("p_load\\(|\\)", "", ploads[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
             requires[j] = temp
           }
@@ -511,14 +524,14 @@ link_to_proj = function(init = F, app = F){
     if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
       message("Checking required packages...")
       unlock_proj()
-      proj.env$required.packages = unique(c(proj.env$required.packages, get_packages("Project Master.R"), parallel = F))
+      proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R"), parallel = F))
       rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
       rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
                                which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
       rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
-        packages = unique(c(packages, get_packages(rfiles, parallel = T)))
+        packages = unique(c(packages, get_proj_packages(rfiles, parallel = T)))
       }
       rm(rfiles)
       message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
