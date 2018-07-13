@@ -627,7 +627,7 @@ link_to_proj = function(init = F, app = F){
 build_cabinet = function(){
   unlock_proj()
 
-  cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs"), function(x) {
+  cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./App"), function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
