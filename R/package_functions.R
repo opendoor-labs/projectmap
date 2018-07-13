@@ -485,13 +485,13 @@ link_to_proj = function(init = F, app = F){
         if(!dir.exists(i)){
           dir.create(i)
           if(i == "./App"){
-            if(!file.exists("./App/global.R")){
+            if(!file.exists("./App/global.R") & !file.exists("global.R")){
               write(x = globalR, file = "./App/global.R")
             }
-            if(!file.exists("./App/ui.R")){
+            if(!file.exists("./App/ui.R") & !file.exists("ui.R")){
               write(x = uiR, file = "./App/ui.R")
             }
-            if(!file.exists("./App/server.r")){
+            if(!file.exists("./App/server.R") & !file.exists("server.R")){
               write(x = serverR, file = "./App/server.R")
             }
           }
@@ -501,7 +501,7 @@ link_to_proj = function(init = F, app = F){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
+    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Maste.R")){
       if(!file.exists("./Functions/cabinet.RData") | init == T){
         #If the file cabinet does not exist, create it
         message("Building project file cabinet...")
@@ -521,7 +521,7 @@ link_to_proj = function(init = F, app = F){
     }
 
     #Find the R files to parse for required packages
-    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
+    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
       message("Checking required packages...")
       unlock_proj()
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R"), parallel = F))
