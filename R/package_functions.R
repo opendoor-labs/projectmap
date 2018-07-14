@@ -521,7 +521,7 @@ link_to_proj = function(init = F, app = F, install = T){
     }
 
     #Find the R files to parse for required packages
-    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) & file.exists("Project Master.R")){
+    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
     #if(install == T){
       message("Checking required packages...")
       unlock_proj()
