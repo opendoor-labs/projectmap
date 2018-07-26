@@ -1429,7 +1429,7 @@ if(!"projectmap" %in% installed.packages()){
   devtools::install_github("opendoor-labs/projectmap")
 }
 library(projectmap)
-link_to_proj()
+link_to_proj(install = F)
 library(tools)
 library(data.table)
 library(plotly)
