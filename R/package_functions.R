@@ -119,13 +119,11 @@ set_proj_models = function(...){
   lines = gsub(" ", "", paste(lines, collapse = ""))
   loc1 = gregexpr("if\\(execute_proj_model\\(", lines)[[1]]
   loc2 = sapply(loc1, function(x) {
-    gregexpr("\\}", substr(lines, x + 1, nchar(lines)))[[1]][1] +
-      x
+    gregexpr("\\}", substr(lines, x + 1, nchar(lines)))[[1]][1] + x
   })
   blocks = lapply(1:length(loc1), function(x) {
     block = substr(lines, loc1[x], loc2[x])
-    model = gsub("\"", "", gsub("\\{", "", gsub("\\)", "", gsub("if\\(execute_proj_model\\(", "",
-                                                                substr(block, 1, gregexpr("\\{", block)[[1]])))))
+    model = gsub("\"", "", gsub("\\{", "", gsub("\\)", "", gsub("if\\(execute_proj_model\\(", "", substr(block, 1, gregexpr("\\{", block)[[1]])))))
     models = names(which(unlist(proj.env$models)))
     if (any(models == model)) {
       return(block)
@@ -137,9 +135,13 @@ set_proj_models = function(...){
   blocks = blocks[which(sapply(blocks, function(x) {
     !is.null(x)
   }))]
-  proj.env$numFiles = sum(sapply(1:length(blocks), function(x) {
-    length(gregexpr("source_file\\(", blocks[x])[[1]])
-  }))
+  if(length(blocks) > 0){
+    proj.env$numFiles = sum(sapply(1:length(blocks), function(x) {
+      length(gregexpr("source_file\\(", blocks[x])[[1]])
+    }))
+  }else{
+    proj.env$numFiles = 0
+  }
 
   #Set the master progress bar, counter, trace.message, and startSourceLog to their default values
   proj.env$pb = utils::txtProgressBar(min = 0,
