@@ -631,6 +631,7 @@ build_cabinet = function(){
   cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./App"), function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
+  cabinet = cabinet[!grepl("./Library/", cabinet)]
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
