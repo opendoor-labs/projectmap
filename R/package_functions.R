@@ -475,7 +475,7 @@ link_to_proj = function(init = F, app = F, install = T){
     #Create the folder structure
     folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
     if(!basename(proj.env$root.dir) %in% gsub("\\./", "", folders)){
-      if(!file.exists("Example.R")){
+      if(!file.exists("Example File.R")){
         write(x = exampleFile, file = "Example File.R")
       }
       if(!file.exists("Project Master.R")){
@@ -501,23 +501,16 @@ link_to_proj = function(init = F, app = F, install = T){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Maste.R")){
-      if(!file.exists("./Functions/cabinet.RData") | init == T){
-        #If the file cabinet does not exist, create it
-        message("Building project file cabinet...")
-        build_cabinet()
-        message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
-      }else{
-        #If the file cabinet already exists, load it
-        message("Loading file cabinet...")
-        load("./Functions/cabinet.RData", envir = proj.env)
-        message(paste0(paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
-      }
-    }else{
-      unlock_proj()
+    if(!file.exists("./Functions/cabinet.RData") | init == T){
+      #If the file cabinet does not exist, create it
       message("Building project file cabinet...")
-      proj.env$cabinet = list.files(recursive = T, full.names = T)
-      message(paste0(paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
+      build_cabinet()
+      message(paste0("\r", paste(rep("\b", nchar("Building project file cabinet... ")), collapse = ""), "Building project file cabinet...Done."))
+    }else{
+      #If the file cabinet already exists, load it
+      message("Loading file cabinet...")
+      load("./Functions/cabinet.RData", envir = proj.env)
+      message(paste0("\r", paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
     }
 
     #Find the R files to parse for required packages
@@ -628,14 +621,17 @@ link_to_proj = function(init = F, app = F, install = T){
 build_cabinet = function(){
   unlock_proj()
 
-  cabinet = unlist(lapply(c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./App"), function(x) {
+  folders = list.dirs(full.names = F, recursive = F)
+  folders = folders[!folders %in% c("Library", ".git")]
+  cabinet = unlist(lapply(folders, function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
-  cabinet = cabinet[!grepl("./Library/", cabinet)]
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
-  save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
+  if(!grepl("/App", getwd())){
+    save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
+  }
   proj.env$cabinet = cabinet
 
   lock_proj()
