@@ -525,7 +525,7 @@ link_to_proj = function(init = F, app = F, install = T){
     if(install == T){
       message("Checking required packages...")
       unlock_proj()
-      proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R"), parallel = F))
+      proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
       rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
                                which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
@@ -656,7 +656,7 @@ add_to_cabinet = function(file){
   root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   file = gsub(root, ".", file)
   cabinet = gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(c(proj.env$cabinet, file)))))
-  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
+  save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -686,7 +686,7 @@ remove_file = function(files){
   #root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   #files = gsub(root, "\\.", files)
   cabinet = unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files]))
-  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
+  save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
   lock_proj()
