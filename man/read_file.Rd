@@ -6,7 +6,7 @@
 \usage{
 read_file(file, inFolder = NULL, showProgress = F, na.strings = c("NULL",
   "NA", "na", "N/A", "n/a", "<NA>", "NONE", "-", ".", "", " ", "NaN", "nan",
-  "Inf", "-Inf"), ...)
+  "Inf", "-Inf"), envir = .GlobalEnv, ...)
 }
 \arguments{
 \item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
@@ -16,6 +16,8 @@ read_file(file, inFolder = NULL, showProgress = F, na.strings = c("NULL",
 \item{showProgress}{A boolean (T, F) indicator specifying whether to show the read in progress if using data.table's fread.}
 
 \item{na.strings}{A vector of character strings to convert to NA}
+
+\item{envir}{The environment to load the data to}
 
 \item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.}
 }

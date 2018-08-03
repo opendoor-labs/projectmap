@@ -4,10 +4,7 @@
 \alias{get_proj_root}
 \title{Get the project root directory}
 \usage{
-get_proj_root(app = F)
-}
-\arguments{
-\item{app}{Boolean (T, F) indicator to tell the function that it is being executed from within the app directory}
+get_proj_root()
 }
 \value{
 No return value

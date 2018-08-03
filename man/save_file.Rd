@@ -7,7 +7,7 @@
 save_file(..., file = NULL, file.override = NULL, row.names = F,
   showProgress = F, paper = "USr", combine = F, width = 9, height = 5,
   units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-  append = F, plot = last_plot(), doc = F, app = F)
+  append = F, plot = last_plot(), doc = F)
 }
 \arguments{
 \item{...}{An object to be saved, including any other arguments to be passed to the save function associated with the file extension.}
@@ -19,8 +19,6 @@ save_file(..., file = NULL, file.override = NULL, row.names = F,
 \item{plot}{If wanting to save a ggplot object, plot should be assigned the ggplot object.}
 
 \item{doc}{Boolean (T, F) to change output directory to Documenation instad of Output. Default is F.}
-
-\item{app}{Boolean (T, F) to change output directory to App instead of Output. Default is F.}
 
 \item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.}
 }

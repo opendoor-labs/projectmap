@@ -4,12 +4,16 @@
 \alias{source_file}
 \title{Source a file for the Project Master.R file execution.}
 \usage{
-source_file(file, inFolder = NULL)
+source_file(file, inFolder = NULL, dont_unload = NULL, ...)
 }
 \arguments{
 \item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
 
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
+
+\item{dont_unload}{A character list of packages names to prevent from being unloaded}
+
+\item{...}{Additional parameters to pass to source}
 }
 \value{
 No return value

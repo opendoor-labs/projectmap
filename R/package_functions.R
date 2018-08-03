@@ -301,14 +301,13 @@ get_proj_packages = function(files, parallel = T){
 
 #' Get the project root directory
 #'
-#' @param app Boolean (T, F) indicator to tell the function that it is being executed from within the app directory
 #' @return No return value
 #' @description Updates the project environment with the root and current directories
 #' @examples
 #' get_proj_root()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_proj_root = function(app = F){
+get_proj_root = function(){
   unlock_proj()
 
   frames = unique(sys.parents())
@@ -360,10 +359,6 @@ get_proj_root = function(app = F){
       proj.env$root.dir = getwd()
     }
   }
-  if(app == T){
-    unlock_proj()
-    proj.env$root.dir = dirname(proj.env$current.dir)
-  }
   lock_proj()
 }
 
@@ -381,7 +376,7 @@ set_proj_lib = function(){
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
   }
-  proj.env$libPath = paste0(gsub("/App", "", proj.env$root.dir), "/Library")
+  proj.env$libPath = paste0(proj.env$root.dir, "/Library")
   .libPaths(new = proj.env$libPath)
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
@@ -411,8 +406,8 @@ exit_proj = function(reset_lib = T){
 
 #' Link a script to the project
 #'
-#' @param init Boolean (T, F) indicator of wheter to reset the project environment.
-#' @param app Boolean (T, F) indicator to tell the function that it is being executed from within the app directory
+#' @param init Boolean (T, F) indicator of whether to reset the project environment.
+#' @param install Boolean (T, F) indicator of whether to install packages
 #' @return No return value
 #' @description Link an R (or Rmd) script to the project environment so that it will be integrated with the
 #' "Project Master.R" script created at the set up of the project.
@@ -447,7 +442,7 @@ exit_proj = function(reset_lib = T){
 #' link_to_proj(init = F)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-link_to_proj = function(init = F, app = F, install = T){
+link_to_proj = function(init = F, install = T){
   if(Sys.getenv("RSTUDIO") != "1"){
     warning("Should be using RStudio.")
   }
@@ -475,7 +470,7 @@ link_to_proj = function(init = F, app = F, install = T){
     set_proj_lib()
 
     #Create the folder structure
-    folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library", "./App")
+    folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library")
     if(!basename(proj.env$root.dir) %in% gsub("\\./", "", folders)){
       if(!file.exists("Example File.R")){
         write(x = exampleFile, file = "Example File.R")
@@ -483,20 +478,18 @@ link_to_proj = function(init = F, app = F, install = T){
       if(!file.exists("Project Master.R")){
         write(x = masterFile, file = "Project Master.R")
       }
+      if(!file.exists("global.R")){
+        write(x = globalR, file = "global.R")
+      }
+      if(!file.exists("ui.R")){
+        write(x = uiR, file = "ui.R")
+      }
+      if(!file.exists("server.R")){
+        write(x = serverR, file = "server.R")
+      }
       for(i in folders){
         if(!dir.exists(i)){
           dir.create(i)
-          if(i == "./App"){
-            if(!file.exists("./App/global.R") & !file.exists("global.R")){
-              write(x = globalR, file = "./App/global.R")
-            }
-            if(!file.exists("./App/ui.R") & !file.exists("ui.R")){
-              write(x = uiR, file = "./App/ui.R")
-            }
-            if(!file.exists("./App/server.R") & !file.exists("server.R")){
-              write(x = serverR, file = "./App/server.R")
-            }
-          }
         }
       }
     }
@@ -584,12 +577,6 @@ link_to_proj = function(init = F, app = F, install = T){
     #   suppressMessages(devtools::reload(devtools::inst("projectmap"), quiet = T))
     #   suppressMessages(link_to_proj(init = F))
     # }
-    # if(basename(proj.env$current.dir) == "App"){
-    #   unlock_proj()
-    #   proj.env$root.dir = proj.env$current.dir
-    #   setwd(proj.env$current.dir)
-    #   message("Project root directory reset to ", getwd(), ".\n")
-    # }
     lock_proj()
     message("\nProject environment set.\n")
   }else{
@@ -600,12 +587,6 @@ link_to_proj = function(init = F, app = F, install = T){
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     set_proj_lib()
-    # if(basename(proj.env$current.dir) == "App"){
-    #   unlock_proj()
-    #   proj.env$root.dir = proj.env$current.dir
-    #   setwd(proj.env$current.dir)
-    #   message("Project root directory reset to ", getwd(), ".\n")
-    # }
     lock_proj()
     message("\nProject environment set.\n")
   }
@@ -631,9 +612,7 @@ build_cabinet = function(){
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
-  if(!grepl("/App", getwd())){
-    save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
-  }
+  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -655,7 +634,7 @@ add_to_cabinet = function(file){
   root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   file = gsub(root, ".", file)
   cabinet = gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(c(proj.env$cabinet, file)))))
-  save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
+  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -685,7 +664,7 @@ remove_file = function(files){
   #root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   #files = gsub(root, "\\.", files)
   cabinet = unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files]))
-  save(cabinet, file = paste0(gsub("/App", "", proj.env$root.dir), "/Functions/cabinet.RData"))
+  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -783,17 +762,17 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F, app = F){
+get_output_dir = function(doc = F){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
   if(length(rootfolder) == 0){
     rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$file)})))
-    outputDir = dirname(trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
+    outputDir = dirname(trimws(paste0(ifelse(doc == T, "./Documentation", "./Output"),
                                       substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file)))))
 
   }else{
-    outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", ifelse(app == T, "./App", "./Output")),
+    outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", "./Output"),
                               substr(proj.env$current.dir, gregexpr(rootfolder, proj.env$current.dir)[[1]] + nchar(rootfolder), nchar(proj.env$current.dir))))
   }
   if(doc == T){
@@ -816,6 +795,7 @@ get_output_dir = function(doc = F, app = F){
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param showProgress A boolean (T, F) indicator specifying whether to show the read in progress if using data.table's fread.
 #' @param na.strings A vector of character strings to convert to NA
+#' @param envir The environment to load the data to
 #' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.
 #' @return A data object (data.table or data.frame).
 #' @description A wrapper function to read in a file containing data. It uses the file extenstion to determine whether to
@@ -826,15 +806,15 @@ get_output_dir = function(doc = F, app = F){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 read_file = function(file, inFolder = NULL, showProgress = F,
-                na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), ...){
+                na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), envir = .GlobalEnv, ...){
   #File needs to be full file path
   file = get_file_path(file, inFolder)
   ext = tools::file_ext(file)
 
   if(ext == "RData"){
-    load(file = file, envir = .GlobalEnv, ...)
+    load(file = file, envir = envir, ...)
   }else if(ext %in% c("csv", "txt")){
-    return(data.table::fread(input = file, na.strings = na.strings, showProgress = showProgress, stringsAsFactors = stringsAsFactors, ...))
+    return(data.table::fread(input = file, na.strings = na.strings, showProgress = showProgress, ...))
   }else if(ext == "rds"){
     return(readRDS(file = file, ...))
   }else if(ext %in% c("xls", "xlsx")){
@@ -848,6 +828,8 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 #'
 #' @param file A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param dont_unload A character list of packages names to prevent from being unloaded
+#' @param ... Additional parameters to pass to source
 #' @return No return value
 #' @description A wrapper function for the base source command but also perfoms some backend functions to track the progress of the
 #' files executed in "Project Master.R" as well as updating the project progress bar. This function should only be used in the "Project Master.R" script.
@@ -865,7 +847,7 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 #' }
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-source_file = function(file, inFolder = NULL){
+source_file = function(file, inFolder = NULL, dont_unload = NULL, ...){
   #If logging hasn't been started, start it
   unlock_proj()
   if(proj.env$startSourceLog == F){
@@ -877,6 +859,7 @@ source_file = function(file, inFolder = NULL){
   unlock_proj()
   proj.env$file = get_file_path(file, inFolder)
   proj.env$current.dir = dirname(proj.env$file)
+  proj.env$dont_unload = dont_unload
   #Prevent file info from being removed
   proj.env$trace.message[[length(proj.env$trace.message) + 1]] = paste("Executing", paste0("\"", basename(proj.env$file), "\""), "...")
 
@@ -889,7 +872,7 @@ source_file = function(file, inFolder = NULL){
   lock_proj()
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
-    invisible(capture.output(suppressMessages(source(proj.env$file, chdir = T))))
+    invisible(capture.output(suppressMessages(source(proj.env$file, chdir = T, ...))))
   }else if(tools::file_ext(proj.env$file) == "Rmd"){
     invisible(capture.output(suppressMessages(rmarkdown::render(proj.env$file, quiet = T, clean = T, knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T)))))
   }else{
@@ -921,7 +904,7 @@ source_file = function(file, inFolder = NULL){
     reset_proj_env()
   }
   #Detach all packages except the required packages
-  suppressWarnings(suppressMessages(pacman::p_unload(pacman::p_loaded()[!pacman::p_loaded() %in% proj.env$required.packages], character.only = T)))
+  suppressWarnings(suppressMessages(pacman::p_unload(pacman::p_loaded()[!pacman::p_loaded() %in% unique(c(proj.env$required.packages, proj.env$dont_unload))], character.only = T)))
   lock_proj()
 }
 
@@ -1073,7 +1056,6 @@ ggplot_grid = function(g, ...){
 #' @param file.override A character string giveing the full file path if want to override the default the output directory.
 #' @param plot If wanting to save a ggplot object, plot should be assigned the ggplot object.
 #' @param doc Boolean (T, F) to change output directory to Documenation instad of Output. Default is F.
-#' @param app Boolean (T, F) to change output directory to App instead of Output. Default is F.
 #' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.
 #' @return A data object (data.table or data.frame).
 #' @description The function uses the file extension to select the appropriate save function to use. By default
@@ -1096,7 +1078,7 @@ ggplot_grid = function(g, ...){
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
                 width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot(), doc = F, app = F){
+                append = F, plot = last_plot(), doc = F){
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
   }
@@ -1117,7 +1099,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }
 
   if(is.null(file.override)){
-    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc, app = app), gsub("\\.", "", dirname(file)), sep = "/"))
+    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc), gsub("\\.", "", dirname(file)), sep = "/"))
   }else{
     outputDir = dirname(file)
   }
