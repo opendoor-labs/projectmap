@@ -772,8 +772,8 @@ get_output_dir = function(doc = F){
                                       substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file)))))
 
   }else{
-    outputDir = trimws(paste0(ifelse(doc == T, "./Documentation", "./Output"),
-                              substr(proj.env$current.dir, gregexpr(rootfolder, proj.env$current.dir)[[1]] + nchar(rootfolder), nchar(proj.env$current.dir))))
+    rootfolder = substr(proj.env$current.dir, gregexpr(paste(rootfolder, collapse = "|"), proj.env$current.dir)[[1]][1], nchar(proj.env$current.dir))
+    outputDir = paste0(ifelse(doc == T, "./Documentation/", "./Output/"), rootfolder)
   }
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
@@ -1357,12 +1357,12 @@ branch = function(file, inFolder = NULL){
   }
 
   #Copy the file to the branch folder, rename, and return the status message
-  status = file.copy(from = file,
-                     to = paste0(dir, basename(filename), "_", user, ".", ext),
-                     recursive = F, overwrite = T)
+  outfile = paste0(dir, "/", basename(filename), "_", user, ".", ext)
+  status = file.copy(from = file, to = outfile, recursive = F, overwrite = T)
   if(status == T){
-    add_to_cabinet(paste0(dir, basename(filename), "_", user, ".", ext))
+    add_to_cabinet(outfile)
     message("File branched successfully.\n")
+    file.edit(outfile)
   }else{
     message("File not branched.\n")
   }
