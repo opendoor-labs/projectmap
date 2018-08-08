@@ -38,3 +38,10 @@ options(xtable.comment = FALSE)
 #  library(ggplot2)
 #  library(data.table)
 
+## ---- echo = T, eval = F-------------------------------------------------
+#  library(projectmap)
+#  branch("Project Master.R")
+
+## ---- echo = T, eval = F-------------------------------------------------
+#  merge_branch("Project Master.R")
+

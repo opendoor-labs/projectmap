@@ -12,7 +12,7 @@
 
 <meta name="author" content="Alex Hubbard" />
 
-<meta name="date" content="2018-08-02" />
+<meta name="date" content="2018-08-07" />
 
 <title>Project Map</title>
 
@@ -70,13 +70,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Project Map</h1>
 <h4 class="author"><em>Alex Hubbard</em></h4>
-<h4 class="date"><em>August 02, 2018</em></h4>
+<h4 class="date"><em>August 07, 2018</em></h4>
 
 
 
 <div id="description" class="section level2">
 <h2>Description</h2>
-<p>It can be a challenge to develop a project in RStudio with multiple authors and make the results repeatable on any machine. It can be especially challenging to collaborate on a project developed in RStudio when output from one author’s scripts is used as an input by another author. It can also be frustrating when the scripts writted by one author are run on another author’s computer missing the required packages. Not to mention, shared drives may have differing names across computers, which can cause file input and output and to break if paths are hardcoded without the using paths relative to the root directory. Finally, it can be a nightmare to setting the correct working directory. All of these challenges are addressed in the <strong>projectmap</strong> package by attempting to do by standardizing folder structure, file input/output, and package version control.</p>
+<p>It can be a challenge to develop a project in RStudio with multiple authors and make the results repeatable on any machine. It can be especially challenging to collaborate on a project developed in RStudio when output from one author’s scripts is used as an input by another author. It can also be frustrating when the scripts writted by one author are run on another author’s computer missing the required packages. Not to mention, shared drives may have differing names across computers, which can cause file input and output to break if paths are hardcoded without the using paths relative to the root directory. Finally, it can be a nightmare to setting the correct working directory. All of these challenges are addressed in the <strong>projectmap</strong> package by attempting to standardize folder structure and file input/output while also performing package version control. The package also allows users to branch files and work on them separately from the master a method for version controlling files.</p>
 </div>
 <div id="installing-the-package" class="section level2">
 <h2>Installing the Package</h2>
@@ -131,6 +131,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The Opendoor color names are “blue”, “navy”, “iris”, “turquoise”, “citrine”, “ruby”, “lightgrey”, “bluegrey”, “coolgrey”, “warmgrey”, and “lightgreytint”. The <em>od_theme()</em> is built with multiple palettes that can be selected by setting the <em>palette</em> argument to one of “main”, “cool”, or “warm”. The <em>main</em> color palette consists of all non-grey colors, the <em>cool</em> color palette consists of “navy”, “blue”, “bluegrey”, and “turquoise”. The <em>warm</em> color palette consists of “ruby”, “iris”, and “citrine”.</p>
 <p>You can also select a subset of the Opendoor colors or naming your own colors by setting the <em>color</em> argument to a vector of color names or hexidecimal strings. Or, you can select a set number of colors by setting the <em>n</em> argument to any positive integer. If the color palette needs to continuous, make sure to set the <em>discrete</em> argument to <em>F</em> (it is <em>T</em> by default). You can also reverse the order of the color palette by setting the <em>reverse</em> argument to <em>T</em>. If you’d like to add black to the color palette (which is absent by default), you can do so by setting the <em>addblack</em> argument to <em>T</em>.</p>
 <p>Finally, the <em>read_file()</em> function is a wrapper function for <strong>data.table’s</strong> <em>fread()</em> for reading in csv files, <strong>xlsx’s</strong> <em>read.xlsx()</em> for reading in xls and xlsx files, and the base <em>load()</em> and <em>readRDS()</em> files for reading in RData and rds files. You only need to specify the file name in the <em>file</em> argument with an extension if you know the file name is unique in the project directory. Otherwise, you can specify the folder path using the <em>inFolder</em> argument (i.e. <em>Output/Model 1/Images</em>). If you leave <em>inFolder</em> as <em>NULL</em>, <em>read_file()</em> will default to looking in the folder path decided by <em>get_output_dir()</em> for the file if multiple files exist with the same name but different folder paths.</p>
+</div>
+<div id="branching-and-merging" class="section level2">
+<h2>Branching and Merging</h2>
+<p>To allow multiple users to edit the same R file and perform version control, the <strong>projectmap</strong> package provides two functions: <em>branch()</em> and <em>merge_branch()</em>.</p>
+<p>First, a user that wants to edit a local version of a file rather than the master file, the user should call the <em>branch()</em> function. Say, a user wants to edit “Project Master.R” separately from the master version, the user should type:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(projectmap)
+<span class="kw">branch</span>(<span class="st">&quot;Project Master.R&quot;</span>)</code></pre></div>
+<p>in an RStudio console. If the working directory is not a root folder for a <strong>projectmap</strong> package, it will prompt the user to select the appropriate directory. It will then detect the user’s username on the computer and create a directory “Branches/username” with the “Project Master_username.R” (where “username” is replaced with the user’s actual username) in that folder. The user should then be able to edit this file without fear of disrupting the master file. All output created from the cloned file that saved with the <em>save_file()</em> function will be placed in the “Output/Branches” subfolder by default so as not to overwrite output created from master files.</p>
+<p>Once the user is done editing the local copy of “Project Master.R” and wants to merge the changes with the master file, the user should call the <em>merge_branch()</em> function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">merge_branch</span>(<span class="st">&quot;Project Master.R&quot;</span>)</code></pre></div>
+<p>The function will automatically detect the user’s username and look in the “Branches/username” folder for their cloned “Project Master.R” file. The function will then process the two versions and display the changes in the RStudio window for approval. The RStudio console will prompt the user to enter “y” (to commit the changes) or “n” (to reject the changes) and a commit message. After these are entered, the master file is overwritten with the users cloned file and a log is made in “Logs/Merges/Project Master” with a file “username_datetime.hmtl” (where “username” is replaced with the user’s actual username and “datetime” is replaced with the date and time of the merge) for records. The commit message is saved as a “Commit Message.txt” in the folder with the same name as “username_datetime.hmtl”.</p>
 </div>
 
 

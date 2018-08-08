@@ -1317,6 +1317,146 @@ build_query = function(query, standard = T, limit = NULL, show = F){
   }
 }
 
+#' Branch a file to work on locally as a method for version control.
+#'
+#' @param file Master file to create a branch for
+#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @return No return value.
+#' @description Clones a file to the Branches folder to work on locally as a version control method. The function creates
+#' a subfolder in Branches with the username on the users computer.
+#' @examples
+#' branch("Project Master.R")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+branch = function(file, inFolder = NULL){
+  if(!exists("proj.env")){
+    require(projectmap)
+  }
+  if(!exists("root.dir", proj.env) | !exists("cabinet", proj.env)){
+    get_proj_root()
+    setwd(proj.env$root.dir)
+    load("./Functions/cabinet.RData", envir = proj.env)
+  }
+
+  #Get the username
+  user = Sys.getenv()["USER"]
+
+  #Get the full file path
+  file = get_file_path(file, inFolder)
+  #Get the extension
+  ext = tools::file_ext(file)
+  #Get the filename
+  filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
+  loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
+  filename = substr(filename, 1, loc - 1)
+
+  #Create the user branch directory if it does not exist
+  dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
+  if(!dir.exists(dir)){
+    dir.create(dir, recursive = T)
+  }
+
+  #Copy the file to the branch folder, rename, and return the status message
+  status = file.copy(from = file,
+                     to = paste0(dir, basename(filename), "_", user, ".", ext),
+                     recursive = F, overwrite = T)
+  if(status == T){
+    add_to_cabinet(paste0(dir, basename(filename), "_", user, ".", ext))
+    message("File branched successfully.\n")
+  }else{
+    message("File not branched.\n")
+  }
+}
+
+#' Merge banch with the master file as a method for version control.
+#'
+#' @param file Master file to merge branch with.
+#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param user A text string giving the username subfolder in the Branches folder to look for the cloned master file.
+#' If user is left as NULL, the function will detect the username from the computer.
+#' @return No return value.
+#' @description Merges a clone of the master with the master file.
+#' @examples
+#' merge_branch("Project Master.R")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+merge_branch = function(file, inFolder = NULL, user = NULL){
+  if(!exists("proj.env")){
+    require(projectmap)
+  }
+  if(!exists("root.dir", proj.env) | !exists("cabinet", proj.env)){
+    get_proj_root()
+    setwd(proj.env$root.dir)
+    load("./Functions/cabinet.RData", envir = proj.env)
+  }
+
+  #Get the username
+  if(is.null(user)){
+    user = Sys.getenv()["USER"]
+  }
+
+  #Find the file path to the master file
+  master = get_file_path(file, inFolder)
+  #Get the extension
+  ext = tools::file_ext(file)
+  #Get the filename
+  filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
+  loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
+  filename = substr(filename, 1, loc - 1)
+
+  #Find the path to the branched file
+  dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
+  branch = list.files(path = dir, pattern = paste0(basename(filename), "_", user, ".", ext))
+
+  if(length(branch) == 0){
+    stop("Could not find ", paste0(filename, ".", ext), " branch for ", user, ".")
+  }else if(length(branch) > 1){
+    stop("Found multiple ", paste0(filename, ".", ext), " branches for ", user, ". Consolidate duplicates into one file.")
+  }else{
+    branch = get_file_path(branch, inFolder = paste0(dir, basename(filename)))
+  }
+
+  #Print the differences to the viewer
+  accept = ""
+  message = ""
+
+  if(all(all.equal(readLines(branch), readLines(master)) == T)){
+    message("No changes to commit.\n")
+    opt = options(show.error.messages = F)
+    on.exit(options(opt))
+    stop(NULL)
+  }else{
+    p = diffr::diffr(branch, master)
+    print(p)
+    if(!dir.exists(paste0("./Logs/Merges/", paste0(basename(filename))))){
+      dir.create(paste0("./Logs/Merges/", paste0(basename(filename))), recursive = T)
+    }
+    time = Sys.time()
+    htmlwidgets::saveWidget(p, paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user, " ", time, ".html"))
+  }
+
+  #Prmopt to accept changes and add a commit message
+  while(!accept %in% c("y", "n")){
+    message("Commit changes: y or n?")
+    accept = readline()
+  }
+  if(accept == "y"){
+    while(message %in% c("")){
+      message("Commit message:")
+      message = readline()
+      write(x = message, file = paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user, " ", time, "_files/Commit Message.txt"))
+    }
+    status = file.copy(from = branch, to = master, overwrite = T)
+    if(status == T){
+      message(user, " ", filename, " branch merged successfully with master.\n")
+    }else{
+      message(user, " ", filename, " branch not merged with master.\n")
+    }
+  }else{
+    message(user, " ", filename, " branch not merged with master.\n")
+  }
+}
+
 masterFile = '###############################################################################
 #Project Master
 #
