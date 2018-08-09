@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_functions.R
 \name{merge_branch}
 \alias{merge_branch}
-\title{Merge banch with the master file as a method for version control.}
+\title{Merge banch with the master file as a method for version control, does not push to origin.}
 \usage{
 merge_branch(file, inFolder = NULL, user = NULL, accept = "",
   message = "", method = "")
@@ -27,7 +27,7 @@ If user is left as NULL, the function will detect the username from the computer
 No return value.
 }
 \description{
-Merges a clone of the master with the master file.
+Merges a clone of the master with the master file, but does not push to the origin.
 }
 \examples{
 merge_branch("Project Master.R")

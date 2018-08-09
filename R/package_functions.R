@@ -1368,7 +1368,7 @@ branch = function(file, inFolder = NULL){
   }
 }
 
-#' Merge banch with the master file as a method for version control.
+#' Merge banch with the master file as a method for version control, does not push to origin.
 #'
 #' @param file Master file to merge branch with.
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
@@ -1380,7 +1380,7 @@ branch = function(file, inFolder = NULL){
 #' if set to "accept", all changes will be accepted, etc.
 #' If user is left as NULL, the function will detect the username from the computer.
 #' @return No return value.
-#' @description Merges a clone of the master with the master file.
+#' @description Merges a clone of the master with the master file, but does not push to the origin.
 #' @examples
 #' merge_branch("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
@@ -1405,7 +1405,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
   loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
   filename = substr(filename, 1, loc - 1)
   dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
-  branch = list.files(path = dir, pattern = paste0(basename(filename), "_", user, ".", ext), full.names = T)
+  branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), "_", user, ".", ext), full.names = T))
   if(length(branch) == 0){
     stop("Could not find ", paste0(filename, ".", ext), " branch for ", user, ".")
   }else if(length(branch) > 1){
@@ -1455,6 +1455,8 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     context = context[3:length(context)]
     start = grep("<|>|~", master_file)[1]
 
+    bgLightRed = crayon::make_style("indianred", bg = TRUE)
+    bgLightGreen = crayon::make_style("palegreen", bg = TRUE)
     method_set = ifelse(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r"), F, T)
     while(start < length(master_file)){
       end = (1:length(master_file))[c(-grep("<|>|~", master_file))]
@@ -1462,10 +1464,10 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
       end = ifelse(is.na(end), length(master_file), end)
 
       if(method_set == F){
-        cat(crayon::bgRed(gsub("<", " ", head[2])), crayon::bgGreen(head[1]), "\n")
+        cat(bgLightRed(gsub("<", " ", crayon::black(head[2]))), bgLightGreen(crayon::black(head[1])), "\n")
         for(j in start:end){
-          cat(ifelse(grepl(">", branch_file[j]), crayon::bgRed(branch_file[j]), branch_file[j]),
-              ifelse(grepl("<", master_file[j]), crayon::bgGreen(master_file[j]), master_file[j]), "\n")
+          cat(ifelse(grepl(">", branch_file[j]), bgLightRed(crayon::black(branch_file[j])), branch_file[j]),
+              ifelse(grepl("<", master_file[j]), bgLightGreen(crayon::black(master_file[j])), master_file[j]), "\n")
         }
       }
 
@@ -1499,7 +1501,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
           temp = temp[temp != " "]
           if(length(temp) == 1){
             if(unique(temp) == "~"){
-              x = gsub("~", " ", x)
+              x = gsub("~", "?", x)
             }
           }
           return(x)
@@ -1532,10 +1534,62 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
       substr(x, 3, nchar(x))
     }))
 
-    write(master_file, file = master, append = F)
-    message(user, " ", filename, " branch merged with master.\n")
+    write(master_file, file = paste0(dirname(branch), "/", gsub(user, paste0(user, "_merged"), basename(branch))), append = F)
+    message(user, " ", filename, " branch merged with master. Check ", paste0(user, "_merged.R"), " for consistency before pushing changes.\n")
+    file.edit(paste0(dirname(branch), "/", gsub(user, paste0(user, "_merged"), basename(branch))))
   }else{
     message(user, " ", filename, " branch not merged with master.\n")
+  }
+}
+
+#' Push merged banch with the master origin file as a method for version control.
+#'
+#' @param file Master file to merge branch with.
+#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param user A text string giving the username subfolder in the Branches folder to look for the cloned master file.
+#' @return No return value.
+#' @description Merges a clone of the master with the master origin file.
+#' @examples
+#' merge_branch("Project Master.R")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+push_merge = function(file, inFolder = NULL, user = NULL){
+  if(!exists("proj.env")){
+    require(projectmap)
+  }
+  if(!exists("root.dir", proj.env) | !exists("cabinet", proj.env)){
+    get_proj_root()
+    setwd(proj.env$root.dir)
+    load("./Functions/cabinet.RData", envir = proj.env)
+  }
+  if(is.null(user)){
+    user = Sys.getenv()["USER"]
+  }
+
+  master = get_file_path(file, inFolder)
+  ext = tools::file_ext(file)
+  filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
+  loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
+  filename = substr(filename, 1, loc - 1)
+  dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
+  branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), "_", user, "_merged.", ext), full.names = T))
+  if(length(branch) == 0){
+    stop("Could not find ", paste0(filename, ".", ext), " merged branch for ", user, ".")
+  }else if(length(branch) > 1){
+    stop("Found multiple ", paste0(filename, ".", ext), " merged branches for ", user, ". Consolidate duplicates into one file.")
+  }
+
+  accept = ""
+  while(accept == ""){
+    message("Are you sure you want to push changes to the master: y or n?")
+    accept = readline()
+  }
+
+  if(accept == "y"){
+    file.copy(from = branch, to = master, overwrite = T)
+    message(user, " ", filename, " branch pushed to master.\n")
+  }else{
+    message(user, " ", filename, " branch not pushed to master.\n")
   }
 }
 
@@ -1599,7 +1653,7 @@ library(ggplot2)
 library(data.table)
 
 #Load functions
-#source(get_file_path("function.R"))
+#source(get_file_path("function.R))
 
 data = data.table(x = 1:10, y = 1:10, variable = "line")
 save_file(data, file = "data.RData")
