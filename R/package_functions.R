@@ -497,9 +497,9 @@ link_to_proj = function(init = F, install = T){
       }
       if(init == T){
         if(!exists(".git")){
-          system("git init", intern = T)
-          system("git add .", intern = T)
-          system("git commit -m 'Initialization'", intern = T)
+          message(paste(system("git init", intern = T), collapse = "\n"))
+          message(paste(system("git add .", intern = T), collapse = "\n"))
+          message(paste(system("git commit -m 'Initialization'", intern = T), collapse = "\n"))
         }
       }
     }
