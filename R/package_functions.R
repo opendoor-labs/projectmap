@@ -1824,7 +1824,7 @@ server = function(input, output, session){
 }
 '
 
-gitIgnore = "#Ignore Data files
+gitIgnore = "#Ignore files
 .Rhistory
 .Rproj.user
 *.RData
