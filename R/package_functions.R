@@ -1373,6 +1373,11 @@ branch = function(file, inFolder = NULL){
 #' @param file Master file to merge branch with.
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param user A text string giving the username subfolder in the Branches folder to look for the cloned master file.
+#' @param accept "y" or "n"
+#' @param message Message to commit
+#' @param method "", "accept", "reject", or "merge". If left as default "", then the function
+#' will prompt the user at all differences on whether to accept, reject or merge, the changes. Otherwise,
+#' if set to "accept", all changes will be accepted, etc.
 #' If user is left as NULL, the function will detect the username from the computer.
 #' @return No return value.
 #' @description Merges a clone of the master with the master file.
@@ -1380,7 +1385,7 @@ branch = function(file, inFolder = NULL){
 #' merge_branch("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-merge_branch = function(file, inFolder = NULL, user = NULL){
+merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message = "", method = ""){
   if(!exists("proj.env")){
     require(projectmap)
   }
@@ -1389,36 +1394,23 @@ merge_branch = function(file, inFolder = NULL, user = NULL){
     setwd(proj.env$root.dir)
     load("./Functions/cabinet.RData", envir = proj.env)
   }
-
-  #Get the username
   if(is.null(user)){
     user = Sys.getenv()["USER"]
   }
 
-  #Find the file path to the master file
   master = get_file_path(file, inFolder)
-  #Get the extension
   ext = tools::file_ext(file)
-  #Get the filename
-  filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
+  filename = ifelse(substr(file, 1, 2) == "./", basename(file),
+                    file)
   loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
   filename = substr(filename, 1, loc - 1)
-
-  #Find the path to the branched file
   dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
-  branch = list.files(path = dir, pattern = paste0(basename(filename), "_", user, ".", ext))
-
+  branch = list.files(path = dir, pattern = paste0(basename(filename), "_", user, ".", ext), full.names = T)
   if(length(branch) == 0){
     stop("Could not find ", paste0(filename, ".", ext), " branch for ", user, ".")
   }else if(length(branch) > 1){
     stop("Found multiple ", paste0(filename, ".", ext), " branches for ", user, ". Consolidate duplicates into one file.")
-  }else{
-    branch = get_file_path(branch, inFolder = paste0(dir, basename(filename)))
   }
-
-  #Print the differences to the viewer
-  accept = ""
-  message = ""
 
   if(all(all.equal(readLines(branch), readLines(master)) == T)){
     message("No changes to commit.\n")
@@ -1432,10 +1424,10 @@ merge_branch = function(file, inFolder = NULL, user = NULL){
       dir.create(paste0("./Logs/Merges/", paste0(basename(filename))), recursive = T)
     }
     time = Sys.time()
-    htmlwidgets::saveWidget(p, paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user, " ", time, ".html"))
+    htmlwidgets::saveWidget(p, file = paste0(proj.env$root.dir,
+                                             "/Logs/Merges/", basename(filename), "/", user, " ",
+                                             time, ".html"))
   }
-
-  #Prmopt to accept changes and add a commit message
   while(!accept %in% c("y", "n")){
     message("Commit changes: y or n?")
     accept = readline()
@@ -1444,14 +1436,106 @@ merge_branch = function(file, inFolder = NULL, user = NULL){
     while(message %in% c("")){
       message("Commit message:")
       message = readline()
-      write(x = message, file = paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user, " ", time, "_files/Commit Message.txt"))
+      write(x = message, file = paste0(proj.env$root.dir,
+                                       "/Logs/Merges/", basename(filename), "/", user,
+                                       " ", time, "_files/Commit Message.txt"))
     }
-    status = file.copy(from = branch, to = master, overwrite = T)
-    if(status == T){
-      message(user, " ", filename, " branch merged successfully with master.\n")
-    }else{
-      message(user, " ", filename, " branch not merged with master.\n")
+
+    context = as.character(diffobj::diffFile(master, branch, format = "raw", mode = "sidebyside", context = -1L))
+    loc = gregexpr(">", context[1])[[1]][1] - 1
+    master_file = unname(sapply(context, function(x){
+      substr(x, 1, loc)
+    }))
+    branch_file = unname(sapply(context, function(x){
+      substr(x, loc + 1, nchar(x))
+    }))
+    head = c(master_file[1], branch_file[1])
+    master_file = master_file[3:length(master_file)]
+    branch_file = branch_file[3:length(branch_file)]
+    context = context[3:length(context)]
+    start = grep("<|>|~", master_file)[1]
+
+    while(start < length(master_file)){
+      end = (1:length(master_file))[c(-grep("<|>|~", master_file))]
+      end = end[end > start][1] - 1
+      end = ifelse(is.na(end), length(master_file), end)
+
+      if(method_set == F){
+        cat(crayon::bgRed(gsub("<", " ", head[2])), crayon::bgGreen(head[1]), "\n")
+        for(j in start:end){
+          cat(ifelse(grepl(">", branch_file[j]), crayon::bgRed(branch_file[j]), branch_file[j]),
+              ifelse(grepl("<", master_file[j]), crayon::bgGreen(master_file[j]), master_file[j]), "\n")
+        }
+      }
+
+      if(method == ""){
+        method_set = F
+        while(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r")){
+          message("Accept (a), reject (r), or merge (m):")
+          method = readline()
+        }
+      }else{
+        method_set = T
+      }
+
+      if(method %in% c("Merge", "merge", "m")){
+        insert = c(master_file[start:end], branch_file[start:end])
+        insert = insert[which(!sapply(insert, function(x){grepl("~", x)}))]
+        insert = gsub("<|>|~", " ", insert)
+        master_temp = c(master_file[1:(start - 1)], insert)
+        branch_temp = c(branch_file[1:(start - 1)], insert)
+        if(end != length(master_file)){
+          master_file = c(master_temp, master_file[(end + 1):length(master_file)])
+        }else{
+          master_file = master_temp
+        }
+        if(end != length(branch_file)){
+          branch_file = c(branch_temp, branch_file[(end + 1):length(branch_file)])
+        }else{
+          branch_file = branch_temp
+        }
+      }else if(method %in% c("Accept", "accept", "a")){
+        insert = gsub("<|>", " ", branch_file[start:end])
+        insert = unname(sapply(insert, function(x){
+          temp = unique(strsplit(x, "")[[1]])
+          temp = temp[temp != " "]
+          if(length(temp) == 1){
+            if(unique(temp) == "~"){
+              x = gsub("~", " ", x)
+            }
+          }
+          return(x)
+        }))
+        master_file[start:end] = insert
+      }else if(method %in% c("Reject", "reject", "r")){
+        insert = gsub("<|>", " ", master_file[start:end])
+        insert = unname(sapply(insert, function(x){
+          temp = unique(strsplit(x, "")[[1]])
+          temp = temp[temp != " "]
+          if(length(temp) == 1){
+            if(unique(temp) == "~"){
+              x = gsub("~", "?", x)
+            }
+          }
+          return(x)
+        }))
+        master_file[start:end] = insert
+      }
+      method = ifelse(method_set == F, "", method)
+      start = grep("<|>|~", master_file)[1]
+      start = ifelse(is.na(start), length(master_file), start)
     }
+    master_file = master_file[unname(sapply(master_file, function(x){
+      temp = unique(strsplit(x, "")[[1]])
+      temp = temp[temp != " "]
+      return(length(temp) != 1 | (length(temp) == 1 & temp[1] != "?"))
+    }))]
+    master_file = unname(sapply(master_file, function(x){
+      substr(x, 3, nchar(x))
+    }))
+
+    write(master_file, file = master, append = F)
+    message(user, " ", filename, " branch merged with master.\n")
   }else{
     message(user, " ", filename, " branch not merged with master.\n")
   }

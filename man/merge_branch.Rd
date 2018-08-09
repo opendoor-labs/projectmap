@@ -4,14 +4,23 @@
 \alias{merge_branch}
 \title{Merge banch with the master file as a method for version control.}
 \usage{
-merge_branch(file, inFolder = NULL, user = NULL)
+merge_branch(file, inFolder = NULL, user = NULL, accept = "",
+  message = "", method = "")
 }
 \arguments{
 \item{file}{Master file to merge branch with.}
 
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
 
-\item{user}{A text string giving the username subfolder in the Branches folder to look for the cloned master file.
+\item{user}{A text string giving the username subfolder in the Branches folder to look for the cloned master file.}
+
+\item{accept}{"y" or "n"}
+
+\item{message}{Message to commit}
+
+\item{method}{"", "accept", "reject", or "merge". If left as default "", then the function
+will prompt the user at all differences on whether to accept, reject or merge, the changes. Otherwise,
+if set to "accept", all changes will be accepted, etc.
 If user is left as NULL, the function will detect the username from the computer.}
 }
 \value{
