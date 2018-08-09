@@ -495,6 +495,13 @@ link_to_proj = function(init = F, install = T){
           dir.create(i)
         }
       }
+      if(init == T){
+        if(!exists(".git")){
+          system("git init", intern = T)
+          system("git add .", intern = T)
+          system("git commit -m 'Initialization'", intern = T)
+        }
+      }
     }
     suppressWarnings(rm(folders, i))
 
