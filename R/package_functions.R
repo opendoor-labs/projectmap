@@ -487,6 +487,9 @@ link_to_proj = function(init = F, install = T){
       if(!file.exists("server.R")){
         write(x = serverR, file = "server.R")
       }
+      if(!file.exists(".gitignore")){
+        write(x = gitIgnore, file = ".gitignore")
+      }
       for(i in folders){
         if(!dir.exists(i)){
           dir.create(i)
@@ -1820,6 +1823,14 @@ server = function(input, output, session){
   })
 }
 '
+
+gitIgnore = "#Ignore Data files
+.Rhistory
+.Rproj.user
+*.RData
+*.csv
+*.DS_Store
+"
 
 #Call these to build the package
 #devtools::document()
