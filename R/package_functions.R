@@ -1455,6 +1455,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     context = context[3:length(context)]
     start = grep("<|>|~", master_file)[1]
 
+    method_set = ifelse(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r"), F, T)
     while(start < length(master_file)){
       end = (1:length(master_file))[c(-grep("<|>|~", master_file))]
       end = end[end > start][1] - 1
@@ -1468,14 +1469,11 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
         }
       }
 
-      if(method == ""){
-        method_set = F
+      if(method_set == F){
         while(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r")){
           message("Accept (a), reject (r), or merge (m):")
           method = readline()
         }
-      }else{
-        method_set = T
       }
 
       if(method %in% c("Merge", "merge", "m")){
