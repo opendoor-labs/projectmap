@@ -1598,6 +1598,9 @@ link_to_proj()
 library(ggplot2)
 library(data.table)
 
+#Load functions
+#source(get_file_path("function.R"))
+
 data = data.table(x = 1:10, y = 1:10, variable = "line")
 save_file(data, file = "data.RData")
 
