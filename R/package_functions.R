@@ -332,7 +332,7 @@ get_proj_root = function(){
     for(i in proj.env$current.dir){
       proj.env$root.dir = i
       for(j in 1:(length(gregexpr("/", i)[[1]]) + 1)){
-        if(file.exists(".projectmaproot")){
+        if(file.exists(paste0(proj.env$root.dir, "/.projectmaproot"))){
           found_wd = T
           proj.env$current.dir = i
           break
@@ -1434,7 +1434,7 @@ clone = function(ignore = c("RData", "csv", "xls", "xlsx"), overwrite = T){
   parallel::stopCluster(cl)
   copy = file.copy(from = ".projectmaproot", to = paste0("Branches/", user, "/.projectmaproot"))
   #Restart R
-  .rs.restartR()
+  restart = capture.output(.rs.restartR())
 }
 
 #' Merge banch with the master file as a method for version control, does not push to origin.
@@ -1479,6 +1479,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
   filename = substr(filename, 1, loc[length(loc)] - 1)
   #Get the directory
   dir = paste0("Branches/", user, "/", ifelse(dirname(master) == ".", "", dirname(master)))
+  dir = ifelse(grepl("/Branches", proj.env$root.dir), dirname(master), dir)
   #Get the branch file
   branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), ".", ext), full.names = T))
   if(length(branch) == 0){
@@ -1486,6 +1487,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
   }else if(length(branch) > 1){
     stop("Found multiple ", filename, " branches for ", user, ". Consolidate duplicates into one file.")
   }
+  master = ifelse(grepl("/Branches", proj.env$root.dir), paste0(dirname(dirname(proj.env$root.dir)), "/", master), master)
 
   if(all(all.equal(readLines(branch), readLines(master)) == T)){
     message("No changes to commit.\n")
@@ -1513,7 +1515,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
 
     #Log the diffferences
     time = Sys.time()
-    logloc = paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user," ", time)
+    logloc = paste0(ifelse(grepl("/Branches", proj.env$root.dir), dirname(dirname(proj.env$root.dir)), proj.env$root.dir), "/Logs/Merges/", basename(filename), "/", user," ", time)
     if(!dir.exists(logloc)){
       dir.create(logloc, recursive = T)
     }
@@ -1602,7 +1604,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     master_file = unname(sapply(master_file, function(x){
       substr(x, 3, nchar(x))
     }))
-    master_file = master_file[3:length(master_file)]
+    master_file = trimws(master_file[3:length(master_file)])
 
     #Write the changes to a temporary file for approval
     write(master_file, file = paste0(dirname(branch), "/", filename, "_merged.", ext), append = F)
@@ -1651,6 +1653,7 @@ push_merge = function(file, inFolder = NULL, user = NULL, open = F){
   filename = substr(filename, 1, loc[length(loc)] - 1)
   #Get the directory
   dir = paste0("Branches/", user, "/", ifelse(dirname(master) == ".", "", dirname(master)))
+  dir = ifelse(grepl("/Branches", proj.env$root.dir), dirname(master), dir)
   #Get the branch file
   branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), "_merged.", ext), full.names = T))
   if(length(branch) == 0){
@@ -1658,6 +1661,7 @@ push_merge = function(file, inFolder = NULL, user = NULL, open = F){
   }else if(length(branch) > 1){
     stop("Found multiple ", filename, " branches for ", user, ". Consolidate duplicates into one file.")
   }
+  master = ifelse(grepl("/Branches", proj.env$root.dir), paste0(dirname(dirname(proj.env$root.dir)), "/", master), master)
 
   accept = ""
   while(accept == ""){
