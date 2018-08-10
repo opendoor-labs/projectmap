@@ -1390,6 +1390,7 @@ branch = function(file, inFolder = NULL, open = T){
 #' @param accept "y" or "n"
 #' @param message Message to commit
 #' @param method "", "accept", "reject", or "merge". If left as default "", then the function
+#' @param open Boolean (T, F) to open the file after branching
 #' will prompt the user at all differences on whether to accept, reject or merge, the changes. Otherwise,
 #' if set to "accept", all changes will be accepted, etc.
 #' If user is left as NULL, the function will detect the username from the computer.
@@ -1424,7 +1425,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
   #Get the directory
   dir = paste0("Branches/", user, "/", ifelse(dirname(master) == ".", "", dirname(master)))
   #Get the branch file
-  branch = gsub("//", "/", list.files(path = dir, pattern = basename(filename), full.names = T))
+  branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), ".", ext), full.names = T))
   if(length(branch) == 0){
     stop("Could not find ", filename, " branch for ", user, ".")
   }else if(length(branch) > 1){
@@ -1550,7 +1551,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
 
     #Write the changes to a temporary file for approval
     write(master_file, file = paste0(dirname(branch), "/", filename, "_merged.", ext), append = F)
-    message(user, " ", filename, " branch merged with master. Check ", paste0(dirname(branch), "/", filename, "_merged", ext), " for consistency before pushing changes.\n")
+    message(user, " ", filename, " branch merged with master. Check ", paste0(dirname(branch), "/", filename, "_merged.", ext), " for consistency before pushing changes.\n")
     if(open == T){
       file.edit(paste0(dirname(branch), "/", filename, "_merged.", ext))
     }
@@ -1564,13 +1565,14 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
 #' @param file Master file to merge branch with.
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param user A text string giving the username subfolder in the Branches folder to look for the cloned master file.
+#' @param open Boolean (T, F) to open the file after branching
 #' @return No return value.
 #' @description Merges a clone of the master with the master origin file.
 #' @examples
 #' merge_branch("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-push_merge = function(file, inFolder = NULL, user = NULL){
+push_merge = function(file, inFolder = NULL, user = NULL, open = F){
   if(!exists("proj.env")){
     require(projectmap)
   }
@@ -1579,21 +1581,27 @@ push_merge = function(file, inFolder = NULL, user = NULL){
     setwd(proj.env$root.dir)
     load("./Functions/cabinet.RData", envir = proj.env)
   }
+  #Get the username
   if(is.null(user)){
     user = Sys.getenv()["USER"]
   }
 
+  #Get the full file path to the master
   master = get_file_path(file, inFolder)
+  #Get the file extension
   ext = tools::file_ext(file)
+  #Get the filename
   filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
   loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
-  filename = substr(filename, 1, loc - 1)
-  dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
-  branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), "_", user, "_merged.", ext), full.names = T))
+  filename = substr(filename, 1, loc[length(loc)] - 1)
+  #Get the directory
+  dir = paste0("Branches/", user, "/", ifelse(dirname(master) == ".", "", dirname(master)))
+  #Get the branch file
+  branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), "_merged.", ext), full.names = T))
   if(length(branch) == 0){
-    stop("Could not find ", paste0(filename, ".", ext), " merged branch for ", user, ".")
+    stop("Could not find ", filename, " branch for ", user, ".")
   }else if(length(branch) > 1){
-    stop("Found multiple ", paste0(filename, ".", ext), " merged branches for ", user, ". Consolidate duplicates into one file.")
+    stop("Found multiple ", filename, " branches for ", user, ". Consolidate duplicates into one file.")
   }
 
   accept = ""
@@ -1607,6 +1615,9 @@ push_merge = function(file, inFolder = NULL, user = NULL){
     file.copy(from = branch, to = paste0(dirname(branch), "/", gsub("_merged", "", basename(branch))), overwrite = T)
     file.remove(branch)
     message(user, " ", filename, " branch pushed to master.\n")
+    if(open == T){
+      file.edit(master)
+    }
   }else{
     message(user, " ", filename, " branch not pushed to master.\n")
   }

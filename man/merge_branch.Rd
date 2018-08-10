@@ -18,7 +18,9 @@ merge_branch(file, inFolder = NULL, user = NULL, accept = "",
 
 \item{message}{Message to commit}
 
-\item{method}{"", "accept", "reject", or "merge". If left as default "", then the function
+\item{method}{"", "accept", "reject", or "merge". If left as default "", then the function}
+
+\item{open}{Boolean (T, F) to open the file after branching
 will prompt the user at all differences on whether to accept, reject or merge, the changes. Otherwise,
 if set to "accept", all changes will be accepted, etc.
 If user is left as NULL, the function will detect the username from the computer.}

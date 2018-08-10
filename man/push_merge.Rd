@@ -4,7 +4,7 @@
 \alias{push_merge}
 \title{Push merged banch with the master origin file as a method for version control.}
 \usage{
-push_merge(file, inFolder = NULL, user = NULL)
+push_merge(file, inFolder = NULL, user = NULL, open = F)
 }
 \arguments{
 \item{file}{Master file to merge branch with.}
@@ -12,6 +12,8 @@ push_merge(file, inFolder = NULL, user = NULL)
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
 
 \item{user}{A text string giving the username subfolder in the Branches folder to look for the cloned master file.}
+
+\item{open}{Boolean (T, F) to open the file after branching}
 }
 \value{
 No return value.
