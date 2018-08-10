@@ -1414,7 +1414,10 @@ clone = function(ignore = c("RData", "csv", "xls", "xlsx")){
   cl = parallel::makeCluster(parallel::detectCores())
   doSNOW::registerDoSNOW(cl)
   `%fun%` = foreach::`%dopar%`
-  clones = foreach::foreach(i = files, .combine = "c", .export = c("proj.env", "branch")) %fun% {
+  progbar = txtProgressBar(min = 0, max = length(files), initial = NA, style = 3, char = "=")
+  cat("Cloning project...\n")
+  foreach::foreach(i = files, .export = c("proj.env", "branch"),
+                   .options.snow = list(progress = function(n){setTxtProgressBar(progbar, n)})) %fun% {
     suppressMessages(projectmap::branch(file = basename(i), inFolder = dirname(i), open = F))
   }
   parallel::stopCluster(cl)
