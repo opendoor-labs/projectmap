@@ -4,12 +4,14 @@
 \alias{branch}
 \title{Branch a file to work on locally as a method for version control.}
 \usage{
-branch(file, inFolder = NULL)
+branch(file, inFolder = NULL, open = T)
 }
 \arguments{
 \item{file}{Master file to create a branch for}
 
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
+
+\item{open}{Boolean (T, F) to open the file after branching}
 }
 \value{
 No return value.

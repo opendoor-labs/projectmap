@@ -496,7 +496,7 @@ link_to_proj = function(init = F, install = T){
         }
       }
       if(init == T){
-        if(!exists(".git")){
+        if(!file.exists(".git")){
           message(paste(system("git init", intern = T), collapse = "\n"))
           message(paste(system("git add .", intern = T), collapse = "\n"))
           message(paste(system("git commit -m 'Initialization'", intern = T), collapse = "\n"))
@@ -615,11 +615,11 @@ build_cabinet = function(){
   unlock_proj()
 
   folders = list.dirs(full.names = F, recursive = F)
-  folders = folders[!folders %in% c("Library", ".git")]
+  folders = folders[!folders %in% c("Library", ".git", "Branches")]
   cabinet = unlist(lapply(folders, function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
-  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F, all.files = T)))
+  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F, all.files = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
@@ -700,6 +700,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   if(ext == ""){
     stop("No extension included in file. File must end in '.ext'.")
   }
+  file = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", file))
   #Find all the paths that contain the file name in its name
   if(!is.null(inFolder)){
     #Find the correct drawer in the file cabinet
@@ -709,7 +710,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
     paths = unique(proj.env$cabinet[grepl(file, proj.env$cabinet)])
   }
   paths = paths[tools::file_ext(paths) == ext]
-  paths = paths[basename(paths) == file]
+  paths = paths[gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", basename(paths))) == file]
   if(is.null(inFolder) & length(paths) > 1){
     paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir()), paths)])
   }
@@ -1331,6 +1332,7 @@ build_query = function(query, standard = T, limit = NULL, show = F){
 #'
 #' @param file Master file to create a branch for
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param open Boolean (T, F) to open the file after branching
 #' @return No return value.
 #' @description Clones a file to the Branches folder to work on locally as a version control method. The function creates
 #' a subfolder in Branches with the username on the users computer.
@@ -1338,7 +1340,7 @@ build_query = function(query, standard = T, limit = NULL, show = F){
 #' branch("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-branch = function(file, inFolder = NULL){
+branch = function(file, inFolder = NULL, open = T){
   if(!exists("proj.env")){
     require(projectmap)
   }
@@ -1372,7 +1374,9 @@ branch = function(file, inFolder = NULL){
   if(status == T){
     add_to_cabinet(outfile)
     message("File branched successfully.\n")
-    file.edit(outfile)
+    if(open == T){
+      file.edit(outfile)
+    }
   }else{
     message("File not branched.\n")
   }
