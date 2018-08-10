@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_functions.R
 \name{branch}
 \alias{branch}
-\title{Branch a file to work on locally as a method for version control.}
+\title{Branch a file into a branch directory denoted by the username as a method for version control.}
 \usage{
 branch(file, inFolder = NULL, open = T)
 }
