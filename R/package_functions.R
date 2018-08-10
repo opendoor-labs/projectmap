@@ -619,7 +619,7 @@ build_cabinet = function(){
   cabinet = unlist(lapply(folders, function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
-  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F)))
+  cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F, all.files = T)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = cabinet[!cabinet %in% dirs]
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
