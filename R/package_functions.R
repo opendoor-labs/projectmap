@@ -1430,9 +1430,6 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
   }else{
     p = diffobj::diffFile(master, branch, format = "html", mode = "sidebyside", color.mode = "rgb")
     print(p)
-    #htmlwidgets::saveWidget(p, file = paste0(proj.env$root.dir,
-    #                                         "/Logs/Merges/", basename(filename), "/", user, " ",
-    #                                         time, ".html"))
   }
   while(!accept %in% c("y", "n")){
     message("Commit changes: y or n?")
@@ -1450,8 +1447,8 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
       dir.create(logloc, recursive = T)
     }
     context_print = as.character(diffobj::diffFile(master, branch, format = "ansi256", brightness = "dark",
-                                                   mode = "sidebyside", context = -1L, color.mode = "rgb"))
-    context = as.character(diffobj::diffFile(master, branch, format = "raw", mode = "sidebyside", context = -1L))
+                                                   mode = "sidebyside", context = -1L, color.mode = "rgb", disp.width = 500))
+    context = as.character(diffobj::diffFile(master, branch, format = "raw", mode = "sidebyside", context = -1L, disp.width = 500))
     cat(paste("Message: ", message, "\n\n", paste0(context, collapse = "\n")), "\n", file = paste0(logloc, "/codediff.txt"), append = F)
     loc = gregexpr(">", context[1])[[1]][1] - 1
     master_file = unname(sapply(context, function(x){
