@@ -40,8 +40,25 @@ options(xtable.comment = FALSE)
 
 ## ---- echo = T, eval = F-------------------------------------------------
 #  library(projectmap)
+#  #Branch or clone
+#  branch("Project Master.R") #or clone()
+#  #Make changes to your branched files
+#  #Merge changes
+#  mege_branch("Project Master.R")
+#  #Review the changes
+#  #Push the changes
+#  push_merge("Project Master.R")
+
+## ---- echo = T, eval = F-------------------------------------------------
+#  library(projectmap)
 #  branch("Project Master.R")
 
 ## ---- echo = T, eval = F-------------------------------------------------
+#  clone()
+
+## ---- echo = T, eval = F-------------------------------------------------
 #  merge_branch("Project Master.R")
+
+## ---- echo = T, eval = F-------------------------------------------------
+#  push_merge("Project Master.R")
 
