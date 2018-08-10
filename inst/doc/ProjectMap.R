@@ -54,6 +54,7 @@ options(xtable.comment = FALSE)
 #  branch("Project Master.R")
 
 ## ---- echo = T, eval = F-------------------------------------------------
+#  library(projectmap)
 #  clone()
 
 ## ---- echo = T, eval = F-------------------------------------------------

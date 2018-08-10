@@ -332,10 +332,7 @@ get_proj_root = function(){
     for(i in proj.env$current.dir){
       proj.env$root.dir = i
       for(j in 1:(length(gregexpr("/", i)[[1]]) + 1)){
-        if(file.exists(paste0(proj.env$root.dir, "/Project Master.R")) |
-           (file.exists(paste0(proj.env$root.dir, "/global.R")) &
-            file.exists(paste0(proj.env$root.dir, "/ui.R")) &
-            file.exists(paste0(proj.env$root.dir, "/server.R")))){
+        if(file.exists(".projectmaproot")){
           found_wd = T
           proj.env$current.dir = i
           break
@@ -376,7 +373,11 @@ set_proj_lib = function(){
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
   }
-  proj.env$libPath = paste0(proj.env$root.dir, "/Library")
+  if(grepl("/Branches", proj.env$root.dir)){
+    proj.env$libPath = paste0(dirname(dirname(proj.env$root.dir)), "/Library")
+  }else{
+    proj.env$libPath = paste0(proj.env$root.dir, "/Library")
+  }
   .libPaths(new = proj.env$libPath)
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
@@ -491,9 +492,14 @@ link_to_proj = function(init = F, install = T){
       if(!file.exists(".gitignore")){
         write(x = gitIgnore, file = ".gitignore")
       }
+      if(!file.exists(".projectmaproot")){
+        write("projectmap root directory", file = ".projectmaproot")
+      }
       for(i in folders){
         if(!dir.exists(i)){
-          dir.create(i)
+          if(!(grepl("/Branches", proj.env$root.dir) & (i %in% c("./Documentation", "./Library")))){
+            dir.create(i)
+          }
         }
       }
       if(init == T){
@@ -1374,7 +1380,6 @@ branch = function(file, inFolder = NULL, open = T, overwrite = T){
   outfile = paste0(dir, "/", basename(filename), ".", ext)
   status = file.copy(from = file, to = outfile, recursive = F, overwrite = overwrite)
   if(status == T){
-    add_to_cabinet(outfile)
     message("File branched successfully.\n")
     if(open == T){
       file.edit(outfile)
@@ -1411,7 +1416,10 @@ clone = function(ignore = c("RData", "csv", "xls", "xlsx"), overwrite = T){
   #Get the files
   files = proj.env$cabinet[sapply(tools::file_ext(proj.env$cabinet), function(x){
     !x %in% ignore
-  }) & !grepl("Branches/", proj.env$cabinet)]
+  }) & !(grepl("Branches/", proj.env$cabinet) | grepl("Library/", proj.env$cabinet) |
+           grepl("Documentation/", proj.env$cabinet) | grepl("rsconnect/", proj.env$cabinet) |
+           grepl("Logs/", proj.env$cabinet)) |
+    grepl("Input/", proj.env$cabinet)]
 
   #Copy the files over to the users branch
   cl = parallel::makeCluster(parallel::detectCores())
@@ -1419,11 +1427,14 @@ clone = function(ignore = c("RData", "csv", "xls", "xlsx"), overwrite = T){
   `%fun%` = foreach::`%dopar%`
   progbar = txtProgressBar(min = 0, max = length(files), initial = NA, style = 3, char = "=")
   cat("Cloning project...\n")
-  foreach::foreach(i = files, .export = c("proj.env", "branch"),
+  clones = foreach::foreach(i = files, .export = c("proj.env", "branch"),
                    .options.snow = list(progress = function(n){setTxtProgressBar(progbar, n)})) %fun% {
     suppressMessages(projectmap::branch(file = basename(i), inFolder = dirname(i), open = F, overwrite = overwrite))
   }
   parallel::stopCluster(cl)
+  copy = file.copy(from = ".projectmaproot", to = paste0("Branches/", user, "/.projectmaproot"))
+  #Restart R
+  .rs.restartR()
 }
 
 #' Merge banch with the master file as a method for version control, does not push to origin.
