@@ -118,7 +118,7 @@ in an RStudio console. If instead the user wants to be able to edit any file fro
 ```{r, echo = T, eval = F}
 clone()
 ````
-in an RStudio console. If the working directory is not a root folder for a **projectmap** package, it will prompt the user to select the appropriate directory. It will then detect the user's username on the computer and create a directory "Branches/username" with the relevant files copied (where "username" is replaced with the user's actual username) to that folder. The user should then be able to edit this file without fear of disrupting the master file. All output created from the cloned files saved with the _save_file()_ function will be placed in the "Output/Branches/username" subfolder by default so as not to overwrite output created from master files.
+in an RStudio console. If the working directory is not a root folder for a **projectmap** package, it will prompt the user to select the appropriate directory. It will then detect the user's username on the computer and create a directory "Branches/username" with the relevant files copied (where "username" is replaced with the user's actual username) to that folder. The user should then be able to edit this file without fear of disrupting the master file. All output created from the cloned files saved with the _save_file()_ function will be placed in the "username/Branches/Output" folder by default so as not to overwrite output created from master files.
 
 Once the user is done editing the branched/cloned copy of "Project Master.R" and wants to merge the changes with the master file, the user should call _merge_branch()_:
 ```{r, echo = T, eval = F}
