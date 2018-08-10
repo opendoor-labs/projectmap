@@ -4,7 +4,7 @@
 \alias{branch}
 \title{Branch a file into a branch directory denoted by the username as a method for version control.}
 \usage{
-branch(file, inFolder = NULL, open = T)
+branch(file, inFolder = NULL, open = T, overwrite = T)
 }
 \arguments{
 \item{file}{Master file to create a branch for}
@@ -12,6 +12,8 @@ branch(file, inFolder = NULL, open = T)
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
 
 \item{open}{Boolean (T, F) to open the file after branching}
+
+\item{overwrite}{Boolean (T, F) of whether to overwrite existing copies}
 }
 \value{
 No return value.

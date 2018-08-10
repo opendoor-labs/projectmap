@@ -4,10 +4,12 @@
 \alias{clone}
 \title{Clone the project into a branch directory denoted by the username as a method for version control.}
 \usage{
-clone(ignore = c("RData", "csv", "xls", "xlsx"))
+clone(ignore = c("RData", "csv", "xls", "xlsx"), overwrite = T)
 }
 \arguments{
 \item{ignore}{file extensions to not copy. Default is c("RData", "csv", "xls", "xlsx").}
+
+\item{overwrite}{Boolean (T, F) of whether to overwrite existing copies}
 }
 \value{
 No return value.

@@ -1333,6 +1333,7 @@ build_query = function(query, standard = T, limit = NULL, show = F){
 #' @param file Master file to create a branch for
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param open Boolean (T, F) to open the file after branching
+#' @param overwrite Boolean (T, F) of whether to overwrite existing copies
 #' @return No return value.
 #' @description Clones a file to the Branches folder to work on locally as a version control method. The function creates
 #' a subfolder in Branches with the username on the users computer.
@@ -1340,7 +1341,7 @@ build_query = function(query, standard = T, limit = NULL, show = F){
 #' branch("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-branch = function(file, inFolder = NULL, open = T){
+branch = function(file, inFolder = NULL, open = T, overwrite = T){
   if(!exists("proj.env")){
     require(projectmap)
   }
@@ -1370,7 +1371,7 @@ branch = function(file, inFolder = NULL, open = T){
 
   #Copy the file to the branch folder, rename, and return the status message
   outfile = paste0(dir, "/", basename(filename), ".", ext)
-  status = file.copy(from = file, to = outfile, recursive = F, overwrite = T)
+  status = file.copy(from = file, to = outfile, recursive = F, overwrite = overwrite)
   if(status == T){
     add_to_cabinet(outfile)
     message("File branched successfully.\n")
@@ -1385,6 +1386,7 @@ branch = function(file, inFolder = NULL, open = T){
 #' Clone the project into a branch directory denoted by the username as a method for version control.
 #'
 #' @param ignore file extensions to not copy. Default is c("RData", "csv", "xls", "xlsx").
+#' @param overwrite Boolean (T, F) of whether to overwrite existing copies
 #' @return No return value.
 #' @description Clones the project into the Branches folder to work on locally as a version control method. The function creates
 #' a subfolder in Branches with the username on the users computer.
@@ -1392,7 +1394,7 @@ branch = function(file, inFolder = NULL, open = T){
 #' clone()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-clone = function(ignore = c("RData", "csv", "xls", "xlsx")){
+clone = function(ignore = c("RData", "csv", "xls", "xlsx"), overwrite = T){
   if(!exists("proj.env")){
     require(projectmap)
   }
@@ -1418,7 +1420,7 @@ clone = function(ignore = c("RData", "csv", "xls", "xlsx")){
   cat("Cloning project...\n")
   foreach::foreach(i = files, .export = c("proj.env", "branch"),
                    .options.snow = list(progress = function(n){setTxtProgressBar(progbar, n)})) %fun% {
-    suppressMessages(projectmap::branch(file = basename(i), inFolder = dirname(i), open = F))
+    suppressMessages(projectmap::branch(file = basename(i), inFolder = dirname(i), open = F, overwrite = overwrite))
   }
   parallel::stopCluster(cl)
 }
