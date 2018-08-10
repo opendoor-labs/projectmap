@@ -621,7 +621,7 @@ build_cabinet = function(){
                             }))
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F, all.files = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
-  cabinet = cabinet[!cabinet %in% dirs]
+  cabinet = trimws(cabinet[!cabinet %in% dirs])
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
@@ -643,7 +643,7 @@ add_to_cabinet = function(file){
 
   root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   file = gsub(root, ".", file)
-  cabinet = gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(c(proj.env$cabinet, file)))))
+  cabinet = trimws(gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(c(proj.env$cabinet, file))))))
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
@@ -673,7 +673,7 @@ remove_file = function(files){
   }
   #root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   #files = gsub(root, "\\.", files)
-  cabinet = unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files]))
+  cabinet = trimws(unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files])))
   save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
   proj.env$cabinet = cabinet
 
