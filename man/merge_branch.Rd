@@ -5,7 +5,7 @@
 \title{Merge banch with the master file as a method for version control, does not push to origin.}
 \usage{
 merge_branch(file, inFolder = NULL, user = NULL, accept = "",
-  message = "", method = "")
+  message = "", method = "", open = T)
 }
 \arguments{
 \item{file}{Master file to merge branch with.}

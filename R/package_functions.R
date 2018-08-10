@@ -1360,7 +1360,7 @@ branch = function(file, inFolder = NULL, open = T){
   #Get the filename
   filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
   loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
-  filename = substr(filename, 1, loc - 1)
+  filename = substr(filename, 1, loc[length(loc)] - 1)
 
   #Create the user branch directory if it does not exist
   dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
@@ -1369,7 +1369,7 @@ branch = function(file, inFolder = NULL, open = T){
   }
 
   #Copy the file to the branch folder, rename, and return the status message
-  outfile = paste0(dir, "/", basename(filename), "_", user, ".", ext)
+  outfile = paste0(dir, "/", basename(filename), ".", ext)
   status = file.copy(from = file, to = outfile, recursive = F, overwrite = T)
   if(status == T){
     add_to_cabinet(outfile)
@@ -1399,7 +1399,7 @@ branch = function(file, inFolder = NULL, open = T){
 #' merge_branch("Project Master.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message = "", method = ""){
+merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message = "", method = "", open = T){
   if(!exists("proj.env")){
     require(projectmap)
   }
@@ -1408,22 +1408,27 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     setwd(proj.env$root.dir)
     load("./Functions/cabinet.RData", envir = proj.env)
   }
+  #Get the username
   if(is.null(user)){
     user = Sys.getenv()["USER"]
   }
 
+  #Get the full file path to the master
   master = get_file_path(file, inFolder)
+  #Get the extension
   ext = tools::file_ext(file)
-  filename = ifelse(substr(file, 1, 2) == "./", basename(file),
-                    file)
+  #Get the filename
+  filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
   loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
-  filename = substr(filename, 1, loc - 1)
-  dir = paste0("Branches/", user, "/", ifelse(dirname(filename) == ".", "", dirname(filename)))
-  branch = gsub("//", "/", list.files(path = dir, pattern = paste0(basename(filename), "_", user, ".", ext), full.names = T))
+  filename = substr(filename, 1, loc[length(loc)] - 1)
+  #Get the directory
+  dir = paste0("Branches/", user, "/", ifelse(dirname(master) == ".", "", dirname(master)))
+  #Get the branch file
+  branch = gsub("//", "/", list.files(path = dir, pattern = basename(filename), full.names = T))
   if(length(branch) == 0){
-    stop("Could not find ", paste0(filename, ".", ext), " branch for ", user, ".")
+    stop("Could not find ", filename, " branch for ", user, ".")
   }else if(length(branch) > 1){
-    stop("Found multiple ", paste0(filename, ".", ext), " branches for ", user, ". Consolidate duplicates into one file.")
+    stop("Found multiple ", filename, " branches for ", user, ". Consolidate duplicates into one file.")
   }
 
   if(all(all.equal(readLines(branch), readLines(master)) == T)){
@@ -1445,15 +1450,20 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
       message = readline()
     }
 
+    #Read in the differences
+    context_print = as.character(diffobj::diffFile(master, branch, format = "ansi256", brightness = "dark",
+                                                   mode = "sidebyside", context = -1L, color.mode = "rgb", disp.width = 500))
+    context = as.character(diffobj::diffFile(master, branch, format = "raw", mode = "sidebyside", context = -1L, disp.width = 500))
+
+    #Log the diffferences
     time = Sys.time()
     logloc = paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user," ", time)
     if(!dir.exists(logloc)){
       dir.create(logloc, recursive = T)
     }
-    context_print = as.character(diffobj::diffFile(master, branch, format = "ansi256", brightness = "dark",
-                                                   mode = "sidebyside", context = -1L, color.mode = "rgb", disp.width = 500))
-    context = as.character(diffobj::diffFile(master, branch, format = "raw", mode = "sidebyside", context = -1L, disp.width = 500))
     cat(paste("Message: ", message, "\n\n", paste0(context, collapse = "\n")), "\n", file = paste0(logloc, "/codediff.txt"), append = F)
+
+    #Separate into master and branch text
     loc = gregexpr(">", context[1])[[1]][1] - 1
     master_file = unname(sapply(context, function(x){
       substr(x, 1, loc)
@@ -1463,6 +1473,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     }))
     start = grep("<|>|~", master_file)[1]
 
+    #Loop through the observed differences and prompt the user to accept, reject, or merge
     method_set = ifelse(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r"), F, T)
     while(start < length(master_file)){
       end = (1:length(master_file))[c(-grep("<|>|~", master_file))]
@@ -1537,9 +1548,12 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     }))
     master_file = master_file[3:length(master_file)]
 
-    write(master_file, file = paste0(dirname(branch), "/", gsub(user, paste0(user, "_merged"), basename(branch))), append = F)
-    message(user, " ", filename, " branch merged with master. Check ", paste0(user, "_merged.R"), " for consistency before pushing changes.\n")
-    file.edit(paste0(dirname(branch), "/", gsub(user, paste0(user, "_merged"), basename(branch))))
+    #Write the changes to a temporary file for approval
+    write(master_file, file = paste0(dirname(branch), "/", filename, "_merged.", ext), append = F)
+    message(user, " ", filename, " branch merged with master. Check ", paste0(dirname(branch), "/", filename, "_merged", ext), " for consistency before pushing changes.\n")
+    if(open == T){
+      file.edit(paste0(dirname(branch), "/", filename, "_merged.", ext))
+    }
   }else{
     message(user, " ", filename, " branch not merged with master.\n")
   }
