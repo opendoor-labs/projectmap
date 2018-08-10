@@ -1328,7 +1328,7 @@ build_query = function(query, standard = T, limit = NULL, show = F){
   }
 }
 
-#' Branch a file to work on locally as a method for version control.
+#' Branch a file into a branch directory denoted by the username as a method for version control.
 #'
 #' @param file Master file to create a branch for
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
@@ -1380,6 +1380,44 @@ branch = function(file, inFolder = NULL, open = T){
   }else{
     message("File not branched.\n")
   }
+}
+
+#' Clone the project into a branch directory denoted by the username as a method for version control.
+#'
+#' @param ignore file extensions to not copy. Default is c("RData", "csv", "xls", "xlsx").
+#' @return No return value.
+#' @description Clones the project into the Branches folder to work on locally as a version control method. The function creates
+#' a subfolder in Branches with the username on the users computer.
+#' @examples
+#' clone()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+clone = function(ignore = c("RData", "csv", "xls", "xlsx")){
+  if(!exists("proj.env")){
+    require(projectmap)
+  }
+  if(!exists("root.dir", proj.env) | !exists("cabinet", proj.env)){
+    get_proj_root()
+    setwd(proj.env$root.dir)
+    load("./Functions/cabinet.RData", envir = proj.env)
+  }
+
+  #Get the username
+  user = Sys.getenv()["USER"]
+
+  #Get the files
+  files = proj.env$cabinet[sapply(tools::file_ext(proj.env$cabinet), function(x){
+    !x %in% ignore
+  }) & !grepl("Branches/", proj.env$cabinet)]
+
+  #Copy the files over to the users branch
+  cl = parallel::makeCluster(parallel::detectCores())
+  doSNOW::registerDoSNOW(cl)
+  `%fun%` = foreach::`%dopar%`
+  clones = foreach::foreach(i = files, .combine = "c", .export = c("proj.env", "branch")) %fun% {
+    suppressMessages(projectmap::branch(file = basename(i), inFolder = dirname(i), open = F))
+  }
+  parallel::stopCluster(cl)
 }
 
 #' Merge banch with the master file as a method for version control, does not push to origin.
