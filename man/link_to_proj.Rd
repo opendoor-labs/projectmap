@@ -23,7 +23,8 @@ This is the most important function in the package. It first looks for the proje
 looking for the folder path to "Project Master.R". If it does not find this file, it will prompt the
 user to specify a path. Once the user specifies the path, the "Project Master.R" file will be
 automatically created in that folder along with "Example File.R". It then stores this folder as
-"root.dir" in the package environment.
+"root.dir" in the package environment. It also creates a ".gitignore" file and initializes the root
+directory for git in case the user would like to use git features.
 
 Once the root directory is set, it will build the folder structure if it does not exist. This
 structure consists of folders "Codes", "Functions", "Input", "Output", "Documentation", and "Logs".
