@@ -1428,15 +1428,11 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     on.exit(options(opt))
     stop(NULL)
   }else{
-    p = diffr::diffr(branch, master)
+    p = diffobj::diffFile(master, branch, format = "html", mode = "sidebyside", color.mode = "rgb")
     print(p)
-    if(!dir.exists(paste0("./Logs/Merges/", paste0(basename(filename))))){
-      dir.create(paste0("./Logs/Merges/", paste0(basename(filename))), recursive = T)
-    }
-    time = Sys.time()
-    htmlwidgets::saveWidget(p, file = paste0(proj.env$root.dir,
-                                             "/Logs/Merges/", basename(filename), "/", user, " ",
-                                             time, ".html"))
+    #htmlwidgets::saveWidget(p, file = paste0(proj.env$root.dir,
+    #                                         "/Logs/Merges/", basename(filename), "/", user, " ",
+    #                                         time, ".html"))
   }
   while(!accept %in% c("y", "n")){
     message("Commit changes: y or n?")
@@ -1446,12 +1442,17 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     while(message %in% c("")){
       message("Commit message:")
       message = readline()
-      write(x = message, file = paste0(proj.env$root.dir,
-                                       "/Logs/Merges/", basename(filename), "/", user,
-                                       " ", time, "_files/Commit Message.txt"))
     }
 
+    time = Sys.time()
+    logloc = paste0(proj.env$root.dir, "/Logs/Merges/", basename(filename), "/", user," ", time)
+    if(!dir.exists(logloc)){
+      dir.create(logloc, recursive = T)
+    }
+    context_print = as.character(diffobj::diffFile(master, branch, format = "ansi256", brightness = "dark",
+                                                   mode = "sidebyside", context = -1L, color.mode = "rgb"))
     context = as.character(diffobj::diffFile(master, branch, format = "raw", mode = "sidebyside", context = -1L))
+    cat(paste("Message: ", message, "\n\n", paste0(context, collapse = "\n")), "\n", file = paste0(logloc, "/codediff.txt"), append = F)
     loc = gregexpr(">", context[1])[[1]][1] - 1
     master_file = unname(sapply(context, function(x){
       substr(x, 1, loc)
@@ -1459,14 +1460,8 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     branch_file = unname(sapply(context, function(x){
       substr(x, loc + 1, nchar(x))
     }))
-    head = c(master_file[1], branch_file[1])
-    master_file = master_file[3:length(master_file)]
-    branch_file = branch_file[3:length(branch_file)]
-    context = context[3:length(context)]
     start = grep("<|>|~", master_file)[1]
 
-    bgLightRed = crayon::make_style("indianred", bg = TRUE)
-    bgLightGreen = crayon::make_style("palegreen", bg = TRUE)
     method_set = ifelse(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r"), F, T)
     while(start < length(master_file)){
       end = (1:length(master_file))[c(-grep("<|>|~", master_file))]
@@ -1474,11 +1469,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
       end = ifelse(is.na(end), length(master_file), end)
 
       if(method_set == F){
-        cat(bgLightRed(gsub("<", " ", crayon::black(head[2]))), bgLightGreen(crayon::black(head[1])), "\n")
-        for(j in start:end){
-          cat(ifelse(grepl(">", branch_file[j]), bgLightRed(crayon::black(branch_file[j])), branch_file[j]),
-              ifelse(grepl("<", master_file[j]), bgLightGreen(crayon::black(master_file[j])), master_file[j]), "\n")
-        }
+        cat(paste(context_print[c(1, ifelse(start - 3 < 1, 1, start - 3):ifelse(end + 3 > length(context_print), length(context_print), end + 3))], collapse = "\n"), "\n")
       }
 
       if(method_set == F){
@@ -1543,6 +1534,7 @@ merge_branch = function(file, inFolder = NULL, user = NULL, accept = "", message
     master_file = unname(sapply(master_file, function(x){
       substr(x, 3, nchar(x))
     }))
+    master_file = master_file[3:length(master_file)]
 
     write(master_file, file = paste0(dirname(branch), "/", gsub(user, paste0(user, "_merged"), basename(branch))), append = F)
     message(user, " ", filename, " branch merged with master. Check ", paste0(user, "_merged.R"), " for consistency before pushing changes.\n")
@@ -1597,6 +1589,8 @@ push_merge = function(file, inFolder = NULL, user = NULL){
 
   if(accept == "y"){
     file.copy(from = branch, to = master, overwrite = T)
+    file.copy(from = branch, to = paste0(dirname(branch), "/", gsub("_merged", "", basename(branch))), overwrite = T)
+    file.remove(branch)
     message(user, " ", filename, " branch pushed to master.\n")
   }else{
     message(user, " ", filename, " branch not pushed to master.\n")
@@ -1831,6 +1825,7 @@ server = function(input, output, session){
 }
 '
 
+#.gitignore file
 gitIgnore = "#Ignore files
 .Rhistory
 .Rproj.user
