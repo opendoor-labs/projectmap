@@ -790,19 +790,21 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F){
   #folder should be the full file path to the folder not including its name
-  basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
-  rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
-  if(length(rootfolder) == 0){
-    rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$file)})))
-    rootfolder = gsub("Codes/", "", rootfolder)
-    outputDir = dirname(trimws(paste0(ifelse(doc == T, "./Documentation", "./Output"),
-                                      substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file)))))
-
-  }else{
-    rootfolder = substr(proj.env$current.dir, gregexpr(paste(rootfolder, collapse = "|"), proj.env$current.dir)[[1]][1], nchar(proj.env$current.dir))
-    rootfolder = gsub("Codes/", "", rootfolder)
-    outputDir = paste0(ifelse(doc == T, "./Documentation/", "./Output/"), rootfolder)
+  folders = strsplit(outputDir, "/")[[1]]
+  folders = folders[folders != ""]
+  outputDir = proj.env$current.dir
+  for(i in 1:length(folders)){
+    if(basename(outputDir) %in% basefolders){
+      outputDir = dirname(outputDir)
+      break
+    }else{
+      outputDir = dirname(outputDir)
+    }
   }
+  if(i == length(folders) & nchar(outputDir) == 1){
+    outputDir = paste0(proj.env$current.dir, ifelse(doc == T, "/Documentation", "/Output"))
+  }
+  outputDir = paste0(dirname(outputDir), ifelse(doc == T, "/Documentation/", "/Output/"))
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
     str = substr(outputDir, loc1, nchar(outputDir))
@@ -2202,6 +2204,8 @@ gitIgnore = "#Ignore files
 .Ruserdata
 *.RData
 *.DS_Store
+**/Logs
+**/Output
 "
 
 #Call these to build the package
