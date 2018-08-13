@@ -818,6 +818,7 @@ get_output_dir = function(doc = F){
     #If an output directory doesn't exist, create it
     dir.create(outputDir, showWarnings = F, recursive = T)
   }
+  outputDir = paste0(outputDir, "/")
   return(gsub("//", "/", outputDir))
 }
 
