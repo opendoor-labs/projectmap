@@ -629,7 +629,7 @@ build_cabinet = function(){
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F, all.files = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = trimws(cabinet[!cabinet %in% dirs])
-  cabinet = unique(unname(sapply(proj.env$cabinet, function(x){
+  cabinet = unique(unname(sapply(cabinet, function(x){
     if(substr(x, 1, 2) == "./"){
       x = substr(x, 3, nchar(x))
     }
