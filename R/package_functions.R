@@ -790,9 +790,10 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F){
   #folder should be the full file path to the folder not including its name
+  basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
+  outputDir = proj.env$current.dir
   folders = strsplit(outputDir, "/")[[1]]
   folders = folders[folders != ""]
-  outputDir = proj.env$current.dir
   for(i in 1:length(folders)){
     if(basename(outputDir) %in% basefolders){
       outputDir = dirname(outputDir)
