@@ -1344,6 +1344,279 @@ build_query = function(query, standard = T, limit = NULL, show = F){
   }
 }
 
+#' Interactively merge a file from different branches
+#'
+#' @param with Branch name want to merge current branch with
+#' @param this Current branch
+#' @param file File name and extenstion to merge with
+#' @return A character vector of the merged files.
+#' @description Interactively merges differences between two files similar to git.
+#' @examples
+#' interactive_merge(with = "master", this = "alexhubbared", file = "Project Master.R")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+interactive_merge = function(with, this, file){
+  assign(branch1, system(paste0("git show ", with, ":'", file, "'"), intern = T))
+  assign(branch2, system(paste0("git show ", this, ":'", file, "'"), intern = T))
+
+  #Get the file extension
+  ext = tools::file_ext(file)
+  #Get the filename
+  filename = ifelse(substr(file, 1, 2) == "./", basename(file), file)
+  loc = gregexpr(paste0(".", tools::file_ext(filename)), filename)[[1]]
+  filename = substr(filename, 1, loc[length(loc)] - 1)
+
+  #Read in the differences
+  context_print = as.character(diffobj::diffChr(get(branch1), get(branch2), format = "ansi256", brightness = "dark", disp.width = 250,
+                                                mode = "sidebyside", context = -1L, color.mode = "rgb", tar.banner = branch1, cur.banner = branch2))
+  context = as.character(diffobj::diffChr(get(branch1), get(branch2), format = "raw", mode = "sidebyside", disp.width = 250,
+                                          tar.banner = branch1, cur.banner = branch2, context = -1L))
+
+  #Separate into master and branch text
+  loc = gregexpr(">", context[1])[[1]][1] - 1
+  with_file = unname(sapply(context, function(x){
+    substr(x, 1, loc)
+  }))
+  this_file = unname(sapply(context, function(x){
+    substr(x, loc + 1, nchar(x))
+  }))
+  start = grep("<|>|~", substr(with_file, 1, 1))[2]
+
+  with_char = unname(sapply(with_file, function(x){
+    temp = strsplit(x, "")[[1]]
+    return(max(which(temp != " ")))
+  }))
+  with_char = max(with_char[is.finite(with_char)])
+  this_char = unname(sapply(this_file, function(x){
+    temp = strsplit(x, "")[[1]]
+    return(max(which(temp != " ")))
+  }))
+  this_char = max(this_char[is.finite(with_char)])
+  with_file = substr(with_file, 1, with_char)
+  this_file = substr(this_file, 1, this_char)
+
+  #Loop through the observed differences and prompt the user to accept, reject, or merge
+  while(start < length(with_file)){
+    end = (1:length(with_file))[c(-grep("<|>|~", with_file))]
+    end = end[end > start][1] - 1
+    end = ifelse(is.na(end), length(with_file), end)
+
+    method = ""
+    cat(paste(context_print[c(1, ifelse(start - 3 < 1, 1, start - 3):ifelse(end + 3 > length(context_print), length(context_print), end + 3))], collapse = "\n"), "\n")
+    while(!method %in% c("Merge", "merge", "Accept", "accept", "Reject", "reject", "m", "a", "r")){
+      message("Accept (a), reject (r), or merge (m):")
+      method = readline()
+    }
+
+    if(method %in% c("Merge", "merge", "m")){
+      insert = c(with_file[start:end],
+                 paste0("#", paste(rep("=", with_char), collapse = "")),
+                 this_file[start:end])
+      insert = insert[which(!sapply(insert, function(x){grepl("~", x)}))]
+      insert = gsub("<|>|~", " ", insert)
+      insert = c(paste0("  #", branch1, paste(rep("<", with_char - 3 - nchar(branch1)), collapse = "")),
+                 insert,
+                 paste0("  #", branch2, paste(rep(">", with_char - 3 - nchar(branch2)), collapse = "")))
+      master_temp = c(with_file[1:(start - 1)], insert)
+      branch_temp = c(this_file[1:(start - 1)], insert)
+      if(end != length(with_file)){
+        with_file = c(master_temp, with_file[(end + 1):length(with_file)])
+      }else{
+        with_file = master_temp
+      }
+      if(end != length(this_file)){
+        this_file = c(branch_temp, this_file[(end + 1):length(this_file)])
+      }else{
+        this_file = branch_temp
+      }
+    }else if(method %in% c("Accept", "accept", "a")){
+      insert = gsub("<|>", " ", this_file[start:end])
+      insert = unname(sapply(insert, function(x){
+        temp = unique(strsplit(x, "")[[1]])
+        temp = temp[temp != " "]
+        if(length(temp) == 1){
+          if(unique(temp) == "~"){
+            x = gsub("~", "?", x)
+          }
+        }
+        return(x)
+      }))
+      with_file[start:end] = insert
+    }else if(method %in% c("Reject", "reject", "r")){
+      insert = gsub("<|>", " ", with_file[start:end])
+      insert = unname(sapply(insert, function(x){
+        temp = unique(strsplit(x, "")[[1]])
+        temp = temp[temp != " "]
+        if(length(temp) == 1){
+          if(unique(temp) == "~"){
+            x = gsub("~", "?", x)
+          }
+        }
+        return(x)
+      }))
+      with_file[start:end] = insert
+    }
+    start = grep("<|>|~", substr(with_file, 1, 1))[2]
+    start = ifelse(is.na(start), length(with_file), start)
+  }
+  with_file = with_file[unname(sapply(with_file, function(x){
+    temp = unique(strsplit(x, "")[[1]])
+    temp = temp[temp != " "]
+    return(length(temp) != 1 | (length(temp) == 1 & temp[1] != "?"))
+  }))]
+  with_file = unname(sapply(with_file, function(x){
+    substr(x, 3, nchar(x))
+  }))
+  with_file = trimws(with_file[3:length(with_file)], "right")
+  return(with_file)
+}
+
+#' Create a branch using git
+#'
+#' @param branch Branch name
+#' @return No return value
+#' @description Creates a git branch. If branch left NULL then uses the current username on the computer.
+#' The function also sets the newly created branch to be upstream from the master branch.
+#' @examples
+#' git_branch()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_branch = function(branch = NULL){
+  if(is.null(branch)){
+    branch = Sys.getenv()["USER"]
+  }
+  if(branch != "master"){
+    message(system(paste("git branch", branch), intern = T))
+    message(system(paste("git branch --set-upstream-to=master", branch), intern = T))
+    x = .rs.restartR()
+  }
+  message(paste(system(paste("git checkout", branch), intern = T), collapse = "\n"))
+}
+
+#' Git pull
+#'
+#' @return No return value
+#' @description Git pull the master branch into the current branch.
+#' @examples
+#' git_pull()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_pull = function(){
+  message(system(paste("git pull"), intern = T))
+}
+
+#' Git push
+#'
+#' @return No return value
+#' @description Git push the current branch into the master branch.
+#' @examples
+#' git_push()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_push = function(){
+  branches = capture.output(system("git branch", intern = T))
+  branches = strsplit(branches, "\" ")[[1]]
+  branches = gsub("\"|\\[|\\]| ", "", branches)
+  branch = branches[grepl("\\*", branches)]
+  branch = substr(branch, gregexpr("\\*", branch)[[1]][1] + 1, nchar(branch))
+
+  x = capture.output(system(paste0("git branch --set-upstream-to=", branch, " ", master), intern = T))
+  x = capture.output(system(paste("git checkout ", master), intern = T))
+  message(system(paste("git pull"), intern = T))
+  x = capture.output(system("git branch --unset-upstream", intern = T))
+  x = capture.output(system(paste("git checkout", branch), intern = T))
+}
+
+#' Git diff
+#'
+#' @return No return value
+#' @param branch1 The first branch to compare
+#' @param branch2 The second branch to compare
+#' @param file The file name with extension to compare
+#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param mode A character string of the display mode used by diffobj
+#' @description Git diff a file between two branches using diffobj. If branch2 is left NULL then uses the current branch.
+#' @examples
+#' git_diff(branch1 = "master", branch2 = "alexhubbard", file = "Example File.R")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_diff = function(branch1 = NULL, branch2 = NULL, file = NULL, inFolder = NULL, mode = "sidebyside"){
+  file = get_file_path(file, inFolder)
+
+  if(is.null(branch1)){
+    stop("Must proved the name of a branch to compare.")
+  }
+  if(is.null(branch2)){
+    branches = capture.output(system("git branch", intern = T))
+    branches = strsplit(branches, "\" ")[[1]]
+    branches = gsub("\"|\\[|\\]| ", "", branches)
+    branch2 = branches[grepl("\\*", branches)]
+    branch2 = substr(branch2, gregexpr("\\*", branch2)[[1]][1] + 1, nchar(branch2))
+  }
+  assign(branch1, system(paste0("git show ", with, ":'", file, "'"), intern = T))
+  assign(branch2, system(paste0("git show ", this, ":'", file, "'"), intern = T))
+  p = diffobj::diffChr(get(branch1), get(branch2), mode = mode, disp.width = 250, color.mode = "rgb",
+                       tar.banner = branch1, cur.banner = branch2)
+  print(p)
+}
+
+#' Merge two branches using git or interactive method
+#'
+#' @param with Branch name want to merge current branch with
+#' @param this Current branch
+#' @param file File name and extenstion to merge with
+#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param interactive Boolean (T, F) indicator of whether to interactively merge (T) or git merge (F)
+#' @return No return value
+#' @description Interactive of git merge a file from 2 branches
+#' @examples
+#' git_merge(with = "master")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_merge = function(with = NULL, this = NULL, file = NULL, inFolder = NULL, interactive = F){
+  if(is.null(with)){
+    stop("Must provide the name of the branch to merge with.")
+  }
+  branches = capture.output(system("git branch", intern = T))
+  branches = strsplit(branches, "\" ")[[1]]
+  branches = gsub("\"|\\[|\\]| ", "", branches)
+  cur.branch = branches[grepl("\\*", branches)]
+  cur.branch = substr(cur.branch, gregexpr("\\*", cur.branch)[[1]][1] + 1, nchar(cur.branch))
+  if(is.null(this)){
+    this = cur.branch
+  }
+  if(cur.branch != with){
+    message(system(paste("git checkout ", with), intern = T))
+  }
+  if(interactive == T){
+    file = get_file_path(file, inFolder)
+    fnl = interactive_merge(with = "master", this = this, file)
+    write(fnl, file = file, append = F)
+  }else{
+    message(system(paste("git merge", with, this), intern = T))
+  }
+  if(cur.branch != with){
+    message(system(paste("git checkout ", this), intern = T))
+  }
+}
+
+#' Commit changes to the current branch
+#'
+#' @param message A character string to provide with git commit
+#' @return No return value
+#' @description Interactive of git merge a file from 2 branches
+#' @examples
+#' git_commit("init")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_commit = function(message){
+  if(is.null(message)){
+    stop("Message must be provided.")
+  }
+  x = capture.output(system("git add .", intern = T))
+  message(system(paste0("git commit -m '", message, "'"), intern = T))
+}
+
 #' Branch a file into a branch directory denoted by the username as a method for version control.
 #'
 #' @param file Master file to create a branch for
@@ -1918,11 +2191,11 @@ server = function(input, output, session){
   })
 }
 '
-
 #.gitignore file
 gitIgnore = "#Ignore files
 .Rhistory
 .Rproj.user
+.Ruserdata
 *.Rproj
 *.RData
 *.csv
