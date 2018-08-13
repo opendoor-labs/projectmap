@@ -507,6 +507,7 @@ link_to_proj = function(init = F, install = T){
           message(paste(system("git init", intern = T), collapse = "\n"))
           message(paste(system("git add .", intern = T), collapse = "\n"))
           message(paste(system("git commit -m 'Initialization'", intern = T), collapse = "\n"))
+          message(paste(system("git config receive.denyCurrentBranch updateInstead", intern = T), collapse = "\n"))
         }
       }
     }
@@ -557,7 +558,7 @@ link_to_proj = function(init = F, install = T){
         }
       }
       if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
-        pacman::p_install_gh("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
+        devtools::install_github("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
         message("Done.")
       }
 
@@ -1493,6 +1494,23 @@ git_branch = function(branch = NULL){
   message(paste(system(paste("git checkout", branch), intern = T), collapse = "\n"))
 }
 
+#' Clone a git repository
+#'
+#' @param repo Character string path to the git repository to clone
+#' @param directory Character string path where to clone the git repository to
+#' @return No return value
+#' @description Clones a git repository
+#' @examples
+#' clone(repo = "/users/username/Documents/repo", directory = "/users/username/Documents/clones/repo")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+git_clone = function(repo = NULL, directory = NULL){
+  if(is.null(repo) | is.null(directory)){
+    stop("Must provide both the repo and final directory.")
+  }
+  message(paste(system(paste0("git clone '", repo, "' '", directory, "'"), intern = T), collapse = "\n"))
+}
+
 #' Git pull
 #'
 #' @return No return value
@@ -1514,17 +1532,7 @@ git_pull = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 git_push = function(){
-  branches = capture.output(system("git branch", intern = T))
-  branches = strsplit(branches, "\" ")[[1]]
-  branches = gsub("\"|\\[|\\]| ", "", branches)
-  branch = branches[grepl("\\*", branches)]
-  branch = substr(branch, gregexpr("\\*", branch)[[1]][1] + 1, nchar(branch))
-
-  x = capture.output(system(paste0("git branch --set-upstream-to=", branch, " ", master), intern = T))
-  x = capture.output(system(paste("git checkout ", master), intern = T))
-  message(system(paste("git pull"), intern = T))
-  x = capture.output(system("git branch --unset-upstream", intern = T))
-  x = capture.output(system(paste("git checkout", branch), intern = T))
+  message(system(paste("git push origin refs/heads/master"), intern = T))
 }
 
 #' Git diff
@@ -1540,23 +1548,19 @@ git_push = function(){
 #' git_diff(branch1 = "master", branch2 = "alexhubbard", file = "Example File.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-git_diff = function(branch1 = NULL, branch2 = NULL, file = NULL, inFolder = NULL, mode = "sidebyside"){
+git_diff = function(branch1 = "master", branch2 = "master", file = NULL, inFolder = NULL, mode = "sidebyside"){
+  remote = capture.output(system("git remote -v", intern = T))
+  remote = trimws(gsub("origin\\\\t|\\(fetch\\)|\\(push\\)|\\(pull\\)|\"", "", remote))[1]
+  remote = trimws(substr(remote, 4, nchar(remote)))
   file = get_file_path(file, inFolder)
 
-  if(is.null(branch1)){
-    stop("Must proved the name of a branch to compare.")
-  }
-  if(is.null(branch2)){
-    branches = capture.output(system("git branch", intern = T))
-    branches = strsplit(branches, "\" ")[[1]]
-    branches = gsub("\"|\\[|\\]| ", "", branches)
-    branch2 = branches[grepl("\\*", branches)]
-    branch2 = substr(branch2, gregexpr("\\*", branch2)[[1]][1] + 1, nchar(branch2))
-  }
-  assign(branch1, system(paste0("git show ", with, ":'", file, "'"), intern = T))
-  assign(branch2, system(paste0("git show ", this, ":'", file, "'"), intern = T))
-  p = diffobj::diffChr(get(branch1), get(branch2), mode = mode, disp.width = 250, color.mode = "rgb",
-                       tar.banner = branch1, cur.banner = branch2)
+  local = capture.output(system(paste0("git show master:'", file, "'"), intern = T))
+  setwd(remote)
+  system(paste0("cd '", remote, "'"), intern = T)
+  remote = capture.output(system(paste0("git show master:'", file, "'"), intern = T))
+  setwd(proj.env$root.dir)
+  system(paste0("cd '", proj.env$root.dir, "'"), intern = T)
+  p = diffobj::diffChr(remote, local, mode = mode, disp.width = 250, color.mode = "rgb")
   print(p)
 }
 
@@ -2196,9 +2200,7 @@ gitIgnore = "#Ignore files
 .Rhistory
 .Rproj.user
 .Ruserdata
-*.Rproj
 *.RData
-*.csv
 *.DS_Store
 "
 

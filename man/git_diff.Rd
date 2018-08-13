@@ -4,8 +4,8 @@
 \alias{git_diff}
 \title{Git diff}
 \usage{
-git_diff(branch1 = NULL, branch2 = NULL, file = NULL, inFolder = NULL,
-  mode = "sidebyside")
+git_diff(branch1 = "master", branch2 = "master", file = NULL,
+  inFolder = NULL, mode = "sidebyside")
 }
 \arguments{
 \item{branch1}{The first branch to compare}
