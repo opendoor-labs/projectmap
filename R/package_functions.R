@@ -805,7 +805,7 @@ get_output_dir = function(doc = F){
   if(i == length(folders) & nchar(outputDir) == 1){
     outputDir = paste0(proj.env$current.dir, ifelse(doc == T, "/Documentation", "/Output"))
   }else{
-    outputDir = paste0(dirname(outputDir), ifelse(doc == T, "/Documentation/", "/Output/"), basename(proj.env$current.dir))
+    outputDir = paste0(outputDir, ifelse(doc == T, "/Documentation/", "/Output/"), basename(proj.env$current.dir))
   }
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
