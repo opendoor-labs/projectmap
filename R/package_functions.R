@@ -793,11 +793,13 @@ get_output_dir = function(doc = F){
   rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
   if(length(rootfolder) == 0){
     rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$file)})))
+    rootfolder = gsub("Codes/", "", rootfolder)
     outputDir = dirname(trimws(paste0(ifelse(doc == T, "./Documentation", "./Output"),
                                       substr(proj.env$file, gregexpr(rootfolder, proj.env$file)[[1]] + nchar(rootfolder), nchar(proj.env$file)))))
 
   }else{
     rootfolder = substr(proj.env$current.dir, gregexpr(paste(rootfolder, collapse = "|"), proj.env$current.dir)[[1]][1], nchar(proj.env$current.dir))
+    rootfolder = gsub("Codes/", "", rootfolder)
     outputDir = paste0(ifelse(doc == T, "./Documentation/", "./Output/"), rootfolder)
   }
   if(doc == T){
