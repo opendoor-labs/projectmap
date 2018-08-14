@@ -1527,7 +1527,7 @@ git_clone = function(repo = NULL, directory = NULL){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 git_pull = function(){
-  message(system(paste("git pull"), intern = T))
+  message(paste(system(paste("git pull"), intern = T)), collapse = "\n")
 }
 
 #' Git push
@@ -1625,7 +1625,7 @@ git_commit = function(message){
     stop("Message must be provided.")
   }
   x = capture.output(system("git add .", intern = T))
-  message(system(paste0("git commit -m '", message, "'"), intern = T))
+  message(paste(system(paste0("git commit -m '", message, "'"), intern = T), collapse = "\n"))
 }
 
 #' Branch a file into a branch directory denoted by the username as a method for version control.

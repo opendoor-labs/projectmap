@@ -134,26 +134,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="branching-and-merging" class="section level2">
 <h2>Branching and Merging</h2>
-<p>To allow multiple users to edit the same R file and perform version control, the <strong>projectmap</strong> package provides four functions: <em>branch()</em>, <em>clone()</em>, <em>merge_branch()</em>, and <em>push_merge()</em>. The workflow should be as follows:</p>
+<p>To allow multiple users to edit the same R file and perform version control, the <strong>projectmap</strong> package provides will set up the project root folder to work with git. The first step the user should take is to start an R project in this folder by opening up RStudio -&gt; File -&gt; New Project -&gt; Existing Directory and select the appropriate directory. You should see a “Git” tab next to the “Environment”, “History”, “Connections”, and “Build”, tabs.</p>
+<p>To clone the directory to have a separate copy to work on and prevent unwanted changes to the master copy use:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(projectmap)
-<span class="co">#Branch or clone</span>
-<span class="kw">branch</span>(<span class="st">&quot;Project Master.R&quot;</span>) <span class="co">#or clone()</span>
-<span class="co">#Make changes to your branched files</span>
-<span class="co">#Merge changes</span>
-<span class="kw">mege_branch</span>(<span class="st">&quot;Project Master.R&quot;</span>)
-<span class="co">#Review the changes</span>
-<span class="co">#Push the changes</span>
-<span class="kw">push_merge</span>(<span class="st">&quot;Project Master.R&quot;</span>)</code></pre></div>
-<p>First, a user that wants to edit a local version of a file rather than the master file, the user should call the <em>clone()</em> function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(projectmap)
-<span class="kw">clone</span>()</code></pre></div>
-<p>in RStudio. If the working directory is not a root folder for a <strong>projectmap</strong> package, it will prompt the user to select the appropriate directory. It will then detect the user’s username on the computer and create a directory “Branches/username” with the relevant files copied (where “username” is replaced with the user’s actual username) to that folder. The user should then be able to edit this file without fear of disrupting the master file. All output created from the cloned files saved with the <em>save_file()</em> function will be placed in the “username/Branches/Output” folder by default so as not to overwrite output created from master files.</p>
-<p>Once the user is done editing the branched/cloned copy of “Project Master.R” and wants to merge the changes with the master file, the user should call <em>merge_branch()</em>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">merge_branch</span>(<span class="st">&quot;Project Master.R&quot;</span>)</code></pre></div>
-<p>The function will automatically detect the user’s username and look in the “Branches/username” folder for their branched/cloned file. The function will then process the two versions and display the changes in the RStudio window for approval. The RStudio console will prompt the user to enter “y” (to commit the changes) or “n” (to reject the changes) and a commit message. After these are entered, a temporary file with “_merged&quot; appended to the file name for approval. The user should check that the merged file behaves appropriately.</p>
-<p>The final step is the push the changes with the _push_merge()_function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">push_merge</span>(<span class="st">&quot;Project Master.R&quot;</span>)</code></pre></div>
-<p>The master file will be overwritten with the users merged file and a log is made in “Logs/Merges/file/username” (where “file” is replaced with the file that changes were made to, “username” is replaced with the user’s actual username, and “datetime” is replaced with the date and time of the merge) for records. The changes and commit message is saved in “codediff.txt” in that folder.</p>
+<span class="kw">git_clone</span>(<span class="dt">repo =</span> <span class="st">&quot;/Users/username/repo&quot;</span>, <span class="dt">directory =</span> <span class="st">&quot;/Users/username/Documents/repo&quot;</span>)</code></pre></div>
+<p><em>git_clone()</em> is a shorthad for git terminal commands. The <strong>projectmaps</strong> packages initializes your repo with a .git folder and .gitignore file, and it also updates the git config file to update the master when receiving pushes from cloned directories. You should be able to use RStudios built in git interface when you open your created R project. The <strong>projectmap</strong> packages also includes some other git shorthand functions: <em>git_branch()</em>, <em>git_diff()</em>, <em>git_pull()</em>, <em>git_merge()</em>, and <em>git_push()</em> that can help with git functionality. Be sure to pull the master copy into your cloned copy before pushing back to the master copy.</p>
 </div>
 
 

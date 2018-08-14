@@ -96,34 +96,11 @@ You can also select a subset of the Opendoor colors or naming your own colors by
 Finally, the _read_file()_ function is a wrapper function for **data.table's** _fread()_ for reading in csv files, **xlsx's** _read.xlsx()_ for reading in xls and xlsx files, and the base _load()_ and _readRDS()_ files for reading in RData and rds files. You only need to specify the file name in the _file_ argument with an extension if you know the file name is unique in the project directory. Otherwise, you can specify the folder path using the _inFolder_ argument (i.e. _Output/Model 1/Images_). If you leave _inFolder_ as _NULL_, _read_file()_ will default to looking in the folder path decided by _get_output_dir()_ for the file if multiple files exist with the same name but different folder paths.
 
 ## Branching and Merging
-To allow multiple users to edit the same R file and perform version control, the **projectmap** package provides four functions: _branch()_, _clone()_, _merge_branch()_, and _push_merge()_. The workflow should be as follows:
+To allow multiple users to edit the same R file and perform version control, the **projectmap** package provides will set up the project root folder to work with git. The first step the user should take is to start an R project in this folder by opening up RStudio -> File -> New Project -> Existing Directory and select the appropriate directory. You should see a "Git" tab next to the "Environment", "History", "Connections", and "Build", tabs.
+
+To clone the directory to have a separate copy to work on and prevent unwanted changes to the master copy use:
 ```{r, echo = T, eval = F}
 library(projectmap)
-#Branch or clone
-branch("Project Master.R") #or clone()
-#Make changes to your branched files
-#Merge changes
-mege_branch("Project Master.R")
-#Review the changes
-#Push the changes
-push_merge("Project Master.R")
+git_clone(repo = "/Users/username/repo", directory = "/Users/username/Documents/repo")
 ```
-
-First, a user that wants to edit a local version of a file rather than the master file, the user should call the _clone()_ function:
-```{r, echo = T, eval = F}
-library(projectmap)
-clone()
-````
-in RStudio. If the working directory is not a root folder for a **projectmap** package, it will prompt the user to select the appropriate directory. It will then detect the user's username on the computer and create a directory "Branches/username" with the relevant files copied (where "username" is replaced with the user's actual username) to that folder. The user should then be able to edit this file without fear of disrupting the master file. All output created from the cloned files saved with the _save_file()_ function will be placed in the "username/Branches/Output" folder by default so as not to overwrite output created from master files.
-
-Once the user is done editing the branched/cloned copy of "Project Master.R" and wants to merge the changes with the master file, the user should call _merge_branch()_:
-```{r, echo = T, eval = F}
-merge_branch("Project Master.R")
-```
-The function will automatically detect the user's username and look in the "Branches/username" folder for their branched/cloned file. The function will then process the two versions and display the changes in the RStudio window for approval. The RStudio console will prompt the user to enter "y" (to commit the changes) or "n" (to reject the changes) and a commit message. After these are entered, a temporary file with "_merged" appended to the file name for approval. The user should check that the merged file behaves appropriately. 
-
-The final step is the push the changes with the _push_merge()_function:
-```{r, echo = T, eval = F}
-push_merge("Project Master.R")
-```
-The master file will be overwritten with the users merged file and a log is made in "Logs/Merges/file/username" (where "file" is replaced with the file that changes were made to, "username" is replaced with the user's actual username, and "datetime" is replaced with the date and time of the merge) for records. The changes and commit message is saved in "codediff.txt" in that folder.
+_git_clone()_ is a shorthad for git terminal commands. The **projectmaps** packages initializes your repo with a .git folder and .gitignore file, and it also updates the git config file to update the master when receiving pushes from cloned directories. You should be able to use RStudios built in git interface when you open your created R project. The **projectmap** packages also includes some other git shorthand functions: _git_branch()_, _git_diff()_, _git_pull()_, _git_merge()_, and _git_push()_ that can help with git functionality. Be sure to pull the master copy into your cloned copy before pushing back to the master copy.
