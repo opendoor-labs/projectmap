@@ -792,25 +792,24 @@ get_output_dir = function(doc = F){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
-    outputDir = proj.env$file
+    path = dirname(proj.env$file)
+    path = gsub("//", "/", paste0(proj.env$root.dir, "/", path))
   }else{
-    outputDir = proj.env$current.dir
+    path = proj.env$current.dir
   }
-  folders = strsplit(outputDir, "/")[[1]]
-  folders = folders[folders != ""]
-  for(i in 1:length(folders)){
-    if(basename(outputDir) %in% basefolders){
-      outputDir = dirname(outputDir)
-      break
-    }else{
-      outputDir = dirname(outputDir)
-    }
+
+  root = gsub("\\(", "\\\\(", gsub("\\)", "\\\\)", proj.env$root.dir))
+  path = gsub(root, "", path)
+  if(substr(path, 1, 1) == "/"){
+    path = substr(path, 2, nchar(path))
   }
-  if(i == length(folders) & nchar(outputDir) == 1){
-    outputDir = paste0(proj.env$current.dir, ifelse(doc == T, "/Documentation", "/Output"))
-  }else{
-    outputDir = paste0(outputDir, ifelse(doc == T, "/Documentation/", "/Output/"), basename(proj.env$current.dir))
+
+  if(substr(path, 1, gregexpr("/", path)[[1]][1] - 1) %in% basefolders){
+    path = substr(path, gregexpr("/", path)[[1]][1] + 1, nchar(path))
   }
+
+  outputDir = paste0(ifelse(doc == T, "Documentation/", "Output/"), path, "/")
+
   if(doc == T){
     loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
     str = substr(outputDir, loc1, nchar(outputDir))
@@ -822,7 +821,6 @@ get_output_dir = function(doc = F){
     #If an output directory doesn't exist, create it
     dir.create(outputDir, showWarnings = F, recursive = T)
   }
-  outputDir = paste0(substr(outputDir, nchar(proj.env$root.dir) + 2, nchar(outputDir)), "/")
   return(gsub("//", "/", outputDir))
 }
 
