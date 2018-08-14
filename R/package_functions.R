@@ -2209,8 +2209,8 @@ gitIgnore = "#Ignore files
 .Ruserdata
 *.RData
 *.DS_Store
-**/Logs
-**/Output
+Logs/
+Output/
 "
 
 #Call these to build the package
