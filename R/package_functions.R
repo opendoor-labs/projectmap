@@ -2000,15 +2000,17 @@ link_to_proj(init = T)
 #These will be placed in the project environment.
 set_proj_models(
   Example = T,
-  Model1 = F
+  Model1 = F,
+  DeployApp = F
 )
 
 #Run the selected files
 if(execute_proj_model("Example")){
   source_file("Example File.R", inFolder = NULL)
 }
-if(execute_proj_model("Model1")){
-  source_file("Model1.R", inFolder = "Codes")
+if(execute_proj_model("DeployApp")){
+  rsconnect::deployApp(appFiles = c(proj.env$cabinet[grepl("Codes/|Functions/|Input/|Output/|www/", proj.env$cabinet)], "ui.R", "server.R", "global.R", "Project Master.R"),
+upload = T, appName = "RiskDashboard", launch.browser = F, forceUpdate = T)
 }
 
 #Commit any changes
