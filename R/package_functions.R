@@ -2011,6 +2011,9 @@ if(execute_proj_model("Model1")){
   source_file("Model1.R", inFolder = "Codes")
 }
 
+#Commit any changes
+git_commit(paste("Project Master finished at", as.character(Sys.time())))
+
 rm(list = ls())
 '
 
