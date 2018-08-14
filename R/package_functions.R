@@ -791,8 +791,7 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 get_output_dir = function(doc = F){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
-  rootfolder = names(which(sapply(basefolders, function(x){grepl(x, proj.env$current.dir)})))
-  if(length(rootfolder) == 0){
+  if(!is.null(proj.env$file)){
     outputDir = proj.env$file
   }else{
     outputDir = proj.env$current.dir
