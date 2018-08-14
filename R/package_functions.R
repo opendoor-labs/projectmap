@@ -2010,7 +2010,7 @@ if(execute_proj_model("Example")){
 }
 if(execute_proj_model("DeployApp")){
   rsconnect::deployApp(appFiles = c(proj.env$cabinet[grepl("Codes/|Functions/|Input/|Output/|www/", proj.env$cabinet)], "ui.R", "server.R", "global.R", "Project Master.R"),
-upload = T, appName = "RiskDashboard", launch.browser = F, forceUpdate = T)
+upload = T, appName = "AppName", launch.browser = F, forceUpdate = T)
 }
 
 #Commit any changes
