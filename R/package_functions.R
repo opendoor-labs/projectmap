@@ -818,7 +818,7 @@ get_output_dir = function(doc = F){
     #If an output directory doesn't exist, create it
     dir.create(outputDir, showWarnings = F, recursive = T)
   }
-  outputDir = paste0(outputDir, "/")
+  outputDir = paste0(substr(outputDir, nchar(proj.env$root.dir) + 2, nchar(outputDir)), "/")
   return(gsub("//", "/", outputDir))
 }
 
