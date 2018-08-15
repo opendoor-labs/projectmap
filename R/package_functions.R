@@ -132,8 +132,11 @@ set_proj_models = function(...){
       return(NULL)
     }
   })
-  blocks = blocks[which(sapply(blocks, function(x) {
+  blocks = blocks[which(sapply(blocks, function(x){
     !is.null(x)
+  }))]
+  blocks = blocks[which(sapply(blocks, function(x){
+    !grepl("rsconnect\\:\\:", x) | !grepl("deployApp\\(", x)
   }))]
   if(length(blocks) > 0){
     proj.env$numFiles = sum(sapply(1:length(blocks), function(x) {
