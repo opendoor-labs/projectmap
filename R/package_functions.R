@@ -125,22 +125,19 @@ set_proj_models = function(...){
     block = substr(lines, loc1[x], loc2[x])
     model = gsub("\"", "", gsub("\\{", "", gsub("\\)", "", gsub("if\\(execute_proj_model\\(", "", substr(block, 1, gregexpr("\\{", block)[[1]])))))
     models = names(which(unlist(proj.env$models)))
-    if (any(models == model)) {
+    if(any(models == model)){
       return(block)
-    }
-    else {
+    }else{
       return(NULL)
     }
   })
   blocks = blocks[which(sapply(blocks, function(x){
     !is.null(x)
   }))]
-  blocks = blocks[which(sapply(blocks, function(x){
-    !grepl("rsconnect\\:\\:", x) | !grepl("deployApp\\(", x)
-  }))]
   if(length(blocks) > 0){
-    proj.env$numFiles = sum(sapply(1:length(blocks), function(x) {
-      length(gregexpr("source_file\\(", blocks[x])[[1]])
+    proj.env$numFiles = sum(sapply(1:length(blocks), function(x){
+      count = gregexpr("source_file\\(", blocks[x])[[1]]
+      return(length(count[count > 0]))
     }))
   }else{
     proj.env$numFiles = 0
