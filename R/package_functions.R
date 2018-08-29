@@ -1212,6 +1212,10 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 render_file = function(file, inFolder = NULL, quiet = T, clean = T, ...){
+  unlock_proj()
+  proj.env$file = get_file_path(file, inFolder)
+  proj.env$current.dir = dirname(proj.env$file)
+  lock_proj()
   rmarkdown::render(get_file_path(file, inFolder = inFolder),
                     quiet = quiet, clean = clean, knit_root_dir = proj.env$root.dir,
                     output_dir = get_output_dir(doc = T))
