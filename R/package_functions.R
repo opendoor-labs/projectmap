@@ -136,7 +136,7 @@ set_proj_models = function(...){
   }))]
   if(length(blocks) > 0){
     proj.env$numFiles = sum(sapply(1:length(blocks), function(x){
-      count = gregexpr("source_file\\(|render_file\\(", blocks[x])[[1]]
+      count = gregexpr("source_file\\(|render\\(", blocks[x])[[1]]
       return(length(count[count > 0]))
     }))
   }else{
@@ -794,14 +794,16 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F){
+get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
     path = dirname(proj.env$file)
     path = gsub("//", "/", paste0(proj.env$root.dir, "/", path))
-  }else{
+  }else if(is.null(file)){
     path = proj.env$current.dir
+  }else{
+    path = get_file_path(file, inFolder = inFolder)
   }
 
   root = gsub("\\(", "\\\\(", gsub("\\)", "\\\\)", proj.env$root.dir))
@@ -1198,29 +1200,6 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   add_to_cabinet(file)
   message("File saved to ", dirname(file), ".")
   Sys.sleep(0.01)
-}
-
-#' Render an Rmd
-#'
-#' @param file A character string giving the name of the file, including the extension, to be saved.
-#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
-#' @param ... Other parameters pased to rmarkdown::render
-#' @return No return value.
-#' @description The functions uses knitr and rmarkdown to render an Rmd file and save it to the Documentation folder.
-#' @examples
-#' render_file("Example.Rmd", inFolder = NULL, ...)
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-render_file = function(file, inFolder = NULL, quiet = T, clean = T, ...){
-  unlock_proj()
-  proj.env$file = get_file_path(file, inFolder)
-  proj.env$current.dir = dirname(proj.env$file)
-  lock_proj()
-  pacman::p_load(get_proj_packages(files = proj.env$file, parallel = F), character.only = T, install = F)
-  rmarkdown::render(get_file_path(file, inFolder = inFolder),
-                    quiet = quiet, clean = clean, knit_root_dir = proj.env$root.dir,
-                    output_dir = get_output_dir(doc = T))
-  pacman::p_unload(get_proj_packages(files = file, parallel = F), character.only = T)
 }
 
 #' Creates the Opendoor color scheme
