@@ -1216,9 +1216,11 @@ render_file = function(file, inFolder = NULL, quiet = T, clean = T, ...){
   proj.env$file = get_file_path(file, inFolder)
   proj.env$current.dir = dirname(proj.env$file)
   lock_proj()
+  pacman::p_load(get_proj_packages(files = file, parallel = F), character.only = T, install = F)
   rmarkdown::render(get_file_path(file, inFolder = inFolder),
                     quiet = quiet, clean = clean, knit_root_dir = proj.env$root.dir,
                     output_dir = get_output_dir(doc = T))
+  pacman::p_unload(get_proj_packages(files = file, parallel = F), character.only = T)
 }
 
 #' Creates the Opendoor color scheme
