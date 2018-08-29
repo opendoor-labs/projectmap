@@ -136,7 +136,7 @@ set_proj_models = function(...){
   }))]
   if(length(blocks) > 0){
     proj.env$numFiles = sum(sapply(1:length(blocks), function(x){
-      count = gregexpr("source_file\\(|render\\(", blocks[x])[[1]]
+      count = gregexpr("source_file\\(", blocks[x])[[1]]
       return(length(count[count > 0]))
     }))
   }else{
