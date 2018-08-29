@@ -803,7 +803,7 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   }else if(is.null(file)){
     path = proj.env$current.dir
   }else{
-    path = get_file_path(file, inFolder = inFolder)
+    path = get_file_folder(file, inFolder = inFolder)
   }
 
   root = gsub("\\(", "\\\\(", gsub("\\)", "\\\\)", proj.env$root.dir))
