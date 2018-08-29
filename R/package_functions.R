@@ -811,7 +811,7 @@ get_output_dir = function(doc = F){
   outputDir = paste0(ifelse(doc == T, "Documentation/", "Output/"), path, "/")
 
   if(doc == T){
-    loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation")
+    loc1 = gregexpr("/Documentation", outputDir)[[1]][1] + nchar("/Documentation") + 1
     str = substr(outputDir, loc1, nchar(outputDir))
     loc2 = gregexpr("/", str)[[1]][2]
     loc2 = ifelse(is.na(loc2), nchar(str) + 1, loc2)
