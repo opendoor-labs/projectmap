@@ -136,7 +136,7 @@ set_proj_models = function(...){
   }))]
   if(length(blocks) > 0){
     proj.env$numFiles = sum(sapply(1:length(blocks), function(x){
-      count = gregexpr("source_file\\(", blocks[x])[[1]]
+      count = gregexpr("source_file\\(|render_file\\(", blocks[x])[[1]]
       return(length(count[count > 0]))
     }))
   }else{
@@ -1198,6 +1198,23 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   add_to_cabinet(file)
   message("File saved to ", dirname(file), ".")
   Sys.sleep(0.01)
+}
+
+#' Render an Rmd
+#'
+#' @param file A character string giving the name of the file, including the extension, to be saved.
+#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
+#' @param ... Other parameters pased to rmarkdown::render
+#' @return No return value.
+#' @description The functions uses knitr and rmarkdown to render an Rmd file and save it to the Documentation folder.
+#' @examples
+#' render_file("Example.Rmd", inFolder = NULL, ...)
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+render_file = function(file, inFolder = NULL, quiet = T, clean = T, ...){
+  rmarkdown::render(get_file_path(file, inFolder = inFolder),
+                    quiet = quiet, clean = clean, knit_root_dir = proj.env$root.dir,
+                    output_dir = get_output_dir(doc = T))
 }
 
 #' Creates the Opendoor color scheme
