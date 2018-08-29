@@ -810,8 +810,8 @@ get_output_dir = function(doc = F){
     path = substr(path, 2, nchar(path))
   }
 
-  if(substr(path, 1, gregexpr("/", path)[[1]][1] - 1) %in% basefolders){
-    path = substr(path, gregexpr("/", path)[[1]][1] + 1, nchar(path))
+  if(substr(path, 1, ifelse(gregexpr("/", path)[[1]][1] <= 0, nchar(path), gregexpr("/", path)[[1]][1] - 1)) %in% basefolders){
+    path = substr(path, ifelse(gregexpr("/", path)[[1]][1] <= 0, nchar(path) + 1, gregexpr("/", path)[[1]][1] + 1), nchar(path))
   }
 
   outputDir = paste0(ifelse(doc == T, "Documentation/", "Output/"), path, "/")
