@@ -468,6 +468,10 @@ link_to_proj = function(init = F, install = T){
     if(!file.exists(paste0(getwd(), "/.projectmaproot"))){
       get_proj_root()
       setwd(proj.env$root.dir)
+    }else{
+      unlock_proj()
+      proj.env$root.dir = getwd()
+      lock_proj()
     }
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
