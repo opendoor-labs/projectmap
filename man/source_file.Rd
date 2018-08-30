@@ -4,7 +4,8 @@
 \alias{source_file}
 \title{Source a file for the Project Master.R file execution.}
 \usage{
-source_file(file, inFolder = NULL, dont_unload = NULL, ...)
+source_file(file, inFolder = NULL, docname = NULL, dont_unload = NULL,
+  ...)
 }
 \arguments{
 \item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
