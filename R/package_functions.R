@@ -456,14 +456,8 @@ link_to_proj = function(init = F, install = T){
     unlock_proj()
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
-    if(!file.exists(paste0(getwd(), "/.projectmaproot"))){
-      get_proj_root()
-      setwd(proj.env$root.dir)
-    }else{
-      unlock_proj()
-      proj.env$root.dir = getwd()
-      lock_proj()
-    }
+    get_proj_root()
+    setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     set_proj_lib()
