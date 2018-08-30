@@ -1051,6 +1051,7 @@ ggsave2 = function(filename, plot = last_plot(), device = NULL, path = NULL, com
 #' Grid of ggplot objects
 #'
 #' @param g A single ggplot object or a list of ggplot object defined as list(g1, g2, ...).
+#' @param plot Boolean (T, F) indicator of whether to plot or return a grob object
 #' @param ... Other arguements passed to grid.arrange.
 #' @return A plot
 #' @description Modifies grid.arrange from the gridExtra package to take a list of objects of ggplot objects.
@@ -1069,17 +1070,25 @@ ggsave2 = function(filename, plot = last_plot(), device = NULL, path = NULL, com
 #' ggplot_grid(list(g1, g2), nrow = 1, ncol = 2)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-ggplot_grid = function(g, ...){
+ggplot_grid = function(g, plot = TRUE, ...){
   if(!ggplot2::is.ggplot(g)){
     if(!all(sapply(g, function(x){"ggplot" %in% class(x)}))){
       stop("All objects in g must be ggplot objects")
     }
-    return(eval(parse(text = paste0("gridExtra::grid.arrange(", paste(paste0("g[[", 1:length(g), "]]"), collapse = ", "), ", ...)"))))
+    if(plot == T){
+      return(eval(parse(text = paste0("gridExtra::grid.arrange(", paste(paste0("g[[", 1:length(g), "]]"), collapse = ", "), ", ...)"))))
+    }else{
+      return(eval(parse(text = paste0("gridExtra::arrangeGrob(", paste(paste0("g[[", 1:length(g), "]]"), collapse = ", "), ", ...)"))))
+    }
   }else{
     if(!"ggplot" %in% class(g)){
       stop("g must be a ggplot object")
     }
-    return(gridExtra::grid.arrange(g, ...))
+    if(plot == T){
+      return(gridExtra::grid.arrange(g, ...))
+    }else{
+      return(gridExtra::arrangeGrob(g, ...))
+    }
   }
 }
 

@@ -4,10 +4,12 @@
 \alias{ggplot_grid}
 \title{Grid of ggplot objects}
 \usage{
-ggplot_grid(g, ...)
+ggplot_grid(g, plot = TRUE, ...)
 }
 \arguments{
 \item{g}{A single ggplot object or a list of ggplot object defined as list(g1, g2, ...).}
+
+\item{plot}{Boolean (T, F) indicator of whether to plot or return a grob object}
 
 \item{...}{Other arguements passed to grid.arrange.}
 }
