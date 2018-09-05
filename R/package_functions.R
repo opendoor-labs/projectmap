@@ -2139,101 +2139,101 @@ sidebar = dashboardSidebar(width = sidebar_wd,
 ###############################################################################
 body = dashboardBody(
 tags$style(HTML(paste0("
-                        /* logo */
-                        .skin-blue .main-header .logo {
-                        background-color: ", od.colors["blue"],";
-                        color: #ffffff;
-                        font-style: bold;
-                        }
-                        /* logo */
-                        .skin-blue .main-header a {
-                        background-color: ", od.colors["blue"],";
-                        color: #ffffff;
-                        font-style: bold;
-                        }
-                        .skin-blue .main-header {
-                        position: fixed;
-                        background-color: ", od.colors["blue"],";
-                        }
-                        /* logo when hovered */
-                        .skin-blue .main-header .logo:hover {
-                        background-color: ", od.colors["blue"],";
-                        }
-                        /* navbar (rest of the header) */
-                        .skin-blue .main-header .navbar {
-                        background-color: ", od.colors["blue"],";
-                        }
-                        /* sidebar */
-                        .skin-blue .main-sidebar {
-                        background-color: #000000;
-                        position: fixed;
-                        overflow: visible;
-                        }
-                        /* active selected tab in the sidebarmenu */
-                        .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
-                        background-color: ", od.colors["warmgrey"],";
-                        font-size: 12pt;
-                        }
-                        /* other links in the sidebarmenu */
-                        .skin-blue .main-sidebar .sidebar .sidebar-menu a{
-                        background-color: #000000;
-                        color: #ffffff;
-                        font-size: 12pt;
-                        }
-                        /* other links in the sidebarmenu when hovered */
-                        .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
-                        background-color: ", od.colors["warmgrey"],";
-                        font-size: 12pt;
-                        }
-                        /* toggle button when hovered  */
-                        .skin-blue .main-header .navbar .sidebar-toggle:hover{
-                        background-color: ", od.colors["navy"],";
-                        }
-                        /* action button  */
-                        .action-button {
-                        background-color: #ffffff;
-                        color: #000000;
-                        }
-                        /* action button when hovered*/
-                        .action-button:hover {
-                        background-color: ", od.colors["lightgrey"], ";
-                        color: #000000;
-                        }
-                        /* progress bar */
-                        .progress-bar {
-                        height: 33px;
-                        color: ", od.colors["blue"], ";
-                        }
-                        .shiny-notification {
-                        height: 100px;
-                        width: 800px;
-                        position:fixed;
-                        top: calc(50% - 50px);
-                        left: calc(50% - 400px);
-                        color: #ffffff;
-                        background-color: #000000;
-                        opacity: 1
-                        }
-                        .selectize-input {
-                        padding: 2px;
-                        min-height: 0;
-                        }
-                        .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar, .js-irs-0 .irs-from, .js-irs-0 .irs-to {
-                        background-color: ", od.colors["blue"], ";
-                        border: 1px solid ", od.colors["warmgrey"], " ;
-                        font-size: 10pt
-                        }
-                        .js-irs-0 .irs-min {
-                        visibility: hidden !important
-                        }
-                        .js-irs-0 .irs-max {
-                        visibility: hidden !important
-                        }
-                        .js-irs-0 .irs-grid-text {
-                        font-size: 10pt
-                        }
-                        #login_attempt{color: red; font-size: 12pt}
-                        ")))),
+                                                      /* logo */
+                                                      .skin-blue .main-header .logo {
+                                                      background-color: ", od.colors["blue"],";
+                                                      color: #ffffff;
+                                                      font-style: bold;
+                                                      }
+                                                      /* logo */
+                                                      .skin-blue .main-header a {
+                                                      background-color: ", od.colors["blue"],";
+                                                      color: #ffffff;
+                                                      font-style: bold;
+                                                      }
+                                                      .skin-blue .main-header {
+                                                      position: fixed;
+                                                      background-color: ", od.colors["blue"],";
+                                                      }
+                                                      /* logo when hovered */
+                                                      .skin-blue .main-header .logo:hover {
+                                                      background-color: ", od.colors["blue"],";
+                                                      }
+                                                      /* navbar (rest of the header) */
+                                                      .skin-blue .main-header .navbar {
+                                                      background-color: ", od.colors["blue"],";
+                                                      }
+                                                      /* sidebar */
+                                                      .skin-blue .main-sidebar {
+                                                      background-color: #000000;
+                                                      position: fixed;
+                                                      overflow: visible;
+                                                      }
+                                                      /* active selected tab in the sidebarmenu */
+                                                      .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+                                                      background-color: ", od.colors["warmgrey"],";
+                                                      font-size: 12pt;
+                                                      }
+                                                      /* other links in the sidebarmenu */
+                                                      .skin-blue .main-sidebar .sidebar .sidebar-menu a{
+                                                      background-color: #000000;
+                                                      color: #ffffff;
+                                                      font-size: 12pt;
+                                                      }
+                                                      /* other links in the sidebarmenu when hovered */
+                                                      .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
+                                                      background-color: ", od.colors["warmgrey"],";
+                                                      font-size: 12pt;
+                                                      }
+                                                      /* toggle button when hovered  */
+                                                      .skin-blue .main-header .navbar .sidebar-toggle:hover{
+                                                      background-color: ", od.colors["navy"],";
+                                                      }
+                                                      /* action button  */
+                                                      .action-button {
+                                                      background-color: #ffffff;
+                                                      color: #000000;
+                                                      }
+                                                      /* action button when hovered*/
+                                                      .action-button:hover {
+                                                      background-color: ", od.colors["lightgrey"], ";
+                                                      color: #000000;
+                                                      }
+                                                      /* progress bar */
+                                                      .progress-bar {
+                                                      height: 33px;
+                                                      color: ", od.colors["blue"], ";
+                                                      }
+                                                      .shiny-notification {
+                                                      height: 100px;
+                                                      width: 800px;
+                                                      position:fixed;
+                                                      top: calc(50% - 50px);
+                                                      left: calc(50% - 400px);
+                                                      color: #ffffff;
+                                                      background-color: #000000;
+                                                      opacity: 1
+                                                      }
+                                                      .selectize-input {
+                                                      padding: 2px;
+                                                      min-height: 0;
+                                                      }
+                                                      .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar, .js-irs-0 .irs-from, .js-irs-0 .irs-to {
+                                                      background-color: ", od.colors["blue"], ";
+                                                      border: 1px solid ", od.colors["warmgrey"], " ;
+                                                      font-size: 10pt
+                                                      }
+                                                      .js-irs-0 .irs-min {
+                                                      visibility: hidden !important
+                                                      }
+                                                      .js-irs-0 .irs-max {
+                                                      visibility: hidden !important
+                                                      }
+                                                      .js-irs-0 .irs-grid-text {
+                                                      font-size: 10pt
+                                                      }
+                                                      #login_attempt{color: red; font-size: 12pt}
+                                                      ")))),
 
   #Plot
   fluidRow(
