@@ -1309,14 +1309,15 @@ od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
   #Define the ggplot theme
   od.theme = ggplot2::theme_minimal() +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(color = od.colors["lightgreytint"], size = 0.5),
-          panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
-          panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
-          legend.position = "bottom",
-          plot.title = ggplot2::element_text(size = rel(1.3), face = "bold"),
-          plot.subtitle = ggplot2::element_text(size = rel(1.1)),
-          axis.title = ggplot2::element_text(size = rel(1.1)),
-          axis.text = ggplot2::element_text(color = "black"),
-          legend.title = ggplot2::element_text(size = rel(1.1)))
+                   panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
+                   panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
+                   legend.position = "bottom",
+                   plot.title = ggplot2::element_text(size = rel(1.5), face = "bold"),
+                   plot.subtitle = ggplot2::element_text(size = rel(1.35)),
+                   axis.title = ggplot2::element_text(size = rel(1.35)),
+                   axis.text = ggplot2::element_text(color = "black", size = rel(1.25)),
+                   legend.title = ggplot2::element_text(size = rel(1.35)),
+                   legend.text = ggplot2::element_text(size = rel(1.25)))
 
   #Add the desired color palaette
   if(is.null(n) & is.null(colors)){
