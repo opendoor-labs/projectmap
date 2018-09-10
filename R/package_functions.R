@@ -1218,22 +1218,6 @@ od.colors = c(
   lightgreytint = "#f0f0f0"
 )
 
-`%+replace%` = ggplot2::`%+replace%`
-#' Opendoor's ggplot2 theme
-#'
-#' @description A ggplot2 theme
-#' @examples
-#' od.theme
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-od.theme = ggplot2::theme_minimal(base_size = 16) %+replace%
-  ggplot2::theme(panel.grid.major = ggplot2::element_line(color = od.colors["lightgreytint"], size = 0.5),
-                 panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
-                 panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
-                 legend.position = "bottom") +
-  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold"))
-ggplot2::theme_set(od.theme)
-
 #' Opendoor's ggplot2 theme
 #'
 #' @param palette A character string giving the name of one of the palattes ("main", "cool", "warm", "grey").
@@ -1324,24 +1308,31 @@ od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
     return(pal)
   }
 
+  od.theme = ggplot2::theme_minimal(base_size = 16) %+replace%
+    ggplot2::theme(panel.grid.major = ggplot2::element_line(color = od.colors["lightgreytint"], size = 0.5),
+                   panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
+                   panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
+                   legend.position = "bottom") +
+    ggplot2::theme(plot.title = ggplot2::element_text(face = "bold"))
+
   #Add the desired color palaette
   if(is.null(n) & is.null(colors)){
     #Default palettes
-    od.theme.fxn = list(od.theme,
+    od.theme = list(od.theme,
                     scale_color_od(palette = palette, discrete = discrete, reverse = reverse),
                     scale_fill_od(palette = palette, discrete = discrete, reverse = reverse))
   }else if(is.numeric(n) & is.null(colors)){
     #Numeric specified palette
-    od.theme.fxn = list(od.theme,
+    od.theme = list(od.theme,
                     ggplot2::scale_color_manual(values = unname(rep(c(od_palettes[[palette]], "black"), length.out = n))))
   }else if(!is.null(colors) & (is.null(n) | !is.numeric(n))){
     #Manual specified palette
-    od.theme.fxn = list(od.theme,
+    od.theme = list(od.theme,
                     ggplot2::scale_color_manual(values = unname(unique(c(od.colors[names(od.colors) %in% colors], colors)))))
   }else{
     stop("Error defining color palette")
   }
-  return(od.theme.fxn)
+  return(od.theme)
 }
 
 #' Build a query for Google BigQuery from a text string
