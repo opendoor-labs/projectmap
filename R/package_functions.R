@@ -1218,6 +1218,7 @@ od.colors = c(
   lightgreytint = "#f0f0f0"
 )
 
+`%+replace%` = ggplot2::`%+replace%`
 #' Opendoor's ggplot2 theme
 #'
 #' @description A ggplot2 theme
@@ -1231,7 +1232,7 @@ od.theme = ggplot2::theme_minimal(base_size = 16) %+replace%
                  panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
                  legend.position = "bottom") +
   ggplot2::theme(plot.title = ggplot2::element_text(face = "bold"))
-theme_set(od.theme)
+ggplot2::theme_set(od.theme)
 
 #' Opendoor's ggplot2 theme
 #'
