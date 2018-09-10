@@ -1217,6 +1217,22 @@ od.colors = c(
   lightgrey = "#babcbc", bluegrey = "#7b9cb1", coolgrey = "#506d7e", warmgrey = "#525975",
   lightgreytint = "#f0f0f0"
 )
+
+#' Opendoor's ggplot2 theme
+#'
+#' @description A ggplot2 theme
+#' @examples
+#' od.theme
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+od.theme = ggplot2::theme_minimal(base_size = 16) %+replace%
+  ggplot2::theme(panel.grid.major = ggplot2::element_line(color = od.colors["lightgreytint"], size = 0.5),
+                 panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
+                 panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
+                 legend.position = "bottom") +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold"))
+theme_set(od.theme)
+
 #' Opendoor's ggplot2 theme
 #'
 #' @param palette A character string giving the name of one of the palattes ("main", "cool", "warm", "grey").
@@ -1248,6 +1264,7 @@ od.colors = c(
 #'   od_theme(colors = c("turquoise", "citrine", "iris"))
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
+#'
 od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
                     n = NULL, colors = NULL){
   #Check the inputs
@@ -1306,43 +1323,24 @@ od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
     return(pal)
   }
 
-  #Define the ggplot theme
-  od.theme = ggplot2::theme_minimal() +
-    ggplot2::theme(panel.grid.major = ggplot2::element_line(color = od.colors["lightgreytint"], size = 0.5),
-                   panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
-                   panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
-                   legend.position = "bottom",
-                   plot.title = ggplot2::element_text(size = rel(1.75), face = "bold"),
-                   plot.subtitle = ggplot2::element_text(size = rel(1.5)),
-                   axis.title = ggplot2::element_text(size = rel(1.35)),
-                   axis.text = ggplot2::element_text(color = "black", size = rel(1.25)),
-                   legend.title = ggplot2::element_text(size = rel(1.35)),
-                   legend.text = ggplot2::element_text(size = rel(1.25)))
-
   #Add the desired color palaette
   if(is.null(n) & is.null(colors)){
     #Default palettes
-    od.theme = list(od.theme,
+    od.theme.fxn = list(od.theme,
                     scale_color_od(palette = palette, discrete = discrete, reverse = reverse),
                     scale_fill_od(palette = palette, discrete = discrete, reverse = reverse))
   }else if(is.numeric(n) & is.null(colors)){
     #Numeric specified palette
-    od.theme = list(od.theme,
+    od.theme.fxn = list(od.theme,
                     ggplot2::scale_color_manual(values = unname(rep(c(od_palettes[[palette]], "black"), length.out = n))))
   }else if(!is.null(colors) & (is.null(n) | !is.numeric(n))){
     #Manual specified palette
-    od.theme = list(od.theme,
+    od.theme.fxn = list(od.theme,
                     ggplot2::scale_color_manual(values = unname(unique(c(od.colors[names(od.colors) %in% colors], colors)))))
   }else{
     stop("Error defining color palette")
   }
-  return(od.theme)
-  update_geom_defaults("line", list(size = 1.25))
-  update_geom_defaults("vline", list(size = 1.25))
-  update_geom_defaults("hline", list(size = 1.25))
-  update_geom_defaults("abline", list(size = 1.25))
-  update_geom_defaults("segment", list(size = 1.25))
-  update_geom_defaults("point", list(size = 1.25))
+  return(od.theme.fxn)
 }
 
 #' Build a query for Google BigQuery from a text string
