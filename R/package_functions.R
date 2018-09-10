@@ -1337,6 +1337,12 @@ od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
     stop("Error defining color palette")
   }
   return(od.theme)
+  update_geom_defaults("line", list(size = 1.25))
+  update_geom_defaults("vline", list(size = 1.25))
+  update_geom_defaults("hline", list(size = 1.25))
+  update_geom_defaults("abline", list(size = 1.25))
+  update_geom_defaults("segment", list(size = 1.25))
+  update_geom_defaults("point", list(size = 1.25))
 }
 
 #' Build a query for Google BigQuery from a text string
