@@ -410,7 +410,7 @@ exit_proj = function(reset_lib = T){
 #' @return No return value
 #' @description Overwrites the stored R Version with the current R Version in .projectmaproot
 #' @examples
-#' updated_RDevVersion()
+#' update_RDevVersion()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 update_RDevVersion = function(){
