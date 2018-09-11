@@ -5,8 +5,8 @@
 \title{A modified ggsave function}
 \usage{
 ggsave2(filename, plot = last_plot(), device = NULL, path = NULL,
-  combine = F, scale = 1, width = NA, height = NA, units = c("in",
-  "cm", "mm"), dpi = 300, limitsize = TRUE, ...)
+  combine = F, scale = 1, width = NA, height = NA,
+  units = c("in", "cm", "mm"), dpi = 300, limitsize = TRUE, ...)
 }
 \arguments{
 \item{filename}{File name to create on disk.}

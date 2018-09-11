@@ -4,9 +4,9 @@
 \alias{read_file}
 \title{Read in a file in a standardized way}
 \usage{
-read_file(file, inFolder = NULL, showProgress = F, na.strings = c("NULL",
-  "NA", "na", "N/A", "n/a", "<NA>", "NONE", "-", ".", "", " ", "NaN", "nan",
-  "Inf", "-Inf"), envir = .GlobalEnv, ...)
+read_file(file, inFolder = NULL, showProgress = F,
+  na.strings = c("NULL", "NA", "na", "N/A", "n/a", "<NA>", "NONE", "-",
+  ".", "", " ", "NaN", "nan", "Inf", "-Inf"), envir = .GlobalEnv, ...)
 }
 \arguments{
 \item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
