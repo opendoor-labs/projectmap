@@ -21,7 +21,7 @@ save_file(..., file = NULL, file.override = NULL, row.names = F,
 
 \item{doc}{Boolean (T, F) to change output directory to Documenation instad of Output. Default is F.}
 
-\item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.}
+\item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or writexl's write_xlsx.}
 }
 \value{
 A data object (data.table or data.frame).

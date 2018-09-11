@@ -19,14 +19,14 @@ read_file(file, inFolder = NULL, showProgress = F,
 
 \item{envir}{The environment to load the data to}
 
-\item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.}
+\item{...}{Other arguments to pass to data.tables fread, the base load or readRDS, or readxl's read_excel.}
 }
 \value{
 A data object (data.table or data.frame).
 }
 \description{
 A wrapper function to read in a file containing data. It uses the file extenstion to determine whether to
-use the base load or readRDS function for RData and rds files, data.table's fread function for csv files, or xlsx's read.xlsx for xls and xlsx files.
+use the base load or readRDS function for RData and rds files, data.table's fread function for csv files, or readxl's read_excel function for xls and xlsx files.
 }
 \examples{
 read_file("Model1.R")

@@ -222,7 +222,7 @@ reset_proj_env = function(build = F, newroot = F){
 proj.env = new.env()
 proj.env$project.name = "Project"
 proj.env$R.dev.version = "3.5.0"
-proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "pacman", "rJava", "xlsx", "tools", "devtools",
+proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "pacman", "readxl", "writexl", "tools", "devtools",
                                "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap")
 if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
@@ -846,10 +846,10 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
 #' @param showProgress A boolean (T, F) indicator specifying whether to show the read in progress if using data.table's fread.
 #' @param na.strings A vector of character strings to convert to NA
 #' @param envir The environment to load the data to
-#' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.
+#' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or readxl's read_excel.
 #' @return A data object (data.table or data.frame).
 #' @description A wrapper function to read in a file containing data. It uses the file extenstion to determine whether to
-#' use the base load or readRDS function for RData and rds files, data.table's fread function for csv files, or xlsx's read.xlsx for xls and xlsx files.
+#' use the base load or readRDS function for RData and rds files, data.table's fread function for csv files, or readxl's read_excel function for xls and xlsx files.
 #' @examples
 #' read_file("Model1.R")
 #' read_file("Model1.R", inFolder = "Codes")
@@ -868,7 +868,7 @@ read_file = function(file, inFolder = NULL, showProgress = F,
   }else if(ext == "rds"){
     return(readRDS(file = file, ...))
   }else if(ext %in% c("xls", "xlsx")){
-    return(xlsx::read.xlsx(file = file, ...))
+    return(readxl::read_excel(path = file, ...))
   }else{
     stop("Data extension must be RData, csv, txt, xls, xlsx, or rds")
   }
@@ -1123,7 +1123,7 @@ ggplot_grid = function(g, plot = TRUE, ...){
 #' @param file.override A character string giveing the full file path if want to override the default the output directory.
 #' @param plot If wanting to save a ggplot object, plot should be assigned the ggplot object.
 #' @param doc Boolean (T, F) to change output directory to Documenation instad of Output. Default is F.
-#' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or xlsx's read.xlsx.
+#' @param ... Other arguments to pass to data.tables fread, the base load or readRDS, or writexl's write_xlsx.
 #' @return A data object (data.table or data.frame).
 #' @description The function uses the file extension to select the appropriate save function to use. By default
 #' it uses get_output_dir to set the output directory to save the output to. By default, get_output_dir sets the
@@ -1218,7 +1218,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
       }
     }
   }else if(ext == "xlsx"){
-    xlsx::saveWorkbook(..., file = file)
+    writexl::write_xlsx(..., path = file)
   }
   #Add the file to the cabinet and save the cabinet
   add_to_cabinet(file)
