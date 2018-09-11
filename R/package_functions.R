@@ -484,7 +484,16 @@ link_to_proj = function(init = F, install = T){
         write(x = gitIgnore, file = ".gitignore")
       }
       if(!file.exists(".projectmaproot")){
-        write("projectmap root directory", file = ".projectmaproot")
+        write(paste("major:", R.Version()$major, "\nminor: ", R.Version()$minor), file = ".projectmaproot")
+      }else{
+        RDevVersion = readLines(".projectmaproot")
+        RVersionTest = sapply(RDevVersion, function(x){
+          eval(parse(text = paste0("R.Version()$", trimws(gsub("[[:punct:]]|[[:digit:]]", "", x))))) == as.numeric(trimws(gsub("[[:alpha:]]|\\:", "", x)))
+        })
+        if(any(RVersionTest == F)){
+          warning(paste0("This project was built under ", paste0(trimws(gsub("major: |minor: ", "", RDevVersion)), collapse = "."),
+                         ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), "."))
+        }
       }
       for(i in folders){
         if(!dir.exists(i)){
