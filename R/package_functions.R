@@ -405,6 +405,18 @@ exit_proj = function(reset_lib = T){
   }
 }
 
+#' Update stored R Development Version
+#'
+#' @return No return value
+#' @description Overwrites the stored R Version with the current R Version in .projectmaproot
+#' @examples
+#' updated_RDevVersion()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+update_RDevVersion = function(){
+  write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
+}
+
 #' Link a script to the project
 #'
 #' @param init Boolean (T, F) indicator of whether to reset the project environment.
