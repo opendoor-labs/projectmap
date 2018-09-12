@@ -368,7 +368,7 @@ get_proj_packages = function(files, parallel = T){
           for(j in 1:length(ploads)){
             temp = trimws(strsplit(gsub("p_load\\(|\\)|c\\(|\"", "", ploads[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
-            ploads2 = c(ploads, temp)
+            ploads2 = c(ploads2, temp)
           }
           rm(temp, loc, j)
         }
