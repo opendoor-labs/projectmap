@@ -374,7 +374,7 @@ get_proj_packages = function(files, parallel = T){
         }
         loadpackages2 = NULL
         if(length(loadpackages) > 0){
-          for(j in 1:length(ploads)){
+          for(j in 1:length(loadpackages)){
             temp = trimws(strsplit(gsub("load\\.packages\\(|\\)|c\\(|\"", "", loadpackages[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
             loadpackages2 = c(loadpackages2, temp)
