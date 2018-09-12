@@ -363,8 +363,8 @@ get_proj_packages = function(files, parallel = T){
           }
           rm(temp, loc, j)
         }
+        ploads2 = NULL
         if(length(ploads) > 0){
-          ploads2 = NULL
           for(j in 1:length(ploads)){
             temp = trimws(strsplit(gsub("p_load\\(|\\)|c\\(|\"", "", ploads[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
@@ -372,8 +372,8 @@ get_proj_packages = function(files, parallel = T){
           }
           rm(temp, loc, j)
         }
+        loadpackages2 = NULL
         if(length(loadpackages) > 0){
-          loadpackages2 = NULL
           for(j in 1:length(ploads)){
             temp = trimws(strsplit(gsub("load\\.packages\\(|\\)|c\\(|\"", "", loadpackages[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
