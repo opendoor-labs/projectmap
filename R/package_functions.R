@@ -335,53 +335,44 @@ get_proj_packages = function(files, parallel = T){
     `%fun%` = foreach::`%do%`
   }
   packages = foreach::foreach(i = files, .combine = "c", .export = c("proj.env", "remove_file")) %fun% {
+    pkg_ids = "library\\(|require\\(|p_load\\(|load.packages\\("
     if(file.exists(i)){
       lines = suppressWarnings(readLines(i))
+      #Remove comments
       lines = lines[substr(lines, 1, 1) != "#"]
+      lines = unname(sapply(lines, function(x){
+        loc = gregexpr("#", x)[[1]][1]
+        if(loc > 0){
+          return(trimws(substr(x, 1, max(c(loc[1] - 1, 1)))))
+        }else{
+          return(x)
+        }
+      }))
+
+      pkgs = NULL
+      if(length(which(grepl("\\:\\:", lines))) > 0){
+        doublecolons = lines[which(grepl("\\:\\:", lines))]
+        for(j in doublecolons){
+          pkgs = unique(c(pkgs, trimws(strsplit(j, "\\:\\:")[[1]][1])))
+        }
+        rm(doublecolons)
+      }
+
       if(length(lines) > 0){
-        libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
-        requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
-        ploads = c(trimws(lines[which(sapply(gregexpr("p_load\\(", lines), function(x){x[1] != -1}))]))
-        loadpackages = trimws(lines[which(sapply(gregexpr("load\\.packages\\(", lines), function(x){x[1] != -1}))])
-        libraries = libraries[substr(libraries, 1, 1) != "#"]
-        requires = requires[substr(requires, 1, 1) != "#"]
-        ploads = ploads[substr(ploads, 1, 1) != "#"]
-        loadpackages = loadpackages[substr(loadpackages, 1, 1) != "#"]
-        if(length(libraries) > 0){
-          for(j in 1:length(libraries)){
-            temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",|::")[[1]])
+        lines = paste(lines, collapse = " ")
+        loc1 = gregexpr(pkg_ids, lines)[[1]]
+        if(length(loc1) > 0){
+          loc2 = gregexpr("\\)", lines)[[1]]
+          loc2 = sapply(loc1, function(x){min(loc2[which(loc2 > x)])})
+
+          for(j in 1:length(loc1)){
+            temp = substr(lines, loc1[j], loc2[j])
+            temp = trimws(strsplit(gsub(paste0(pkg_ids, "|c\\(|\"|\\)"), "", temp), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
-            libraries[j] = temp
+            pkgs = unique(c(pkgs, temp))
           }
-          rm(temp, j)
         }
-        if(length(requires) > 0){
-          for(j in 1:length(requires)){
-            temp = trimws(strsplit(gsub("require\\(|\\)", "", requires[j]), ",|::")[[1]])
-            temp = temp[!grepl("=", temp)]
-            requires[j] = temp
-          }
-          rm(temp, loc, j)
-        }
-        ploads2 = NULL
-        if(length(ploads) > 0){
-          for(j in 1:length(ploads)){
-            temp = trimws(strsplit(gsub("p_load\\(|\\)|c\\(|\"", "", ploads[j]), ",|::")[[1]])
-            temp = temp[!grepl("=", temp)]
-            ploads2 = c(ploads2, temp)
-          }
-          rm(temp, loc, j)
-        }
-        loadpackages2 = NULL
-        if(length(loadpackages) > 0){
-          for(j in 1:length(loadpackages)){
-            temp = trimws(strsplit(gsub("load\\.packages\\(|\\)|c\\(|\"", "", loadpackages[j]), ",|::")[[1]])
-            temp = temp[!grepl("=", temp)]
-            loadpackages2 = c(loadpackages2, temp)
-          }
-          rm(temp, loc, j)
-        }
-        return(unique(c(libraries, requires, ploads2, loadpackages2)))
+        return(pkgs)
       }else{
         return(NULL)
       }
