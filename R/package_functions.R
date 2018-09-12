@@ -91,7 +91,7 @@ remove.packages = function(..., lib = proj.env$libPath){
 #' @export
 unload.packages = function(pkgs){
   for(i in pkgs){
-    tryCatch(detach(paste0("package:", i), unload = T),
+    tryCatch(detach(paste0("package:", i), character.only = T, unload = T, force = T),
              error = function(err){warning(paste("Package", i, "could not be unloaded."))})
   }
 }
@@ -104,7 +104,14 @@ unload.packages = function(pkgs){
 #' load.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-load.packages = function(pkgs, lib.loc = proj.env$libPath){
+load.packages = function(..., packages = NULL, character.only = F){
+  if(!missing(packages)){
+    pkgs = packages
+  }else if(character.only == T){
+    pkgs = eval(match.call()[[2]])
+  }else{
+    pkgs = as.character(match.call(expand.dots = FALSE)[[2]])
+  }
   for(i in pkgs){
     tryCatch(library(i, character.only = T),
              error = function(err){warning(paste("Package", i, "could not be loaded."))})
@@ -334,10 +341,12 @@ get_proj_packages = function(files, parallel = T){
       if(length(lines) > 0){
         libraries = trimws(unique(lines[which(sapply(gregexpr("library\\(", lines), function(x){x[1] != -1}))]))
         requires = trimws(lines[which(sapply(gregexpr("require\\(", lines), function(x){x[1] != -1}))])
-        ploads = trimws(lines[which(sapply(gregexpr("p_load\\(", lines), function(x){x[1] != -1}))])
+        ploads = c(trimws(lines[which(sapply(gregexpr("p_load\\(", lines), function(x){x[1] != -1}))]))
+        loadpackages = trimws(lines[which(sapply(gregexpr("load\\.packages\\(", lines), function(x){x[1] != -1}))])
         libraries = libraries[substr(libraries, 1, 1) != "#"]
         requires = requires[substr(requires, 1, 1) != "#"]
         ploads = ploads[substr(ploads, 1, 1) != "#"]
+        loadpackages = loadpackages[substr(loadpackages, 1, 1) != "#"]
         if(length(libraries) > 0){
           for(j in 1:length(libraries)){
             temp = trimws(strsplit(gsub("library\\(|\\)", "", libraries[j]), ",|::")[[1]])
@@ -355,14 +364,24 @@ get_proj_packages = function(files, parallel = T){
           rm(temp, loc, j)
         }
         if(length(ploads) > 0){
+          ploads2 = NULL
           for(j in 1:length(ploads)){
-            temp = trimws(strsplit(gsub("p_load\\(|\\)", "", ploads[j]), ",|::")[[1]])
+            temp = trimws(strsplit(gsub("p_load\\(|\\)|c\\(|\"", "", ploads[j]), ",|::")[[1]])
             temp = temp[!grepl("=", temp)]
-            requires[j] = temp
+            ploads2 = c(ploads, temp)
           }
           rm(temp, loc, j)
         }
-        return(unique(c(libraries, requires)))
+        if(length(loadpackages) > 0){
+          loadpackages2 = NULL
+          for(j in 1:length(ploads)){
+            temp = trimws(strsplit(gsub("load\\.packages\\(|\\)|c\\(|\"", "", loadpackages[j]), ",|::")[[1]])
+            temp = temp[!grepl("=", temp)]
+            loadpackages2 = c(loadpackages2, temp)
+          }
+          rm(temp, loc, j)
+        }
+        return(unique(c(libraries, requires, ploads2, loadpackages2)))
       }else{
         return(NULL)
       }

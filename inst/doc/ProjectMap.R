@@ -37,6 +37,9 @@ options(xtable.comment = FALSE)
 #  #Load other required packages
 #  library(ggplot2)
 #  library(data.table)
+#  
+#  #OR
+#  #load.packages(ggplot2, data.table)
 
 ## ---- echo = T, eval = F-------------------------------------------------
 #  library(projectmap)

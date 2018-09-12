@@ -4,7 +4,7 @@
 \alias{load.packages}
 \title{This function loads packages}
 \usage{
-load.packages(pkgs, lib.loc = proj.env$libPath)
+load.packages(..., packages = NULL, character.only = F)
 }
 \arguments{
 \item{pkgs}{Character vector of package names}
