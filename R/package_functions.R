@@ -96,6 +96,21 @@ unload.packages = function(pkgs){
   }
 }
 
+#' This function loads packages
+#'
+#' @param pkgs Character vector of package names
+#' @return No return value
+#' @examples
+#' load.packages("packageName")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+load.packages = function(pkgs, lib.loc = proj.env$libPath){
+  for(i in pkgs){
+    tryCatch(library(i, character.only = T),
+             error = function(err){warning(paste("Package", i, "could not be loaded."))})
+  }
+}
+
 #' This function gets package dependencies
 #'
 #' @param pkgs Character vector of package names
