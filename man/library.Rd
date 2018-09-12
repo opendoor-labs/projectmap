@@ -13,8 +13,7 @@ library(..., lib.loc = proj.env$libPath)
 \item{lib.loc}{Path to users package library}
 }
 \value{
-Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
+No return value
 }
 \description{
 for package version control

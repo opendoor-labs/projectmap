@@ -4,57 +4,121 @@
 #' for package version control
 #' @param lib.loc Path to users package library
 #' @param ... First, package name, then other named arguments passed to the base library function
-#' @return Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-#' When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
+#' @return No return value
 #' @examples
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 library = function(..., lib.loc = proj.env$libPath){
-  if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
-    #If not in an app setting, only look in project library
+  if(!is.null(proj.env$root.dir)){
+    #If set project directory to the project directory, only look in project library
     base::library(..., lib.loc = lib.loc)
   }else{
     base::library(...)
   }
 }
+
 #' This overwrites the base require function to only look in the user's project library to load a package
 #' for package version control
 #'
 #' @param lib.loc Path to users package library
 #' @param ... First, package name, then other named arguments passed to the base require function
-#' @return Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-#' When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
+#' @return No return value
 #' @examples
 #' require(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 require = function(..., lib.loc = proj.env$libPath){
-  if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
-    #If not in an app setting, only look in project library
+  if(!is.null(proj.env$root.dir)){
+    #If set project directory to the project directory, only look in project library
     base::require(..., lib.loc = lib.loc)
   }else{
     base::require(...)
   }
 }
+
 #' This overwrites the base install.packages function to only install the function in the user's project library
 #' for package version control
 #'
 #' @param lib Path to users package library
 #' @param ... First, package name, then other named arguments passed to the base install.packages function
-#' @return Normally library returns (invisibly) the list of attached packages, but TRUE or FALSE if logical.return is TRUE.
-#' When called as library() it returns an object of class "libraryIQR", and for library(help=), one of class "packageInfo".
+#' @return No return value
 #' @examples
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packges = function(..., lib = proj.env$libPath){
-  if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R"))){
-    #If not in an app setting, only look in project library
-    utils::install.packages(..., lib = lib)
+install.packages = function(pkgs, lib = proj.env$libPath, ...){
+  if(!is.null(proj.env$root.dir)){
+    #If set project directory to the project directory, only look in project library
+    for(i in pkgs){
+      tryCatch(utils::install.packages(i, lib = lib, ...),
+             error = function(err){warning("Package", i, "could not be installed.")})
+    }
   }else{
     utils::install.packages(...)
   }
+}
+
+#' This overwrites the base remove.packages function to only remove the function in the user's project library
+#' for package version control
+#'
+#' @param lib Path to users package library
+#' @param ... First, package name, then other named arguments passed to the base install.packages function
+#' @return No return value
+#' @examples
+#' remove.packages("packageName")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+remove.packages = function(..., lib = proj.env$libPath){
+  if(!is.null(proj.env$root.dir)){
+    #If set project directory to the project directory, only look in project library
+    for(i in unlist(list(...))){
+      tryCatch(utils::remove.packages(i, lib = lib),
+             error = function(err){warning(paste("Package", i, "is not in the project library."))})
+    }
+  }else{
+    utils::remove.packages(...)
+  }
+}
+
+#' This function unloads packages
+#'
+#' @param pkgs Character vector of package names
+#' @return No return value
+#' @examples
+#' unload.packages("packageName")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+unload.packages = function(pkgs){
+  for(i in pkgs){
+    tryCatch(detach(paste0("package:", i), unload = T),
+             error = function(err){warning(paste("Package", i, "could not be unloaded."))})
+  }
+}
+
+#' This function gets package dependencies
+#'
+#' @param pkgs Character vector of package names
+#' @return Character vector of package names
+#' @examples
+#' packages_dependencies("packageName")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+package.dependencies = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports", "Depends", "Suggests")){
+  ret = NULL
+  for(i in pkgs){
+    out = utils::packageDescription(i, lib.loc = lib.loc)
+    out = unname(unlist(lapply(out[intersect(names(out), fields)], function(x){
+      x = unlist(strsplit(x, ",\\s*"))
+      return(unname(sapply(x, function(y){
+        y = trimws(substr(y, 1, ifelse(gregexpr("\\(", y)[[1]][1] > 0, gregexpr("\\(", y)[[1]][1] - 1, nchar(y))))
+        return(gsub("\\s+", " ", gsub("\n", " ", y)))
+      })))
+    })))
+    out = out[!out %in% c("", "R")]
+    ret = unique(c(ret, out))
+  }
+  return(ret)
 }
 
 #' Lock all the project variables
@@ -222,7 +286,7 @@ reset_proj_env = function(build = F, newroot = F){
 proj.env = new.env()
 proj.env$project.name = "Project"
 proj.env$R.dev.version = "3.5.0"
-proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "pacman", "readxl", "writexl", "tools", "devtools",
+proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools",
                                "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap")
 if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
@@ -396,7 +460,7 @@ set_proj_lib = function(){
 exit_proj = function(reset_lib = T){
   orig.lib = proj.env$libPath.orig
   proj.lib = proj.env$libPath
-  suppressMessages(pacman::p_unload(projectmap))
+  suppressMessages(unload.packages("projectmap"))
   if(reset_lib == T){
     .libPaths(new = orig.lib)
     message("projectmap package detached. Library path reset to ", .libPaths()[1], ".\n")
@@ -557,46 +621,53 @@ link_to_proj = function(init = F, install = T){
       message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
 
       if(!is.null(packages)){
-        packages = packages[!packages %in% c("projectmap", installed.packages(lib.loc = proj.env$libPath))]
+        #Clean up package library
+        packages_to_keep = unique(c(packages,
+                                    package.dependencies(packages[!packages %in% installed.packages(priority = "base")]),
+                                    proj.env$required.packages))
+        installed_packages = unname(installed.packages(lib = proj.env$libPath)[, "Package"])
+        packages_to_remove = installed_packages[!installed_packages %in% packages_to_keep]
+        remove.packages(packages_to_remove, lib = proj.env$libPath)
+
+        #Install the packages
+        packages = packages[!packages %in% c("projectmap", installed_packages)]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
           message("Installing packages...")
-          for(i in packages){
-            pacman::p_install(i, character.only = T, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
-          }
+          install.packages(packages, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
-        if("projectmap" %in% installed.packages(lib.loc = proj.env$libPath) & length(packages) > 0){
+        if("projectmap" %in% installed_packages & length(packages) > 0){
           message("Done.")
         }
       }
-      if(!"projectmap" %in% installed.packages(lib.loc = proj.env$libPath)){
+      if(!"projectmap" %in% installed_packages){
         devtools::install_github("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
         message("Done.")
       }
 
       #Link to Google BiqQuery and Google Drive if necessary
-      if("bigrquery" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
-        if(!".httr-oauth" %in% packages){#list.files(path = proj.env$root.dir, all.files = T, recursive = F) & "bigrquery" %in% packages){
+      if("bigrquery" %in% packages){
+        if(!".httr-oauth" %in% packages){
           invisible(bigrquery::bq_projects())
         }
       }
-      if("bigQueryR" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+      if("bigQueryR" %in% packages){
         if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(bigQueryR::bqr_auth())
         }
       }
-      if("googledrive" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+      if("googledrive" %in% packages){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(googldedrive::drive_auth())
         }
       }
-      if("googlesheets" %in% packages){#installed.packages(lib.loc = proj.env$libPath)){
+      if("googlesheets" %in% packages){
         if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
           invisible(googlesheets::gs_auth())
         }
       }
-      rm(packages)
+      rm(packages, packages_to_keep, packages_to_remove, installed_packages)
     }
 
     #Create the location of the master log and define the progress bar variables
@@ -604,10 +675,6 @@ link_to_proj = function(init = F, install = T){
     proj.env$logLocation = paste("./Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
     proj.env$startSourceLog = F
 
-    # if(init == T){
-    #   suppressMessages(devtools::reload(devtools::inst("projectmap"), quiet = T))
-    #   suppressMessages(link_to_proj(init = F))
-    # }
     lock_proj()
     message("\nProject environment set.\n")
   }else{
@@ -962,7 +1029,9 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     reset_proj_env()
   }
   #Detach all packages except the required packages
-  suppressWarnings(suppressMessages(pacman::p_unload(pacman::p_loaded()[!pacman::p_loaded() %in% unique(c(proj.env$required.packages, proj.env$dont_unload))], character.only = T)))
+  loaded.packages = names(utils::sessionInfo()[["otherPkgs"]])
+  unload.packages(loaded.packages[!loaded.packages %in% unique(c(proj.env$required.packages, proj.env$dont_unload))])
+  rm(loaded.packages)
   lock_proj()
 }
 
