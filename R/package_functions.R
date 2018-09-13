@@ -10,11 +10,15 @@
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 library = function(..., lib.loc = proj.env$libPath){
-  if(proj.env$current.dir != proj.env$root.dir){
-    #If set project directory to the project directory, only look in project library
-    base::library(..., lib.loc = lib.loc)
+  if(!is.null(proj.env$current.dir)){
+    if(proj.env$current.dir != proj.env$root.dir){
+      #If set project directory to the project directory, only look in project library
+      base::library(..., lib.loc = lib.loc)
+    }else{
+      base::library(...)
+    }
   }else{
-    base::library(...)
+    base::library(..., lib.loc = lib.loc)
   }
 }
 
@@ -29,11 +33,15 @@ library = function(..., lib.loc = proj.env$libPath){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 require = function(..., lib.loc = proj.env$libPath){
-  if(proj.env$current.dir != proj.env$root.dir){
-    #If set project directory to the project directory, only look in project library
-    base::require(..., lib.loc = lib.loc)
+  if(!is.null(proj.env$current.dir)){
+    if(proj.env$current.dir != proj.env$root.dir){
+      #If set project directory to the project directory, only look in project library
+      base::require(..., lib.loc = lib.loc)
+    }else{
+      base::require(...)
+    }
   }else{
-    base::require(...)
+    base::library(..., lib.loc = lib.loc)
   }
 }
 
