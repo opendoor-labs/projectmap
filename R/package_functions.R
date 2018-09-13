@@ -2165,8 +2165,7 @@ library(projectmap)
 link_to_proj()
 
 #Load other required packages
-library(ggplot2)
-library(data.table)
+load.packages(ggplot2, data.table)
 
 #Load functions
 #source(get_file_path("function.R))
@@ -2206,12 +2205,7 @@ if(!"projectmap" %in% installed.packages()){
 }
 library(projectmap)
 link_to_proj(install = F)
-library(tools)
-library(data.table)
-library(plotly)
-library(ggplot2)
-library(shiny)
-library(shinydashboard)
+load.packages(tools, data.table, plotly, ggplot2, shiny, shinydashboard)
 
 ###############################################################################
 #Define parameters
