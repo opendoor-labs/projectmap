@@ -9,11 +9,11 @@
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-library = function(..., lib.loc = proj.env$libPath, recursive = F){
+library = function(..., lib.loc = proj.env$libPath){
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
-      base::library(..., lib.loc = ifelse(recursive == T, NULL, lib.loc))
+      base::library(..., lib.loc = lib.loc)
     }else{
       base::library(...)
     }
@@ -36,7 +36,7 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
-      base::require(..., lib.loc = ifelse(recursive == T, NULL, lib.loc))
+      base::require(..., lib.loc = lib.loc)
     }else{
       base::require(...)
     }
@@ -2213,16 +2213,21 @@ if(!"projectmap" %in% installed.packages()){
 }
 library(projectmap)
 link_to_proj(install = F)
-load.packages(tools, data.table, plotly, ggplot2, shiny, shinydashboard)
+#Do not use load.packages() to load packages. Use the library() function directly.
+library(tools)
+library(data.table)
+library(plotly)
+library(ggplot2)
+library(shiny)
+library(shinydashboard)
 
 ###############################################################################
 #Define parameters
 ###############################################################################
 plot_ht = 500
-sidebar_wd = 300
-')
+sidebar_wd = 300')
 
-uiR = '###############################################################################
+uiR = paste0('###############################################################################
 #UI Script
 #
 #Script used to generate the UI
@@ -2369,9 +2374,9 @@ tags$style(HTML(paste0("
 ###############################################################################
 ui = dashboardPage(
   header, sidebar, body
-)
-'
-serverR = '###############################################################################
+)')
+
+serverR = paste0('###############################################################################
 #Server Script
 #
 #Script used to generate the server
@@ -2390,8 +2395,8 @@ server = function(input, output, session){
     data = data.table(x = 1:10, y = 1:10)
     plot_ly(data, x = ~x, y = ~y, type = "scatter", mode = "lines")
   })
-}
-'
+}')
+
 #.gitignore file
 gitIgnore = "#Ignore files
 .Rhistory

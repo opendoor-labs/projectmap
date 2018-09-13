@@ -72,7 +72,7 @@ The _run_proj_model()_ function returns _T_ or _F_ for the model string argument
 To see how the master file executes, set the working directory to your projects root folder and type `source("Project Master.R")` in the console. Be sure to explore the output in the _Output_ folder. 
 
 ## The Example file
-This file exists as a template for authors to follow when writing R scripts for the project. The only required function is _link_to_proj()_, which should be placed at the top after loading the **projectmap** package. Then, load all other required libraries for the R script using the _library()_ or _load.packages()_ functions. Do not use **pacman's** _p_load()_ as it may load packages from your default R library rather than the project specific library. 
+This file exists as a template for authors to follow when writing R scripts for the project. The only required function is _link_to_proj()_, which should be placed at the top after loading the **projectmap** package. Then, load all other required libraries for the R script using the _library()_ or _load.packages()_ functions. Do not use **pacman's** _p_load()_ as it may load packages from your default R library rather than the project specific library. Do not use _load.packages()_ in any of the _gloabl.R_, _ui.R_, or _server.R_ files if you plan to host the app on shinyapps.io.
 ```{r, echo = T, eval = F}
 rm(list = ls())
 #Load projectmap
