@@ -134,7 +134,7 @@ load.packages = function(..., packages = NULL, character.only = F){
 #' packages_dependencies("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-package.dependencies = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports", "Depends", "Suggests")){
+package.depend = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports", "Depends", "Suggests")){
   ret = NULL
   for(i in pkgs){
     out = utils::packageDescription(i, lib.loc = lib.loc)
@@ -656,7 +656,7 @@ link_to_proj = function(init = F, install = T){
       if(!is.null(packages)){
         #Clean up package library
         packages_to_keep = unique(c(packages,
-                                    package.dependencies(packages[!packages %in% installed.packages(priority = "base")]),
+                                    package.depend(packages[!packages %in% installed.packages(priority = "base")]),
                                     proj.env$required.packages))
         installed_packages = unname(installed.packages(lib = proj.env$libPath)[, "Package"])
         packages_to_remove = installed_packages[!installed_packages %in% packages_to_keep]
