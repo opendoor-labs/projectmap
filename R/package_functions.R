@@ -10,7 +10,7 @@
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 library = function(..., lib.loc = proj.env$libPath){
-  if(!is.null(proj.env$root.dir)){
+  if(proj.env$current.dir != proj.env$root.dir){
     #If set project directory to the project directory, only look in project library
     base::library(..., lib.loc = lib.loc)
   }else{
@@ -29,7 +29,7 @@ library = function(..., lib.loc = proj.env$libPath){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 require = function(..., lib.loc = proj.env$libPath){
-  if(!is.null(proj.env$root.dir)){
+  if(proj.env$current.dir != proj.env$root.dir){
     #If set project directory to the project directory, only look in project library
     base::require(..., lib.loc = lib.loc)
   }else{
@@ -113,7 +113,7 @@ load.packages = function(..., packages = NULL, character.only = F){
     pkgs = as.character(match.call(expand.dots = FALSE)[[2]])
   }
   for(i in pkgs){
-    tryCatch(library(i, character.only = T),
+    tryCatch(projectmap::library(i, character.only = T),
              error = function(err){warning(paste("Package", i, "could not be loaded."))})
   }
 }
