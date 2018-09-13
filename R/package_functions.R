@@ -9,16 +9,16 @@
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-library = function(..., lib.loc = proj.env$libPath){
+library = function(..., lib.loc = proj.env$libPath, recursive = F){
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
-      base::library(..., lib.loc = lib.loc)
+      base::library(..., lib.loc = ifelse(recursive == T, NULL, lib.loc))
     }else{
       base::library(...)
     }
   }else{
-    base::library(..., lib.loc = lib.loc)
+    base::library(...)
   }
 }
 
@@ -32,16 +32,16 @@ library = function(..., lib.loc = proj.env$libPath){
 #' require(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-require = function(..., lib.loc = proj.env$libPath){
+require = function(..., lib.loc = proj.env$libPath, recursive = F){
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
-      base::require(..., lib.loc = lib.loc)
+      base::require(..., lib.loc = ifelse(recursive == T, NULL, lib.loc))
     }else{
       base::require(...)
     }
   }else{
-    base::library(..., lib.loc = lib.loc)
+    base::library(...)
   }
 }
 
