@@ -52,7 +52,7 @@ install.packages = function(pkgs, lib = proj.env$libPath, ...){
     #If set project directory to the project directory, only look in project library
     for(i in pkgs){
       tryCatch(utils::install.packages(i, lib = lib, ...),
-             error = function(err){warning("Package", i, "could not be installed.")})
+             error = function(err){warning(paste("Package", i, "could not be installed."))})
     }
   }else{
     utils::install.packages(...)
