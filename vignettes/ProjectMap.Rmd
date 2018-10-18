@@ -25,9 +25,8 @@ It can be a challenge to develop a project in RStudio with multiple authors and 
 ## Installing the Package
 To install the **projectmap** package:
 ```{r, echo = T, eval = F}
-devtools::install_github("opendoor-labs/projectmap", auth_token = "TOKEN")
+devtools::install_github("opendoor-labs/projectmap")
 ```
-You will need to get the auth_token from Opendoor's 1password vault. Search for "github opendoor-labs/projectmap auth_token" in 1password to find the auth_token.
 
 ## Setting up a Project
 Once the installation is complete, you can now set up a new project using the package. Open RStudio and in the console type:
@@ -39,7 +38,10 @@ You will be prompted to select a directory to build your new project in. It is s
 
 Once the package is loaded, **projectmap** creates a hidden environment variable called _proj.env_, that maintains a list variables essential for the package functions to operate correctly. You should be able to delete it or edit it without unlocking it first using the _unlock_proj()_ funciton. It is not recommended to make any changes to the _proj.env_ variables, but if you do, make sure to lock it when you are done using the _lock_proj()_ function.
 
-The _link_to_proj()_ function is the workhorse function for the **projectmap** package. It is responsible for building the folder structure, adding a new library path to your RStudio session, installing all of the required packages into the projects directory, and building a file _cabinet_ of all files in the directory. It also creates a color palette (a vector of hexidecimal strings with names called _od.colors_) and ggplot theme (_od_theme()_) based on Opendoor's color palette from the Google Slides template. This function also creates a ".gitignore" file and initializes the root directory as a git repository in case the user would like to use git features with the project.
+The _link_to_proj()_ function is the workhorse function for the **projectmap** package. It is responsible for building the folder structure, adding a new library path to your RStudio session, installing all of the required packages into the projects directory, and building a file _cabinet_ of all files in the directory. It also creates a color palette (a vector of hexidecimal strings with names called _od.colors_) and ggplot theme (_od_theme()_) based on Opendoor's color palette from the Google Slides template. This function also creates a ".gitignore" file and initializes the root directory as a git repository in case the user would like to use git features with the project. If you want to change this folder to push to a GitHub repository, then in the terminal enter:
+"git remote add origin https://github.com/folder/package.git"
+"git config remote.origin.url git@github.com:folder/pacakge.git"
+replacing "folder/package" with the correct path and package name.
 
 The _cabinet_ maintains a list of file paths relative to the root directory (using the "./" syntax which replaces the folder path of the root directory) for all files in the directory. This list is maintained so authors do not need to hardcode file paths, and instead can use the helper functions _get_file_path()_, _get_file_folder()_, _save_file()_, _read_file()_, and _source_file()_, which only require the authors to specify the file name and extension, and optionally, a folder path. This file can be updated by calling the _build_cabinet()_ function, which stores the _cabinet_ in the _Functions_ folder as an RData file.
 
