@@ -12,7 +12,7 @@
 
 <meta name="author" content="Alex Hubbard" />
 
-<meta name="date" content="2018-09-12" />
+<meta name="date" content="2018-10-17" />
 
 <title>Project Map</title>
 
@@ -278,7 +278,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Project Map</h1>
 <h4 class="author"><em>Alex Hubbard</em></h4>
-<h4 class="date"><em>September 12, 2018</em></h4>
+<h4 class="date"><em>October 17, 2018</em></h4>
 
 
 
@@ -324,7 +324,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </div>
 <div id="the-example-file" class="section level2">
 <h2>The Example file</h2>
-<p>This file exists as a template for authors to follow when writing R scripts for the project. The only required function is <em>link_to_proj()</em>, which should be placed at the top after loading the <strong>projectmap</strong> package. Then, load all other required libraries for the R script using the <em>library()</em> or <em>load.packages()</em> functions. Do not use <strong>pacman’s</strong> <em>p_load()</em> as it may load packages from your default R library rather than the project specific library.</p>
+<p>This file exists as a template for authors to follow when writing R scripts for the project. The only required function is <em>link_to_proj()</em>, which should be placed at the top after loading the <strong>projectmap</strong> package. Then, load all other required libraries for the R script using the <em>library()</em> or <em>load.packages()</em> functions. Do not use <strong>pacman’s</strong> <em>p_load()</em> as it may load packages from your default R library rather than the project specific library. Do not use <em>load.packages()</em> in any of the <em>gloabl.R</em>, <em>ui.R</em>, or <em>server.R</em> files if you plan to host the app on shinyapps.io.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">rm</span>(<span class="dt">list =</span> <span class="kw">ls</span>())</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#Load projectmap</span></a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw">library</span>(projectmap)</a>

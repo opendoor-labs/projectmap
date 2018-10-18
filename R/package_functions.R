@@ -675,31 +675,32 @@ link_to_proj = function(init = F, install = T){
         }
       }
       if(!"projectmap" %in% installed_packages){
-        devtools::install_github("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
+        key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
+        devtools::install_github("opendoor-labs/projectmap", auth_token = key, quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
         message("Done.")
       }
 
-      #Link to Google BiqQuery and Google Drive if necessary
-      if("bigrquery" %in% packages){
-        if(!".httr-oauth" %in% packages){
-          invisible(bigrquery::bq_projects())
-        }
-      }
-      if("bigQueryR" %in% packages){
-        if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-          invisible(bigQueryR::bqr_auth())
-        }
-      }
-      if("googledrive" %in% packages){
-        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-          invisible(googldedrive::drive_auth())
-        }
-      }
-      if("googlesheets" %in% packages){
-        if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-          invisible(googlesheets::gs_auth())
-        }
-      }
+      # #Link to Google BiqQuery and Google Drive if necessary
+      # if("bigrquery" %in% packages){
+      #   if(!".httr-oauth" %in% packages){
+      #     invisible(bigrquery::bq_projects())
+      #   }
+      # }
+      # if("bigQueryR" %in% packages){
+      #   if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+      #     invisible(bigQueryR::bqr_auth())
+      #   }
+      # }
+      # if("googledrive" %in% packages){
+      #   if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+      #     invisible(googldedrive::drive_auth())
+      #   }
+      # }
+      # if("googlesheets" %in% packages){
+      #   if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
+      #     invisible(googlesheets::gs_auth())
+      #   }
+      # }
       rm(packages, packages_to_keep, packages_to_remove, installed_packages)
     }
 
@@ -2417,6 +2418,3 @@ Output/
 #devtools::install()
 #library(projectmap)
 #
-
-
-#601e567bd4ecedf4b060793cdb29155246ed1728

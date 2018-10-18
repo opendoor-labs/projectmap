@@ -25,8 +25,9 @@ It can be a challenge to develop a project in RStudio with multiple authors and 
 ## Installing the Package
 To install the **projectmap** package:
 ```{r, echo = T, eval = F}
-devtools::install_github("opendoor-labs/projectmap")
+devtools::install_github("opendoor-labs/projectmap", auth_token = "TOKEN")
 ```
+You will need to get the auth_token from Opendoor's 1password vault. Search for "github opendoor-labs/projectmap auth_token" in 1password to find the auth_token.
 
 ## Setting up a Project
 Once the installation is complete, you can now set up a new project using the package. Open RStudio and in the console type:
