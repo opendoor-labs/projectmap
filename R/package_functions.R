@@ -2410,12 +2410,13 @@ Logs/
 Output/
 "
 
+#
 #Call these to build the package
 #devtools::document()
 #devtools::build_vignettes()
 #devtools::install()
 #library(projectmap)
-
+#
 
 
 
