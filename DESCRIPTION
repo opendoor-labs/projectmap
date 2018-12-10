@@ -45,4 +45,4 @@ Imports:
   shinydashboard (>= 0.7.0),
   rsconnect (>= 0.8.8),
   diffobj (>= 0.1.11)
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

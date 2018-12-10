@@ -653,12 +653,17 @@ link_to_proj = function(init = F, install = T){
       rm(rfiles)
       message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
 
+      installed_packages = unname(installed.packages(lib = proj.env$libPath)[, "Package"])
+      if(!"projectmap" %in% installed_packages){
+        #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
+        devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
+      }
+
       if(!is.null(packages)){
         #Clean up package library
         packages_to_keep = unique(c(packages,
                                     package.depend(packages[!packages %in% installed.packages(priority = "base")]),
                                     proj.env$required.packages))
-        installed_packages = unname(installed.packages(lib = proj.env$libPath)[, "Package"])
         packages_to_remove = installed_packages[!installed_packages %in% packages_to_keep]
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
@@ -673,11 +678,6 @@ link_to_proj = function(init = F, install = T){
         if("projectmap" %in% installed_packages & length(packages) > 0){
           message("Done.")
         }
-      }
-      if(!"projectmap" %in% installed_packages){
-        #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
-        devtools::install_github("opendoor-labs/projectmap", quiet = T, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
-        message("Done.")
       }
 
       # #Link to Google BiqQuery and Google Drive if necessary
