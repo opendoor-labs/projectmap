@@ -55,11 +55,11 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, lib = proj.env$libPath, ...){
+install.packages = function(pkgs, lib.loc = proj.env$libPath, ...){
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     for(i in pkgs){
-      tryCatch(utils::install.packages(i, lib = lib, ...),
+      tryCatch(utils::install.packages(i, lib.loc = lib.loc, ...),
              error = function(err){warning(paste("Package", i, "could not be installed."))})
     }
   }else{
@@ -361,9 +361,13 @@ get_proj_packages = function(files, parallel = T){
       if(length(which(grepl("\\:\\:", lines))) > 0){
         doublecolons = lines[which(grepl("\\:\\:", lines))]
         for(j in doublecolons){
-          pkgs = unique(c(pkgs, trimws(strsplit(j, "\\:\\:")[[1]][1])))
+          temp = trimws(strsplit(j, "\\:\\:")[[1]][1])
+          for(k in length(temp)){
+            p = trimws(strsplit(temp[k], " |[[:punct:]]")[[1]])
+            pkgs = unique(c(pkgs, p[[length(p)]]))
+          }
         }
-        rm(doublecolons)
+        suppressWarnings(rm(doublecolons, temp, p, j, k))
       }
 
       if(length(lines) > 0){
@@ -380,6 +384,7 @@ get_proj_packages = function(files, parallel = T){
             pkgs = unique(c(pkgs, temp))
           }
         }
+        pkgs = pkgs[!grepl("[[:punct:]]", pkgs)]
         return(pkgs)
       }else{
         return(NULL)
@@ -653,7 +658,7 @@ link_to_proj = function(init = F, install = T){
       rm(rfiles)
       message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
 
-      installed_packages = unname(installed.packages(lib = proj.env$libPath)[, "Package"])
+      installed_packages = unname(installed.packages(lib.loc = proj.env$libPath)[, "Package"])
       if(!"projectmap" %in% installed_packages){
         #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
         devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
@@ -673,7 +678,7 @@ link_to_proj = function(init = F, install = T){
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
           message("Installing packages...")
-          install.packages(packages, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+          install.packages(packages, quiet = T, verbose = F, dependencies = T, lib.loc = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages & length(packages) > 0){
           message("Done.")
