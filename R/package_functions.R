@@ -55,15 +55,15 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, lib.loc = proj.env$libPath, ...){
+install.packages = function(pkgs, lib = proj.env$libPath, ...){
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     for(i in pkgs){
-      tryCatch(utils::install.packages(i, lib.loc = lib.loc, ...),
+      tryCatch(utils::install.packages(i, lib = lib, ...),
              error = function(err){warning(paste("Package", i, "could not be installed."))})
     }
   }else{
-    utils::install.packages(...)
+    utils::install.packages(pkgs, lib = lib, ...)
   }
 }
 
@@ -678,7 +678,7 @@ link_to_proj = function(init = F, install = T){
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
           message("Installing packages...")
-          install.packages(packages, quiet = T, verbose = F, dependencies = T, lib.loc = proj.env$libPath)
+          install.packages(packages, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages & length(packages) > 0){
           message("Done.")
