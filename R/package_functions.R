@@ -1438,7 +1438,7 @@ od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
     return(pal)
   }
 
-  od.theme = ggplot2::theme_minimal(base_size = 16) %+replace%
+  od.theme = ggplot2::theme_minimal(base_size = 12) %+replace%
     ggplot2::theme(panel.grid.major = ggplot2::element_line(color = od.colors["lightgreytint"], size = 0.5),
                    panel.grid.minor = ggplot2::element_line(color = od.colors["lightgreytint"], linetype = "dashed", size = 0.5),
                    panel.border = ggplot2::element_rect(color = od.colors["warmgrey"], fill = NA),
@@ -1462,12 +1462,12 @@ od_theme = function(palette = "main", discrete = T, reverse = F, addblack = F,
   }else{
     stop("Error defining color palette")
   }
-  update_geom_defaults("line", list(size = 1.125))
-  update_geom_defaults("abline", list(size = 1.125))
-  update_geom_defaults("vline", list(size = 1.125))
-  update_geom_defaults("hline", list(size = 1.125))
-  update_geom_defaults("segment", list(size = 1.125))
-  update_geom_defaults("point", list(size = 1.2))
+  update_geom_defaults("line", list(size = 1.075))
+  update_geom_defaults("abline", list(size = 1.075))
+  update_geom_defaults("vline", list(size = 1.075))
+  update_geom_defaults("hline", list(size = 1.075))
+  update_geom_defaults("segment", list(size = 1.075))
+  update_geom_defaults("point", list(size = 1.125))
   return(od.theme)
 }
 
