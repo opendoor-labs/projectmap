@@ -39,8 +39,7 @@ it will load it into the project environment.
 
 Finally, the function searches all R scripts for "library" and "require" keywords. It will check that
 all packages in these keywords are installed, and if they are not, install them. If any package
-versions differ from previous runs, it will prompt to update for the correct package version. If any
-of the bigrquery, bigQueryR, googledrive, or googlesheets packages are used in any of the R scripts,
+versions differ from previous runs, it will prompt to update for the correct package version.
 it will open a web browser and ask the user to verify access. Authenication tokens will be stored in
 the project folder to prevent this from happening on future runs. The authentication token may be
 updated periodically.
