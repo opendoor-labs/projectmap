@@ -316,7 +316,7 @@ reset_proj_env = function(build = F, newroot = F){
 proj.env = new.env()
 proj.env$project.name = "Project"
 proj.env$R.dev.version = "3.5.0"
-proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools",
+proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate",
                                "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap")
 if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
@@ -546,8 +546,7 @@ update_RDevVersion = function(){
 #'
 #' Finally, the function searches all R scripts for "library" and "require" keywords. It will check that
 #' all packages in these keywords are installed, and if they are not, install them. If any package
-#' versions differ from previous runs, it will prompt to update for the correct package version. If any
-#' of the bigrquery, bigQueryR, googledrive, or googlesheets packages are used in any of the R scripts,
+#' versions differ from previous runs, it will prompt to update for the correct package version.
 #' it will open a web browser and ask the user to verify access. Authenication tokens will be stored in
 #' the project folder to prevent this from happening on future runs. The authentication token may be
 #' updated periodically.
@@ -684,28 +683,6 @@ link_to_proj = function(init = F, install = T){
           message("Done.")
         }
       }
-
-      # #Link to Google BiqQuery and Google Drive if necessary
-      # if("bigrquery" %in% packages){
-      #   if(!".httr-oauth" %in% packages){
-      #     invisible(bigrquery::bq_projects())
-      #   }
-      # }
-      # if("bigQueryR" %in% packages){
-      #   if(!"bq.oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-      #     invisible(bigQueryR::bqr_auth())
-      #   }
-      # }
-      # if("googledrive" %in% packages){
-      #   if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-      #     invisible(googldedrive::drive_auth())
-      #   }
-      # }
-      # if("googlesheets" %in% packages){
-      #   if(!".httr-oauth" %in% list.files(path = proj.env$root.dir, all.files = T, recursive = F)){
-      #     invisible(googlesheets::gs_auth())
-      #   }
-      # }
       rm(packages, packages_to_keep, packages_to_remove, installed_packages)
     }
 
