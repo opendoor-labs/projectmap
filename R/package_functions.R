@@ -1016,8 +1016,12 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
                           knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T)))))
     }
+  }else if(tools::file_ext(proj.env$file == ".py")){
+    setwd(proj.env$current.dir)
+    invisible(capture.output(suppressMessages(reticulate::source_python(file = proj.env$file, ...))))
+    setwd(proj.env$root.dir)
   }else{
-    stop("File extension must be either .R or .Rmd")
+    stop("File extension must be either .R, .py, or .Rmd")
   }
   setwd(proj.env$root.dir)
 

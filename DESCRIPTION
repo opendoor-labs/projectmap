@@ -39,9 +39,8 @@ Imports:
     shiny (>= 1.1.0),
     shinydashboard (>= 0.7.0),
     rsconnect (>= 0.8.8),
-    diffobj (>= 0.1.11),
-    diffobj (>= 1.12),
-    Rcpp (>= 1.0.1)
+    Rcpp (>= 1.0.1),
+    reticulate (>= 1.12)
 RoxygenNote: 6.1.1
 LinkingTo: 
     Rcpp
