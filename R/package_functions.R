@@ -848,7 +848,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   if(full == F){
     return(gsub("//", "/", ret))
   }else{
-    gsub("//", "/", paste0(proj.env$root.dir, "/", ret))
+    return(gsub("//", "/", paste0(proj.env$root.dir, "/", ret)))
   }
 }
 
