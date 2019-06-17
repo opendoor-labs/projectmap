@@ -648,7 +648,8 @@ link_to_proj = function(init = F, install = T){
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
       rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")))]
+                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd"),
+                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".py")))]
       rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
@@ -1016,10 +1017,10 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
                           knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T)))))
     }
-  }else if(tools::file_ext(proj.env$file == ".py")){
-    setwd(proj.env$current.dir)
-    invisible(capture.output(suppressMessages(reticulate::source_python(file = proj.env$file, ...))))
-    setwd(proj.env$root.dir)
+  # }else if(tools::file_ext(proj.env$file == ".py")){
+  #   setwd(proj.env$current.dir)
+  #   invisible(capture.output(suppressMessages(reticulate::source_python(file = proj.env$file, ...))))
+  #   setwd(proj.env$root.dir)
   }else{
     stop("File extension must be either .R, .py, or .Rmd")
   }
@@ -1539,35 +1540,6 @@ git_push = function(){
   message(system(paste("git push origin refs/heads/master"), intern = T))
 }
 
-#' Git diff
-#'
-#' @return No return value
-#' @param branch1 The first branch to compare
-#' @param branch2 The second branch to compare
-#' @param file The file name with extension to compare
-#' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
-#' @param mode A character string of the display mode used by diffobj
-#' @description Git diff a file between two branches using diffobj. If branch2 is left NULL then uses the current branch.
-#' @examples
-#' git_diff(branch1 = "master", branch2 = "alexhubbard", file = "Example File.R")
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-git_diff = function(branch1 = "master", branch2 = "master", file = NULL, inFolder = NULL, mode = "sidebyside"){
-  remote = capture.output(system("git remote -v", intern = T))
-  remote = trimws(gsub("origin\\\\t|\\(fetch\\)|\\(push\\)|\\(pull\\)|\"", "", remote))[1]
-  remote = trimws(substr(remote, 4, nchar(remote)))
-  file = get_file_path(file, inFolder)
-
-  local = capture.output(system(paste0("git show master:'", file, "'"), intern = T))
-  setwd(remote)
-  system(paste0("cd '", remote, "'"), intern = T)
-  remote = capture.output(system(paste0("git show master:'", file, "'"), intern = T))
-  setwd(proj.env$root.dir)
-  system(paste0("cd '", proj.env$root.dir, "'"), intern = T)
-  p = diffobj::diffChr(remote, local, mode = mode, disp.width = 250, color.mode = "rgb")
-  print(p)
-}
-
 #' Merge two branches using git or interactive method
 #'
 #' @param with Branch name want to merge current branch with
@@ -1581,7 +1553,7 @@ git_diff = function(branch1 = "master", branch2 = "master", file = NULL, inFolde
 #' git_merge(with = "master")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-git_merge = function(with = NULL, this = NULL, file = NULL, inFolder = NULL, interactive = F){
+git_merge = function(with = NULL, this = NULL, file = NULL, inFolder = NULL){
   if(is.null(with)){
     stop("Must provide the name of the branch to merge with.")
   }
@@ -1596,13 +1568,7 @@ git_merge = function(with = NULL, this = NULL, file = NULL, inFolder = NULL, int
   if(cur.branch != with){
     message(system(paste("git checkout ", with), intern = T))
   }
-  if(interactive == T){
-    file = get_file_path(file, inFolder)
-    fnl = interactive_merge(with = "master", this = this, file)
-    write(fnl, file = file, append = F)
-  }else{
-    message(system(paste("git merge", with, this), intern = T))
-  }
+  message(system(paste("git merge", with, this), intern = T))
   if(cur.branch != with){
     message(system(paste("git checkout ", this), intern = T))
   }

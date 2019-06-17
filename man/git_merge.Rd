@@ -4,8 +4,7 @@
 \alias{git_merge}
 \title{Merge two branches using git or interactive method}
 \usage{
-git_merge(with = NULL, this = NULL, file = NULL, inFolder = NULL,
-  interactive = F)
+git_merge(with = NULL, this = NULL, file = NULL, inFolder = NULL)
 }
 \arguments{
 \item{with}{Branch name want to merge current branch with}
