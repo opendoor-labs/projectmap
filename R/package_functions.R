@@ -720,7 +720,7 @@ link_to_proj = function(init = F, install = T){
         if(!file.exists("./Functions/required_packages.csv")){
           update_ReqPackages()
         }
-        proj_req_pkgs = data.table::data.table(data.table::fread(file = "./Functions/required_packages.csv"))
+        proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
         cat(class(proj_req_pkgs), "\n")
         assign("proj_req_pkgs", proj_req_pkgs, .GlobalEnv)
 
@@ -750,8 +750,8 @@ link_to_proj = function(init = F, install = T){
           in_req = packages[packages %in% proj_req_pkgs$Package]
           assign("in_req", in_req, .GlobalEnv)
           assign("packages", in_req, .GlobalEnv)
-          versions = c(proj_req_pkgs[Package %in% in_req, ]$Version)
-          names(versions) = proj_req_pkgs[Package %in% in_req, ]$Package
+          versions = c(proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Version)
+          names(versions) = proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Package
           in_req = names(versions)
           out_req = packages[!packages %in% proj_req_pkgs$Package]
           if(length(out_req) > 0){
