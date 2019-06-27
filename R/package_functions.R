@@ -759,7 +759,6 @@ link_to_proj = function(init = F, install = T){
             packages = c(in_req)
           }
           rm(in_req, out_req)
-          cat(paste(packages, collapse = "\n"))
           install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages & length(packages) > 0){
