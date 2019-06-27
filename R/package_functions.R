@@ -560,7 +560,7 @@ update_RDevVersion = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 update_ReqPackages = function(){
-  proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))[order(Package, Version), ]
+  proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
   proj_req_pkgs = proj_req_pkgs[, .(Version = max(Version)), by = "Package"]
   data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
 }
@@ -721,8 +721,6 @@ link_to_proj = function(init = F, install = T){
           update_ReqPackages()
         }
         proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
-        cat(class(proj_req_pkgs), "\n")
-        assign("proj_req_pkgs", proj_req_pkgs, .GlobalEnv)
 
         if(nrow(installed_packages) > 0){
           version_check = sapply(1:nrow(installed_packages), function(x){
@@ -748,8 +746,6 @@ link_to_proj = function(init = F, install = T){
 
           #Check if packages to install are in the required list and get the version, otherwise just install the package
           in_req = packages[packages %in% proj_req_pkgs$Package]
-          assign("in_req", in_req, .GlobalEnv)
-          assign("packages", in_req, .GlobalEnv)
           versions = c(proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Version)
           names(versions) = proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Package
           in_req = names(versions)
