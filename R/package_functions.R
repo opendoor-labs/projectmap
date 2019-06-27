@@ -561,7 +561,6 @@ update_RDevVersion = function(){
 #' @export
 update_ReqPackages = function(){
   proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
-  proj_req_pkgs = proj_req_pkgs[, .(Version = max(Version)), by = "Package"]
   data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
 }
 
