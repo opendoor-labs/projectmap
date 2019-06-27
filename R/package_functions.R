@@ -702,7 +702,7 @@ link_to_proj = function(init = F, install = T){
       message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
 
       installed_packages = data.table::data.table(installed.packages(lib.loc = proj.env$libPath))[, c("Package", "Version")]
-      if(!"projectmap" %in% installed_packages){
+      if(!"projectmap" %in% installed_packages$Package){
         #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
         devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
       }
