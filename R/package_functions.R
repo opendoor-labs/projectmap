@@ -64,17 +64,16 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
     if(update_req_pkgs == T){
       proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
     }
-    pb = utils::txtProgressBar(min = 0, max = length(pkgs), initial = 0, char = "=", style = 3)
-    for(i in 1:length(pkgs)){
-      if(is.na(versions[i])){
+    for(i in pkgs){
+      if(is.na(versions[which(pkgs == i)])){
         tryCatch(utils::install.packages(i, lib = lib, ...),
                error = function(err){
                  warning(paste("Package", i, "could not be installed."))
         })
       }else{
-        tryCatch(versions::install.versions(pkgs = pkgs[i], versions = versions[i], lib = lib, ...),
+        tryCatch(versions::install.versions(pkgs = i, versions = versions[which(pkgs == i)], lib = lib, ...),
                    error = function(err){
-                     warning(paste("Package", pkgs[i], "version", versions[i], "could not be installed."))
+                     warning(paste("Package", pi, "version", versions[which(pkgs == i)], "could not be installed."))
         })
       }
       if(update_req_pkgs == T){
@@ -84,7 +83,6 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
           proj_req_pkgs = data.table::rbind(proj_req_pkgs, data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")], use.names = T, fill = T)
         }
       }
-      utils::setTxtProgressBar(pb, i)
     }
   }else{
     if(!is.null(versions)){
