@@ -723,8 +723,8 @@ link_to_proj = function(init = F, install = T){
 
         if(nrow(installed_packages) > 0){
           version_check = sapply(1:nrow(installed_packages), function(x){
-            if(nrow(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]) > 0){
-              return(!any(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
+            if(nrow(proj_req_pkgs[proj_req_pkgs$Package == installed_packages[x, ]$Package, ]) > 0){
+              return(!any(proj_req_pkgs[proj_req_pkgsPackage == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
             }else{
               return(NA)
             }
