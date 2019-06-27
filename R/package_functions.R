@@ -680,7 +680,7 @@ link_to_proj = function(init = F, install = T){
     }else{
       #If the file cabinet already exists, load it
       message("Loading file cabinet...")
-      assign("cabinet", readLines("./Functions/file_cabinet.txt"), envir = proj.env)
+      assign("cabinet", readLines("./Functions/.file_cabinet.txt"), envir = proj.env)
       message(paste0("\r", paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
     }
 
@@ -815,7 +815,7 @@ build_cabinet = function(){
     return(x)
   })))
   proj.env$cabinet = cabinet
-  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
+  write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   lock_proj()
 }
 
@@ -836,7 +836,7 @@ add_to_cabinet = function(file){
   file = gsub(root, "", file)
   file = ifelse(substr(file, 1, 2) == "./", substr(file, 3, nchar(file)), file)
   cabinet = trimws(gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(c(proj.env$cabinet, file))))))
-  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
+  write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -866,7 +866,7 @@ remove_file = function(files){
   #root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   #files = gsub(root, "\\.", files)
   cabinet = trimws(unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files])))
-  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
+  write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   proj.env$cabinet = cabinet
 
   lock_proj()
