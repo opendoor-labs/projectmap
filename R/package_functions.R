@@ -64,6 +64,7 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
     if(update_req_pkgs == T){
       proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
     }
+    pb = utils::txtProgressBar(min = 0, max = length(pkgs), initial = 0, char = "=", style = 3)
     for(i in 1:length(pkgs)){
       if(is.na(versions[i])){
         tryCatch(utils::install.packages(i, lib = lib, ...),
@@ -83,6 +84,7 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
           proj_req_pkgs = data.table::rbind(proj_req_pkgs, data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")], use.names = T, fill = T)
         }
       }
+      utils::setTxtProgressBar(pb, i)
     }
   }else{
     if(!is.null(versions)){
@@ -757,7 +759,7 @@ link_to_proj = function(init = F, install = T){
             packages = c(in_req)
           }
           rm(in_req, out_req)
-
+          cat(paste(packages, collapse = "\n"))
           install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages & length(packages) > 0){
