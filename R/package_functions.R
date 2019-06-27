@@ -702,7 +702,7 @@ link_to_proj = function(init = F, install = T){
       rm(rfiles)
       message(paste0(paste(rep("\b", nchar("Checking required packages... ")), collapse = ""), "Checking required packages...Done."))
 
-      installed_packages = unname(installed.packages(lib.loc = proj.env$libPath)[, "Package"])
+      installed_packages = data.table::data.table(installed.packages(lib.loc = proj.env$libPath))[, c("Package", "Version")]
       if(!"projectmap" %in% installed_packages){
         #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
         devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
@@ -713,26 +713,29 @@ link_to_proj = function(init = F, install = T){
         packages_to_keep = unique(c(packages,
                                     package.depend(packages[!packages %in% installed.packages(priority = "base")]),
                                     proj.env$required.packages))
-        packages_to_remove = installed_packages[!installed_packages %in% packages_to_keep]
+        packages_to_remove = installed_packages$Package[!installed_packages$Package %in% packages_to_keep]
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
         #Check if packages are of the correct version
         if(!file.exists("./Functions/required_packages.csv")){
           update_ReqPackages()
-          proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
         }
-        version_check = sapply(1:nrow(installed_packages), function(x){
-          if(nrow(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]) > 0){
-            return(!any(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
-          }else{
-            return(NA)
+        proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
+
+        if(nrow(installed_packages) > 0){
+          version_check = sapply(1:nrow(installed_packages), function(x){
+            if(nrow(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]) > 0){
+              return(!any(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
+            }else{
+              return(NA)
+            }
+          })
+          names(version_check) = installed_packages$Package
+          if(any(version_check == T)){
+            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
           }
-        })
-        names(version_check) = installed_packages$Package
-        if(any(version_check == T)){
-          warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
+          rm(version_check)
         }
-        rm(version_check)
 
         #Install the packages
         packages = packages[!packages %in% c("projectmap", installed_packages)]
@@ -749,7 +752,7 @@ link_to_proj = function(init = F, install = T){
           out_req = packages[!packages %in% proj_req_pkgs$Package]
           if(length(out_req) > 0){
             versions = c(versions, rep(NA, length(out_req)))
-            names(versions) = c(names(versions), out_req)
+            names(versions)[names(versions) == ""] = out_req
             packages = c(in_req, out_req)
           }else{
             packages = c(in_req)
@@ -811,9 +814,8 @@ build_cabinet = function(){
     }
     return(x)
   })))
-  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
   proj.env$cabinet = cabinet
-
+  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
   lock_proj()
 }
 
