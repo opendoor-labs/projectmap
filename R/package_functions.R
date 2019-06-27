@@ -722,6 +722,7 @@ link_to_proj = function(init = F, install = T){
         }
         proj_req_pkgs = data.table::data.table(data.table::fread(file = "./Functions/required_packages.csv"))
         cat(class(proj_req_pkgs), "\n")
+        assign("proj_req_pkgs", proj_req_pkgs, .GlobalEnv)
 
         if(nrow(installed_packages) > 0){
           version_check = sapply(1:nrow(installed_packages), function(x){
