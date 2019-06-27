@@ -748,6 +748,8 @@ link_to_proj = function(init = F, install = T){
 
           #Check if packages to install are in the required list and get the version, otherwise just install the package
           in_req = packages[packages %in% proj_req_pkgs$Package]
+          assign("in_req", in_req, .GlobalEnv)
+          assign("packages", in_req, .GlobalEnv)
           versions = c(proj_req_pkgs[Package %in% in_req, ]$Version)
           names(versions) = proj_req_pkgs[Package %in% in_req, ]$Package
           in_req = names(versions)
