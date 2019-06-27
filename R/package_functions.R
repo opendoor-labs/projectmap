@@ -730,7 +730,7 @@ link_to_proj = function(init = F, install = T){
             }
           })
           names(version_check) = installed_packages$Package
-          cat(paste(version_check, collapse = "\n"))
+          assign("version_check", version_check, .GlobalEnv)
           if(any(version_check == T)){
             warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
           }
