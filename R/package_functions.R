@@ -55,15 +55,44 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, lib = proj.env$libPath, ...){
+install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
-    for(i in pkgs){
-      tryCatch(utils::install.packages(i, lib = lib, ...),
-             error = function(err){warning(paste("Package", i, "could not be installed."))})
+    if(is.null(versions)){
+      versions = rep(NA, length(pkgs))
+    }
+    if(update_req_pkgs == T){
+      proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
+    }
+    for(i in 1:length(pkgs)){
+      if(is.na(versions[i])){
+        tryCatch(utils::install.packages(i, lib = lib, ...),
+               error = function(err){
+                 warning(paste("Package", i, "could not be installed."))
+        })
+      }else{
+        tryCatch(versions::install.versions(pkgs = pkgs[i], versions = versions[i], lib = lib, ...),
+                   error = function(err){
+                     warning(paste("Package", pkgs[i], "version", versions[i], "could not be installed."))
+        })
+      }
+      if(update_req_pkgs == T){
+        if(nrow(proj_req_pkgs[Package == i, ]) > 0){
+          proj_req_pkgs[Package == i, "Version" := data.table::data.table(installed.packages()[, c("Package", "Version")])[Package == i, ][Version == max(Version), ]$Version]
+        }else{
+          proj_req_pkgs = data.table::rbind(proj_req_pkgs, data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")], use.names = T, fill = T)
+        }
+      }
     }
   }else{
-    utils::install.packages(pkgs, lib = lib, ...)
+    if(!is.null(versions)){
+      utils::install.packages(pkgs, lib = lib, ...)
+    }else{
+      devtools::install_version(package = pkgs, version = version, lib = lib, ...)
+    }
+  }
+  if(update_req_pkgs == T){
+    data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
   }
 }
 
@@ -317,7 +346,7 @@ proj.env = new.env()
 proj.env$project.name = "Project"
 proj.env$R.dev.version = "3.5.0"
 proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate",
-                               "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap")
+                               "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
 if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
 }
@@ -475,11 +504,7 @@ set_proj_lib = function(){
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
   }
-  if(grepl("/Branches", proj.env$root.dir)){
-    proj.env$libPath = paste0(dirname(dirname(proj.env$root.dir)), "/Library")
-  }else{
-    proj.env$libPath = paste0(proj.env$root.dir, "/Library")
-  }
+  proj.env$libPath = paste0(proj.env$root.dir, "/Library")
   .libPaths(new = proj.env$libPath)
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
@@ -516,7 +541,28 @@ exit_proj = function(reset_lib = T){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 update_RDevVersion = function(){
-  write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
+  RDevVersion = readLines(".projectmaproot")
+  RVersionTest = sapply(RDevVersion, function(x){
+    eval(parse(text = paste0("R.Version()$", trimws(gsub("[[:punct:]]|[[:digit:]]", "", x))))) >= as.numeric(trimws(gsub("[[:alpha:]]|\\:", "", x)))
+  })
+  if(all(RVersionTest == T)){
+    write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
+  }
+  update_ReqPackages()
+}
+
+#' Update stored required packages
+#'
+#' @return No return value
+#' @description Overwrites the stored required packages with the current versions of installed packages
+#' @examples
+#' update_ReqPackages()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+update_ReqPackages = function(){
+  proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))[order(Package, Version), ]
+  proj_req_pkgs = proj_req_pkgs[, .(Version = max(Version)), by = "Package"]
+  data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
 }
 
 #' Link a script to the project
@@ -607,13 +653,11 @@ link_to_proj = function(init = F, install = T){
           warning(paste0("This project was built under ", paste0(trimws(gsub("major: |minor: ", "", RDevVersion)), collapse = "."),
                          ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), "."))
         }
-        rm(RDevVersion)
+        rm(RDevVersion, RVersionTest)
       }
       for(i in folders){
         if(!dir.exists(i)){
-          if(!(grepl("/Branches", proj.env$root.dir) & (i %in% c("./Documentation", "./Library")))){
-            dir.create(i)
-          }
+          dir.create(i)
         }
       }
       if(init == T){
@@ -636,7 +680,7 @@ link_to_proj = function(init = F, install = T){
     }else{
       #If the file cabinet already exists, load it
       message("Loading file cabinet...")
-      load("./Functions/cabinet.RData", envir = proj.env)
+      assign("cabinet", readLines("./Functions/file_cabinet.txt"), envir = proj.env)
       message(paste0("\r", paste(rep("\b", nchar("Loading file cabinet... ")), collapse = ""), "Loading file cabinet...Done."))
     }
 
@@ -672,19 +716,53 @@ link_to_proj = function(init = F, install = T){
         packages_to_remove = installed_packages[!installed_packages %in% packages_to_keep]
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
+        #Check if packages are of the correct version
+        if(!file.exists("./Functions/required_packages.csv")){
+          update_ReqPackages()
+          proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
+        }
+        version_check = sapply(1:nrow(installed_packages), function(x){
+          if(nrow(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]) > 0){
+            return(!any(proj_req_pkgs[Package == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
+          }else{
+            return(NA)
+          }
+        })
+        names(version_check) = installed_packages$Package
+        if(any(version_check == T)){
+          warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
+        }
+        rm(version_check)
+
         #Install the packages
         packages = packages[!packages %in% c("projectmap", installed_packages)]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
           message("Installing packages...")
-          install.packages(packages, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+
+          #Check if packages to install are in the required list and get the version, otherwise just install the package
+          in_req = packages[packages %in% proj_req_pkgs$Package]
+          versions = c(proj_req_pkgs[Package %in% in_req, ]$Version)
+          names(versions) = proj_req_pkgs[Package %in% in_req, ]$Package
+          in_req = names(versions)
+          out_req = packages[!packages %in% proj_req_pkgs$Package]
+          if(length(out_req) > 0){
+            versions = c(versions, rep(NA, length(out_req)))
+            names(versions) = c(names(versions), out_req)
+            packages = c(in_req, out_req)
+          }else{
+            packages = c(in_req)
+          }
+          rm(in_req, out_req)
+
+          install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages & length(packages) > 0){
           message("Done.")
         }
       }
-      rm(packages, packages_to_keep, packages_to_remove, installed_packages)
+      rm(packages, packages_to_keep, packages_to_remove, installed_packages, proj_req_pkgs)
     }
 
     #Create the location of the master log and define the progress bar variables
@@ -720,7 +798,7 @@ build_cabinet = function(){
   unlock_proj()
 
   folders = list.dirs(full.names = F, recursive = F)
-  folders = folders[!folders %in% c("Library", ".git", "Branches")]
+  folders = folders[!folders %in% c("Library", ".git")]
   cabinet = unlist(lapply(folders, function(x) {
                               unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
                             }))
@@ -733,7 +811,7 @@ build_cabinet = function(){
     }
     return(x)
   })))
-  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
+  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -756,7 +834,7 @@ add_to_cabinet = function(file){
   file = gsub(root, "", file)
   file = ifelse(substr(file, 1, 2) == "./", substr(file, 3, nchar(file)), file)
   cabinet = trimws(gsub("//", "/", gsub(proj.env$root.dir, "\\.", unique(sort(c(proj.env$cabinet, file))))))
-  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
+  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -786,7 +864,7 @@ remove_file = function(files){
   #root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   #files = gsub(root, "\\.", files)
   cabinet = trimws(unique(sort(proj.env$cabinet[!proj.env$cabinet %in% files])))
-  save(cabinet, file = paste0(proj.env$root.dir, "/Functions/cabinet.RData"))
+  write(proj.env$cabinet, file = "./Functions/file_cabinet.txt")
   proj.env$cabinet = cabinet
 
   lock_proj()
@@ -1047,6 +1125,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     utils::setTxtProgressBar(proj.env$pb, proj.env$pbCounter)
     cat("\n")
     cat(paste0("\n", proj.env$trace.message[[length(proj.env$trace.message)]]), file = paste0(proj.env$logLocation, ".txt"), "\n", append = T)
+    update_RDevVersion()
     reset_proj_env()
   }
   #Detach all packages except the required packages
