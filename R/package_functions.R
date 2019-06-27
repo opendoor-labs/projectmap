@@ -739,7 +739,7 @@ link_to_proj = function(init = F, install = T){
         }
 
         #Install the packages
-        packages = packages[!packages %in% c("projectmap", installed_packages)]
+        packages = packages[!packages %in% c("projectmap", installed_packages$Package)]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
