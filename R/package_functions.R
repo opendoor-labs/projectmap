@@ -73,7 +73,7 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
       }else{
         tryCatch(versions::install.versions(pkgs = i, versions = versions[which(pkgs == i)], lib = lib, ...),
                    error = function(err){
-                     warning(paste("Package", pi, "version", versions[which(pkgs == i)], "could not be installed."))
+                     warning(paste("Package", i, "version", versions[which(pkgs == i)], "could not be installed."))
         })
       }
       if(update_req_pkgs == T){
