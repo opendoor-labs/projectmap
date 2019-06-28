@@ -67,20 +67,20 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
     for(i in pkgs){
       if(is.na(versions[which(pkgs == i)])){
         tryCatch(utils::install.packages(i, lib = lib, ...),
-               error = function(err){
-                 warning(paste("Package", i, "could not be installed."))
-        })
+                 error = function(err){
+                   warning(paste("Package", i, "could not be installed."))
+                 })
       }else{
-        tryCatch(versions::install.versions(pkgs = i, versions = versions[which(pkgs == i)], lib = lib, ...),
-                   error = function(err){
-                     warning(paste("Package", i, "version", versions[which(pkgs == i)], "could not be installed."))
-        })
+        tryCatch(versions::install.versions(pkgs = i, versions = as.character(versions[which(pkgs == i)]), lib = lib),
+                 error = function(err){
+                   warning(paste("Package", i, versions[which(pkgs == i)], "could not be installed."))
+                 })
       }
       if(update_req_pkgs == T){
         if(nrow(proj_req_pkgs[Package == i, ]) > 0){
           proj_req_pkgs[Package == i, "Version" := data.table::data.table(installed.packages()[, c("Package", "Version")])[Package == i, ][Version == max(Version), ]$Version]
         }else{
-          proj_req_pkgs = data.table::rbind(proj_req_pkgs, data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")], use.names = T, fill = T)
+          proj_req_pkgs = rbind(proj_req_pkgs, data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")])
         }
       }
     }
@@ -88,7 +88,7 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
     if(!is.null(versions)){
       utils::install.packages(pkgs, lib = lib, ...)
     }else{
-      devtools::install_version(package = pkgs, version = version, lib = lib, ...)
+      versions::install.version(pkgs = pkgs, versions = versions, lib = lib, ...)
     }
   }
   if(update_req_pkgs == T){
@@ -532,15 +532,49 @@ exit_proj = function(reset_lib = T){
   }
 }
 
+#' Update stored required packages
+#'
+#' @return No return value
+#' @description Overwrites the stored required packages with the current versions of installed packages
+#' @examples
+#' update_req_packages()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+update_req_packages = function(){
+  proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
+  data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
+}
+
+
+#' Install required packages
+#'
+#' @return No return value
+#' @description Installs required packages stored in ./Function/required_packages.csv
+#' @examples
+#' install_req_packages()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+install_req_packages = function(){
+
+  proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
+  installed_packages = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
+
+  missing_packages = installed_packages[!installed_packages$Package %in% proj_req_pkgs$Package, ]
+  version_packages = installed_packages[installed_packages$Package %in% proj_req_pkgs$Package, ]
+  version_packages = version_packages[!version_packages$Version %in% proj_req_pkgs[proj_req_pkgs$Package %in% version_packages$Package, ]$Version, ]
+  packages = rbind(missing_packages, version_packages)
+  install.packages(pkgs = packages$Package, versions = packages$Version, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+}
+
 #' Update stored R Development Version
 #'
 #' @return No return value
 #' @description Overwrites the stored R Version with the current R Version in .projectmaproot
 #' @examples
-#' update_RDevVersion()
+#' update_Rdev_version()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-update_RDevVersion = function(){
+update_Rdev_version = function(){
   RDevVersion = readLines(".projectmaproot")
   RVersionTest = sapply(RDevVersion, function(x){
     eval(parse(text = paste0("R.Version()$", trimws(gsub("[[:punct:]]|[[:digit:]]", "", x))))) >= as.numeric(trimws(gsub("[[:alpha:]]|\\:", "", x)))
@@ -548,20 +582,7 @@ update_RDevVersion = function(){
   if(all(RVersionTest == T)){
     write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
   }
-  update_ReqPackages()
-}
-
-#' Update stored required packages
-#'
-#' @return No return value
-#' @description Overwrites the stored required packages with the current versions of installed packages
-#' @examples
-#' update_ReqPackages()
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-update_ReqPackages = function(){
-  proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
-  data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
+  update_req_packages()
 }
 
 #' Link a script to the project
@@ -715,7 +736,7 @@ link_to_proj = function(init = F, install = T){
 
         #Check if packages are of the correct version
         if(!file.exists("./Functions/required_packages.csv")){
-          update_ReqPackages()
+          update_req_packages()
         }
         proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
 
@@ -1123,7 +1144,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     utils::setTxtProgressBar(proj.env$pb, proj.env$pbCounter)
     cat("\n")
     cat(paste0("\n", proj.env$trace.message[[length(proj.env$trace.message)]]), file = paste0(proj.env$logLocation, ".txt"), "\n", append = T)
-    update_RDevVersion()
+    update_Rdev_version()
     reset_proj_env()
   }
   #Detach all packages except the required packages
