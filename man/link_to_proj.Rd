@@ -7,7 +7,7 @@
 link_to_proj(init = F, install = T)
 }
 \arguments{
-\item{init}{Boolean (T, F) indicator of whether to reset the project environment.}
+\item{init}{Boolean (T, F) indicator of whether to initialize git}
 
 \item{install}{Boolean (T, F) indicator of whether to install packages}
 }

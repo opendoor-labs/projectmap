@@ -24,7 +24,7 @@ A wrapper function for the base source command but also perfoms some backend fun
 files executed in "Project Master.R" as well as updating the project progress bar. This function should only be used in the "Project Master.R" script.
 }
 \examples{
-link_file(init = T)
+link_to_proj(init = T)
 set_proj_models(
   Model1 = T,
   Model2 = T
