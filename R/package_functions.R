@@ -1065,7 +1065,7 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 #' @description A wrapper function for the base source command but also perfoms some backend functions to track the progress of the
 #' files executed in "Project Master.R" as well as updating the project progress bar. This function should only be used in the "Project Master.R" script.
 #' @examples
-#' link_to_proj(init = T)
+#' link_to_proj()
 #' set_proj_models(
 #'   Model1 = T,
 #'   Model2 = T
@@ -1709,7 +1709,7 @@ if(!"projectmap" %in% installed.packages()){
 library(projectmap)
 
 #Link this file as part of the project
-link_to_proj(init = T)
+link_to_proj()
 
 #These will be placed in the project environment.
 set_proj_models(
