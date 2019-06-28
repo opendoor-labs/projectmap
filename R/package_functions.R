@@ -566,7 +566,7 @@ update_ReqPackages = function(){
 
 #' Link a script to the project
 #'
-#' @param init Boolean (T, F) indicator of whether to reset the project environment.
+#' @param init Boolean (T, F) indicator of whether to initialize git
 #' @param install Boolean (T, F) indicator of whether to install packages
 #' @return No return value
 #' @description Link an R (or Rmd) script to the project environment so that it will be integrated with the
@@ -608,9 +608,7 @@ link_to_proj = function(init = F, install = T){
   }
 
   if(!exists("root.dir", proj.env)){
-    if(init == T){
-      reset_proj_env()
-    }
+    reset_proj_env()
     unlock_proj()
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
@@ -1046,7 +1044,7 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 #' @description A wrapper function for the base source command but also perfoms some backend functions to track the progress of the
 #' files executed in "Project Master.R" as well as updating the project progress bar. This function should only be used in the "Project Master.R" script.
 #' @examples
-#' link_file(init = T)
+#' link_to_proj(init = T)
 #' set_proj_models(
 #'   Model1 = T,
 #'   Model2 = T
