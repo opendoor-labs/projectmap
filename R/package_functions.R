@@ -638,9 +638,6 @@ link_to_proj = function(init = F, install = T){
       if(!file.exists("server.R")){
         write(x = serverR, file = "server.R")
       }
-      if(!file.exists(".gitignore")){
-        write(x = gitIgnore, file = ".gitignore")
-      }
       if(!file.exists(".projectmaproot")){
         write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
       }else{
@@ -661,6 +658,9 @@ link_to_proj = function(init = F, install = T){
       }
       if(init == T){
         if(!file.exists(".git")){
+          if(!file.exists(".gitignore")){
+            write(x = gitIgnore, file = ".gitignore")
+          }
           message(paste(system("git init", intern = T), collapse = "\n"))
           message(paste(system("git add .", intern = T), collapse = "\n"))
           message(paste(system("git commit -m 'Initialization'", intern = T), collapse = "\n"))
