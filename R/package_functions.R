@@ -402,7 +402,7 @@ get_proj_packages = function(files, parallel = T){
       if(length(lines) > 0){
         lines = paste(lines, collapse = " ")
         loc1 = gregexpr(pkg_ids, lines)[[1]]
-        if(length(loc1) > 0){
+        if(loc1[[1]] > 0){
           loc2 = gregexpr("\\)", lines)[[1]]
           loc2 = sapply(loc1, function(x){min(loc2[which(loc2 > x)])})
 
@@ -413,7 +413,6 @@ get_proj_packages = function(files, parallel = T){
             pkgs = unique(c(pkgs, temp))
           }
         }
-        pkgs = pkgs[!grepl("[[:punct:]]", pkgs)]
         return(pkgs)
       }else{
         return(NULL)
@@ -708,11 +707,8 @@ link_to_proj = function(init = F, install = T){
       message("Checking required packages...")
       unlock_proj()
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
-      rfiles = proj.env$cabinet[grepl("\\.R", proj.env$cabinet) & !grepl("Project Master.R", proj.env$cabinet)]
-      rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd"),
-                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".py")))]
-      rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
+      rfiles = proj.env$cabinet[which(tools::file_ext(proj.env$cabinet) %in% c("R", "Rmd") &
+                                        !grepl("Project Master.R", proj.env$cabinet))]
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
         packages = unique(c(packages, get_proj_packages(rfiles, parallel = T)))
