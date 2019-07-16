@@ -1329,7 +1329,7 @@ ggplot_grid = function(g, plot = TRUE, ...){
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
                 width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot(), doc = F){
+                append = F, plot = last_plot(), doc = F, envir = parent.frame()){
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
   }
@@ -1365,7 +1365,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   file = trimws(gsub("//", "/", paste0(outputDir, basename(file))))
   #Save the file using the specified function and data ext
   if(ext == "RData"){
-    save(..., file = file)
+    save(..., file = file, envir = envir)
   }else if(ext == "rds"){
     saveRDS(..., file = file)
   }else if(ext == "csv"){
