@@ -4,7 +4,7 @@
 \alias{set_proj_lib}
 \title{Set the path to the project library}
 \usage{
-set_proj_lib()
+set_proj_lib(proj.env)
 }
 \value{
 No return value

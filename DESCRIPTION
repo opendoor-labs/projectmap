@@ -40,8 +40,7 @@ Imports:
     shinydashboard (>= 0.7.0),
     rsconnect (>= 0.8.8),
     versions (>= 0.3),
-    Rcpp (>= 1.0.1),
-    pryr (>= 0.1.4)
+    Rcpp (>= 1.0.1)
 RoxygenNote: 6.1.1
 LinkingTo: 
     Rcpp

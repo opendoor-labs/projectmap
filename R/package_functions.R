@@ -295,7 +295,6 @@ execute_proj_model = function(model){
 #' @examples
 #' reset_proj_env()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
 reset_proj_env = function(build = F, newroot = F){
   proj.env = get_proj_env()
   proj.env$startSourceLog = T
@@ -339,7 +338,7 @@ reset_init = function(){
 #' @export
 get_proj_env = function(...){
   proj.env = new.env()
-  proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate", "pryr",
+  proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate",
                                  "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
   if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
     warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
@@ -348,15 +347,7 @@ get_proj_env = function(...){
   if(file.exists(".proj_env.RData")){
     args = list(...)
     load(".proj_env.RData")
-    if(length(list) == 0){
-      return(proj.env)
-    }else{
-      env = new.env
-      for(a in args){
-        assign(a, proj.env[[a]], env)
-      }
-      return(env)
-    }
+    return(proj.env)
   }else{
     return(proj.env)
   }
@@ -368,26 +359,8 @@ get_proj_env = function(...){
 #' @examples
 #' save_proj_env(proj.env)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
 save_proj_env = function(proj.env){
   save(proj.env, file = ".proj_env.RData")
-}
-
-#' Updates the project environment
-#'
-#' @description An environment variable
-#' @param ... Named objects to assign to the project environment variable
-#' @examples
-#' set_proj_env(test = "test")
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-set_proj_env = function(...){
-  args = list(...)
-  proj.env = get_proj_env()
-  for(a in names(args)){
-    proj.env[[a]] = args[[a]]
-  }
-  save_proj_env(proj.env)
 }
 
 #' Parse out packages to load
@@ -473,7 +446,6 @@ get_proj_packages = function(files, parallel = T){
 #' @examples
 #' get_proj_root()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
 get_proj_root = function(proj.env){
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
@@ -532,7 +504,6 @@ get_proj_root = function(proj.env){
 #' @examples
 #' set_proj_lib()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
 set_proj_lib = function(proj.env){
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
@@ -1187,27 +1158,6 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   unload.packages(loaded.packages[!loaded.packages %in% unique(c(proj.env$required.packages, proj.env$dont_unload))])
   rm(loaded.packages)
   save_proj_env(proj.env)
-}
-
-#' A modified sum function
-#'
-#' @param x A vector of numeric values
-#' @param na.rm A boolean (T, F) indicator of whether to include NA values or not in the calculation.
-#' @return A numeric value
-#' @description Corrects the problem of returning 0 when adding up a vector of all NA's when na.rm = T
-#' @examples
-#' sum_dt(c(1, 2, NA, 3), na.rm = T)
-#' DT[, sum(col, na.rm = T)]
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-sum_dt = function(x, na.rm = F){
-  #If all items in a vector are NA, return NaN
-  if(all(is.na(x))){
-    return(NaN)
-  }else{
-    #Otherwise sum as usual
-    return(sum(x, na.rm = na.rm))
-  }
 }
 
 #' A modified ggsave function

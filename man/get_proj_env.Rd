@@ -4,13 +4,13 @@
 \alias{get_proj_env}
 \title{Loads the project environment variable}
 \usage{
-get_proj_env()
+get_proj_env(...)
 }
 \description{
 An environment variable
 }
 \examples{
-get_proj_env()
+proj.env = get_proj_env()
 }
 \author{
 Alex Hubbard (hubbard.alex@gmail.com)

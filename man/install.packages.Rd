@@ -5,7 +5,7 @@
 \title{This overwrites the base install.packages function to only install the function in the user's project library
 for package version control}
 \usage{
-install.packages(pkgs, versions = NULL, lib = proj.env$libPath,
+install.packages(pkgs, versions = NULL, lib = NULL,
   update_req_pkgs = F, ...)
 }
 \arguments{
