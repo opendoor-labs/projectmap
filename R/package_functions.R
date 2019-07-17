@@ -17,7 +17,7 @@ if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
 #' names(proj.env)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-env_loc = pryr::where("proj.env")
+env_loc = environment()#pryr::where("proj.env")
 
 #' Loads the project environment variable
 #'
