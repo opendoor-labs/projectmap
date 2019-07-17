@@ -1150,7 +1150,6 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   setwd(proj.env$root.dir)
 
   #Log the output
-  proj.env = get_proj_env()
   proj.env$current.dir = proj.env$root.dir
   proj.env$file = NULL
   proj.env$trace.message[[length(proj.env$trace.message)]] = paste0(proj.env$trace.message[[length(proj.env$trace.message)]], "Done.")
