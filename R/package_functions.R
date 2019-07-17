@@ -1350,7 +1350,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }
 
   if(is.null(file.override)){
-    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc, proj.env = proj.env)), gsub("\\.", "", dirname(file)), sep = "/"))
+    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc, proj.env = proj.env), gsub("\\.", "", dirname(file)), sep = "/"))
   }else{
     outputDir = dirname(file)
   }
