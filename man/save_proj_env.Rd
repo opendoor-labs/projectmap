@@ -4,13 +4,13 @@
 \alias{save_proj_env}
 \title{Save the project environment variable}
 \usage{
-save_proj_env(proj.env)
+save_proj_env()
 }
 \description{
 An environment variable
 }
 \examples{
-save_proj_env(proj.env)
+save_proj_env()
 }
 \author{
 Alex Hubbard (hubbard.alex@gmail.com)

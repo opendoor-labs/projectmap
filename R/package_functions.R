@@ -417,6 +417,7 @@ proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readx
 if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
 }
+#Save and lock the project environment
 save_proj_env()
 
 # proj.env$root.dir = eval(parse(text = '
@@ -425,9 +426,6 @@ save_proj_env()
 #                                 return(proj.env$root.dir)
 #                                }
 #                                fxn()'))
-
-#Lock the project
-proj.env = lock(proj.env)
 
 #' Parse out packages to load
 #'
