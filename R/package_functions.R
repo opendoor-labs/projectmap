@@ -377,7 +377,10 @@ save_proj_env = function(){
   if(bindingIsLocked("proj.env", ret_env)){
     unlockBinding("proj.env", ret_env)
   }
-  assign("proj.env", proj.env, ret_env)
+  if(!identical(ret_env, .GlobalEnv)){
+    assign("proj.env", proj.env, ret_env)
+  }
+  utils::assignInNamespace("proj.env", proj.env, ns = "projectmap")
   lockBinding("proj.env", ret_env)
 }
 
