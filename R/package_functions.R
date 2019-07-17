@@ -221,6 +221,11 @@ lock_proj = function(){
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
   }
+  if(bindingIsActive("proj.env", ret_env)){
+    if(bindingisLocked("proje.env", ret_env)){
+      unlockBinding("proj.env", ret_env)
+    }
+  }
   assign("proj.env", proj.env, ret_env)
 }
 
@@ -238,6 +243,11 @@ unlock_proj = function(){
   for(i in names(proj.env)){
     if(bindingIsLocked(i, proj.env)){
       unlockBinding(i, proj.env)
+    }
+  }
+  if(bindingIsActive("proj.env", ret_env)){
+    if(bindingisLocked("proje.env", ret_env)){
+      unlockBinding("proj.env", ret_env)
     }
   }
   assign("proj.env", proj.env, ret_env)
