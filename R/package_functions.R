@@ -1104,11 +1104,11 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     if(is.null(docname)){
       invisible(capture.output(suppressMessages(
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
-                          knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T, proj.env = proj.env))))))
+                          knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T, proj.env = proj.env)))))
     }else{
       invisible(capture.output(suppressMessages(
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
-                          knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T, proj.env = proj.env))))))
+                          knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T, proj.env = proj.env)))))
     }
   # }else if(tools::file_ext(proj.env$file == ".py")){
   #   setwd(proj.env$current.dir)
