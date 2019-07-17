@@ -693,7 +693,7 @@ link_to_proj = function(init = F, install = T){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!file.exists("./Functions/cabinet.RData") | init == T){
+    if(!file.exists("./Functions/.file_cabinet.txt")){
       #If the file cabinet does not exist, create it
       message("Building project file cabinet...")
       build_cabinet()
@@ -726,6 +726,7 @@ link_to_proj = function(init = F, install = T){
       }
 
       if(!is.null(packages)){
+        cat("removing packages\n")
         #Clean up package library
         packages_to_keep = unique(c(packages,
                                     package.depend(packages[!packages %in% installed.packages(priority = "base")]),
@@ -735,11 +736,13 @@ link_to_proj = function(init = F, install = T){
 
         #Check if packages are of the correct version
         if(!file.exists("./Functions/required_packages.csv")){
+          cat("update_req\n")
           update_req_packages()
         }
         proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
 
         if(nrow(installed_packages) > 0){
+          cat("version_check\n")
           version_check = sapply(1:nrow(installed_packages), function(x){
             if(nrow(proj_req_pkgs[proj_req_pkgs$Package == installed_packages[x, ]$Package, ]) > 0){
               return(!any(proj_req_pkgs[proj_req_pkgs$Package == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
