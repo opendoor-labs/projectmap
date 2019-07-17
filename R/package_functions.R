@@ -917,7 +917,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   paths = paths[tools::file_ext(paths) == ext]
   paths = paths[gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", basename(paths))) == file]
   if(is.null(inFolder) & length(paths) > 1){
-    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir(proj.env = proj.env))), paths)])
+    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir(proj.env = proj.env)), paths)])
   }
   paths = paths[which.min(nchar(paths))]
   if(length(paths) == 1 | allowMult == T){
