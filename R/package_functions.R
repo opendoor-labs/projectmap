@@ -295,6 +295,7 @@ execute_proj_model = function(model){
 #' @examples
 #' reset_proj_env()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
 reset_proj_env = function(build = F, newroot = F){
   proj.env = get_proj_env()
   proj.env$startSourceLog = T
@@ -359,6 +360,7 @@ get_proj_env = function(...){
 #' @examples
 #' save_proj_env(proj.env)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
 save_proj_env = function(proj.env){
   save(proj.env, file = ".proj_env.RData")
 }
