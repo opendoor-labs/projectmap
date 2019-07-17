@@ -355,6 +355,7 @@ get_proj_env = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 save_proj_env = function(){
+  proj.env = get("proj.env", .GlobalEnv)
   save(proj.env, ".proj_env.RData")
   assign("proj.env", proj.env, .GlobalEnv)
 }
