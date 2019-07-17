@@ -26,10 +26,11 @@ env_loc = pryr::where("proj.env")
 #' get_proj_env()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_proj_env = function(){
+get_proj_env = function(loc = pryr::where("proj.env")){
   if(file.exists(".proj_env.RData")){
     ret_env = pryr::where("proj.env")
     print(ret_env)
+    print(loc)
     load(".proj_env.RData")
     if(bindingIsActive("proj.env", ret_env)){
       if(bindingisLocked("proje.env", ret_env)){
