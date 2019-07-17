@@ -1,3 +1,26 @@
+#' Creates a project environment variable
+#'
+#' @description An environment variable
+#' @examples
+#' names(proj.env)
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+proj.env = new.env()
+proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate", "pryr",
+                               "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
+if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
+  warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
+}
+
+#' Creates a project environment variable
+#'
+#' @description An environment variable
+#' @examples
+#' names(proj.env)
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+env_loc = pryr::where("proj.env")
+
 #' Redefined library, require, and install.packages functions to only look in the project library
 #' This overwrites the base library function to only look in the user's project library to load a package
 #'
@@ -398,6 +421,7 @@ save_proj_env = function(){
   lockBinding("proj.env", ret_env)
   lockBinding("proj.env", env_loc)
 }
+save_proj_env()
 
 #' Updates the project environment
 #'
@@ -421,21 +445,6 @@ set_proj_env = function(...){
   }
   save_proj_env()
 }
-
-#' Creates a project environment variable
-#'
-#' @description An environment variable
-#' @examples
-#' names(proj.env)
-#' @author Alex Hubbard (hubbard.alex@gmail.com)
-#' @export
-proj.env = new.env()
-proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate", "pryr",
-                               "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
-if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
-  warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
-}
-save_proj_env()
 
 # proj.env$root.dir = eval(parse(text = '
 #                                fxn = function(){
