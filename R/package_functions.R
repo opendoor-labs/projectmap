@@ -318,7 +318,7 @@ reset_proj_env = function(build = F, newroot = F){
 get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
     ret_env = pryr::where("proj.env")
-    cat(ret_env, "\n")
+    print(ret_env)
     load(".proj_env.RData")
     unlockBinding("proj.env", env_loc)
     if(bindingIsActive("proj.env", ret_env)){
@@ -328,9 +328,8 @@ get_proj_env = function(){
     }
     if(!identical(ret_env, .GlobalEnv)){
       assign("proj.env", proj.env, ret_env)
-    }else{
-      assign("proj.env", proj.env, env_loc)
     }
+    assign("proj.env", proj.env, env_loc)
     lockBinding("proj.env", ret_env)
     lockBinding("proj.env", env_loc)
   }else{
