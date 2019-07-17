@@ -29,6 +29,7 @@ env_loc = pryr::where("proj.env")
 get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
     ret_env = pryr::where("proj.env")
+    print(ret_env)
     load(".proj_env.RData")
     unlockBinding("proj.env", env_loc)
     if(bindingIsActive("proj.env", ret_env)){
