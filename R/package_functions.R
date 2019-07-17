@@ -198,7 +198,11 @@ lock_proj = function(){
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
   }
+  if(bindingIsLocked("proj.env", ret_env)){
+    unlockBinding("proj.env", ret_env)
+  }
   assign("proj.env", proj.env, ret_env)
+  lockBinding("proj.env", ret_env)
 }
 
 #' Unlock all the project variables
@@ -217,7 +221,11 @@ unlock_proj = function(){
       unlockBinding(i, proj.env)
     }
   }
+  if(bindingIsLocked("proj.env", ret_env)){
+    unlockBinding("proj.env", ret_env)
+  }
   assign("proj.env", proj.env, ret_env)
+  lockBinding("proj.env", ret_env)
 }
 
 #' Set the project models to be executed from the "Project Master.R" file
