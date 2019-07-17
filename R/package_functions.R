@@ -314,17 +314,16 @@ get_proj_env = function(...){
   if(file.exists(".proj_env.RData")){
     args = list(...)
     load(".proj_env.RData")
-    if(length(list) == 0){
+    # if(length(list) == 0){
       return(proj.env)
-    }else{
-      env = new.env
-      for(a in args){
-        assign(a, proj.env[[a]], env)
-      }
-      return(env)
-    }
+    # }else{
+    #   env = new.env
+    #   for(a in args){
+    #     assign(a, proj.env[[a]], env)
+    #   }
+    #   return(env)
+    # }
   }else{
-
     return(proj.env)
   }
 }
