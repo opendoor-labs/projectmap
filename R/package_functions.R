@@ -189,10 +189,10 @@ package.depend = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports"
 #' @return No return value
 #' @description Lock all project environment variablers
 #' @examples
-#' lock_proj()
+#' lock_proj(poj.env)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-lock_proj = function(){
+lock_proj = function(proj.env){
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
   }
@@ -204,10 +204,10 @@ lock_proj = function(){
 #' @return No return value
 #' @description Unlock all project environment variablers
 #' @examples
-#' unlock_proj()
+#' unlock_proj(poj.env)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-unlock_proj = function(){
+unlock_proj = function(proj.env){
   for(i in names(proj.env)){
     if(bindingIsLocked(i, proj.env)){
       unlockBinding(i, proj.env)
@@ -231,7 +231,7 @@ unlock_proj = function(){
 #' @export
 set_proj_models = function(...){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
   #Assign the models to a named list
   proj.env$models = list(...)
 
@@ -280,7 +280,7 @@ set_proj_models = function(...){
   proj.env$pbCounter = 0
   proj.env$trace.message = list()
   proj.env$startSourceLog = F
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -312,7 +312,7 @@ execute_proj_model = function(model){
 #' @export
 reset_proj_env = function(build = F, newroot = F){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
   proj.env$startSourceLog = T
   proj.env$current.dir = NULL
   if(!is.null(proj.env$numFiles)){
@@ -327,7 +327,7 @@ reset_proj_env = function(build = F, newroot = F){
   if (newroot == T) {
     proj.env$root.dir = NULL
   }
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -415,7 +415,7 @@ save_proj_env(proj.env)
 #                                fxn()'))
 
 #Lock the project
-lock_proj()
+lock_proj(poj.env)
 
 #' Parse out packages to load
 #'
@@ -503,7 +503,7 @@ get_proj_packages = function(files, parallel = T){
 #' @export
 get_proj_root = function(){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
 
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
@@ -544,7 +544,7 @@ get_proj_root = function(){
     }
   }
   if(found_wd == F){
-    unlock_proj()
+    unlock_proj(poj.env)
     if(Sys.getenv("RSTUDIO") == "1"){
       proj.env$root.dir = rstudioapi::selectDirectory(caption = "Select Project Directory", label = "Select", path = NULL)
     }else{
@@ -552,7 +552,7 @@ get_proj_root = function(){
     }
   }
 
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -566,7 +566,7 @@ get_proj_root = function(){
 #' @export
 set_proj_lib = function(){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
 
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
@@ -575,7 +575,7 @@ set_proj_lib = function(){
   .libPaths(new = proj.env$libPath)
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -701,7 +701,7 @@ link_to_proj = function(init = F, install = T){
   if(!exists("root.dir", proj.env)){
     reset_proj_env()
     get_proj_env()
-    unlock_proj()
+    unlock_proj(poj.env)
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
     get_proj_root()
@@ -777,7 +777,7 @@ link_to_proj = function(init = F, install = T){
     #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
     if(install == T){
       message("Checking required packages...")
-      unlock_proj()
+      unlock_proj(poj.env)
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[which(tools::file_ext(proj.env$cabinet) %in% c("R", "Rmd") &
                                         !grepl("Project Master.R", proj.env$cabinet))]
@@ -854,23 +854,23 @@ link_to_proj = function(init = F, install = T){
     }
 
     #Create the location of the master log and define the progress bar variables
-    unlock_proj()
+    unlock_proj(poj.env)
     proj.env$logLocation = paste("./Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
     proj.env$startSourceLog = F
 
-    lock_proj()
+    lock_proj(poj.env)
     save_proj_env(proj.env)
     message("\nProject environment set.\n")
   }else{
     get_proj_env()
-    unlock_proj()
+    unlock_proj(poj.env)
     get_proj_root()
     setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     set_proj_lib()
-    lock_proj()
+    lock_proj(poj.env)
     save_proj_env(proj.env)
     message("\nProject environment set.\n")
   }
@@ -887,7 +887,7 @@ link_to_proj = function(init = F, install = T){
 #' @export
 build_cabinet = function(){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
 
   folders = list.dirs(full.names = F, recursive = F)
   folders = folders[!folders %in% c("Library", ".git")]
@@ -905,7 +905,7 @@ build_cabinet = function(){
   })))
   proj.env$cabinet = cabinet
   write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -921,7 +921,7 @@ build_cabinet = function(){
 #' @export
 add_to_cabinet = function(file){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
 
   root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   file = gsub(root, "", file)
@@ -930,7 +930,7 @@ add_to_cabinet = function(file){
   write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   proj.env$cabinet = cabinet
 
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -948,7 +948,7 @@ add_to_cabinet = function(file){
 #' @export
 remove_file = function(files){
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
 
   #Files should be full file paths, can be more than 1
   for(i in files){
@@ -962,7 +962,7 @@ remove_file = function(files){
   write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   proj.env$cabinet = cabinet
 
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
@@ -1162,14 +1162,14 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL, ...){
   #If logging hasn't been started, start it
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
   if(proj.env$startSourceLog == F){
     proj.env$startSourceLog = T
     proj.env$trace.message[[length(proj.env$trace.message) + 1]] = paste0("Start Time: ", Sys.time())
     cat(proj.env$trace.message[[1]], file = paste0(proj.env$logLocation, ".txt"), "\n", append = F)
   }
   #Get the file path and add to the project environment variables so it won't be removed
-  unlock_proj()
+  unlock_proj(poj.env)
   proj.env$file = get_file_path(file, inFolder)
   proj.env$current.dir = dirname(proj.env$file)
   proj.env$dont_unload = dont_unload
@@ -1182,7 +1182,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   utils::setTxtProgressBar(proj.env$pb, proj.env$pbCounter)
 
   #Source the file
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
@@ -1208,7 +1208,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
 
   #Log the output
   get_proj_env()
-  unlock_proj()
+  unlock_proj(poj.env)
   proj.env$current.dir = proj.env$root.dir
   proj.env$file = NULL
   proj.env$trace.message[[length(proj.env$trace.message)]] = paste0(proj.env$trace.message[[length(proj.env$trace.message)]], "Done.")
@@ -1235,7 +1235,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   loaded.packages = names(utils::sessionInfo()[["otherPkgs"]])
   unload.packages(loaded.packages[!loaded.packages %in% unique(c(proj.env$required.packages, proj.env$dont_unload))])
   rm(loaded.packages)
-  lock_proj()
+  lock_proj(poj.env)
   save_proj_env(proj.env)
 }
 
