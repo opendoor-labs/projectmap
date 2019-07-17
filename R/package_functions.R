@@ -303,8 +303,8 @@ execute_proj_model = function(model){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 reset_proj_env = function(build = F, newroot = F){
+  get_proj_env()
   unlock_proj()
-
   proj.env$startSourceLog = T
   proj.env$current.dir = NULL
   if(!is.null(proj.env$numFiles)){
@@ -313,14 +313,14 @@ reset_proj_env = function(build = F, newroot = F){
   proj.env$pbCounter = 0
   proj.env$trace.message = ""
   proj.env$file = NULL
-  if(build == T){
+  if (build == T) {
     build_cabinet()
   }
-  if(newroot == T){
+  if (newroot == T) {
     proj.env$root.dir = NULL
   }
-
   lock_proj()
+  save_proj_env()
 }
 
 # #' Exit a project packrat mode
@@ -335,6 +335,53 @@ reset_proj_env = function(build = F, newroot = F){
 #   packrat::disable()
 # }
 
+#' Loads the project environment variable
+#'
+#' @description An environment variable
+#' @examples
+#' get_proj_env()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+get_proj_env = function(){
+  load(".proj_env.RData")
+  assign("proj.env", proj.env, .GlobalEnv)
+}
+
+#' Save the project environment variable
+#'
+#' @description An environment variable
+#' @examples
+#' save_proj_env()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+save_proj_env = function(){
+  save(proj.env, ".proj_env.RData")
+  assign("proj.env", proj.env, .GlobalEnv)
+}
+
+#' Updates the project environment
+#'
+#' @description An environment variable
+#' @param ... Named objects to assign to the project environment variable
+#' @examples
+#' set_proj_env(test = "test")
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+set_proj_env = function(...){
+  args = list(...)
+  get_proj_env()
+  for(a in names(args)){
+    if(exists(a, proj.env)){
+      if(bindingIsLocked(a, proj.env)){
+        unlockBinding(a, proj.env)
+      }
+    }
+    proj.env[[a]] = args[[a]]
+    lockBinding(a, proj.env)
+  }
+  save_proj_env()
+}
+
 #' Creates a project environment variable
 #'
 #' @description An environment variable
@@ -343,13 +390,19 @@ reset_proj_env = function(build = F, newroot = F){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 proj.env = new.env()
-proj.env$project.name = "Project"
-proj.env$R.dev.version = "3.5.0"
 proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate",
                                "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
-if(get("R.dev.version", envir = proj.env) != paste(R.Version()$major, R.Version()$minor, sep = ".")){
-  warning.message = paste0("projectmap was built under R version ", get("R.dev.version", envir = proj.env), ". Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
+if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
+  warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
 }
+save_proj_env()
+
+# proj.env$root.dir = eval(parse(text = '
+#                                fxn = function(){
+#                                 load(".proj_env.RData")
+#                                 return(proj.env$root.dir)
+#                                }
+#                                fxn()'))
 
 #Lock the project
 lock_proj()
@@ -364,6 +417,7 @@ lock_proj()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 get_proj_packages = function(files, parallel = T){
+  get_proj_env()
   if(parallel == T){
     cl = parallel::makeCluster(parallel::detectCores())
     doSNOW::registerDoSNOW(cl)
@@ -438,6 +492,7 @@ get_proj_packages = function(files, parallel = T){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 get_proj_root = function(){
+  get_proj_env()
   unlock_proj()
 
   frames = unique(sys.parents())
@@ -486,7 +541,9 @@ get_proj_root = function(){
       proj.env$root.dir = getwd()
     }
   }
+
   lock_proj()
+  save_proj_env()
 }
 
 #' Set the path to the project library
@@ -498,6 +555,7 @@ get_proj_root = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 set_proj_lib = function(){
+  get_proj_env()
   unlock_proj()
 
   if(is.null(proj.env$libPath.orig)){
@@ -508,6 +566,7 @@ set_proj_lib = function(){
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
   lock_proj()
+  save_proj_env()
 }
 
 #' Exit a project
@@ -520,6 +579,7 @@ set_proj_lib = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 exit_proj = function(reset_lib = T){
+  get_proj_env()
   orig.lib = proj.env$libPath.orig
   proj.lib = proj.env$libPath
   suppressMessages(unload.packages("projectmap"))
@@ -540,6 +600,7 @@ exit_proj = function(reset_lib = T){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 update_req_packages = function(){
+  get_proj_env()
   proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
   data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
 }
@@ -554,7 +615,7 @@ update_req_packages = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 install_req_packages = function(){
-
+  get_proj_env()
   proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
   installed_packages = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
 
@@ -629,6 +690,7 @@ link_to_proj = function(init = F, install = T){
 
   if(!exists("root.dir", proj.env)){
     reset_proj_env()
+    get_proj_env()
     unlock_proj()
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
@@ -787,8 +849,10 @@ link_to_proj = function(init = F, install = T){
     proj.env$startSourceLog = F
 
     lock_proj()
+    save_proj_env()
     message("\nProject environment set.\n")
   }else{
+    get_proj_env()
     unlock_proj()
     get_proj_root()
     setwd(proj.env$root.dir)
@@ -797,6 +861,7 @@ link_to_proj = function(init = F, install = T){
     #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     set_proj_lib()
     lock_proj()
+    save_proj_env()
     message("\nProject environment set.\n")
   }
 }
@@ -811,6 +876,7 @@ link_to_proj = function(init = F, install = T){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 build_cabinet = function(){
+  get_proj_env()
   unlock_proj()
 
   folders = list.dirs(full.names = F, recursive = F)
@@ -830,6 +896,7 @@ build_cabinet = function(){
   proj.env$cabinet = cabinet
   write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   lock_proj()
+  save_proj_env()
 }
 
 #' Adds a file to the file cabinet
@@ -843,6 +910,7 @@ build_cabinet = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 add_to_cabinet = function(file){
+  get_proj_env()
   unlock_proj()
 
   root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
@@ -853,6 +921,7 @@ add_to_cabinet = function(file){
   proj.env$cabinet = cabinet
 
   lock_proj()
+  save_proj_env()
 }
 
 #' Removes a file from the project directory and the file cabinet
@@ -868,6 +937,7 @@ add_to_cabinet = function(file){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 remove_file = function(files){
+  get_proj_env()
   unlock_proj()
 
   #Files should be full file paths, can be more than 1
@@ -883,6 +953,7 @@ remove_file = function(files){
   proj.env$cabinet = cabinet
 
   lock_proj()
+  save_proj_env()
 }
 
 #' Get a file path relative to the root directory
@@ -899,7 +970,8 @@ remove_file = function(files){
 #' get_file_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F, proj.env = get("proj.env", .GlobalEnv)){
+get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F){
+  get_proj_env()
   #Get the file extenstion
   ext = tools::file_ext(file)
   if(ext == ""){
@@ -917,7 +989,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   paths = paths[tools::file_ext(paths) == ext]
   paths = paths[gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", basename(paths))) == file]
   if(is.null(inFolder) & length(paths) > 1){
-    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir(proj.env = proj.env)), paths)])
+    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir()), paths)])
   }
   paths = paths[which.min(nchar(paths))]
   if(length(paths) == 1 | allowMult == T){
@@ -927,7 +999,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
     if(recall == T){
       #If the file is not found, rebuild the cabinet to check if it is there
       build_cabinet()
-      ret = get_file_path(file = file, inFolder = inFolder, recall = F, allowMult = allowMult, proj.env = proj.env)
+      ret = get_file_path(file = file, inFolder = inFolder, recall = F, allowMult = allowMult)
     }else{
       #If the file is still not found
       stop("File not found. Make sure the file exists or check the file name.")
@@ -959,8 +1031,9 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
 #' get_folder_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F, proj.env = get("proj.env", .GlobalEnv)){
-  path = get_file_path(file = file, inFolder = inFolder, recall = recall, allowMult = allowMult, proj.env = proj.env)
+get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
+  get_proj_env()
+  path = get_file_path(file = file, inFolder = inFolder, recall = recall, allowMult = allowMult)
   return(dirname(path))
 }
 
@@ -978,7 +1051,8 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F, pro
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get("proj.env", .GlobalEnv)){
+get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
+  get_proj_env()
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
@@ -1032,10 +1106,11 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get(
 #' read_file("Model1.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-read_file = function(file, inFolder = NULL, showProgress = F, proj.env = get("proj.env", .GlobalEnv),
+read_file = function(file, inFolder = NULL, showProgress = F,
                 na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), envir = .GlobalEnv, ...){
   #File needs to be full file path
-  file = get_file_path(file, inFolder, proj.env = proj.env)
+  get_proj_env()
+  file = get_file_path(file, inFolder)
   ext = tools::file_ext(file)
 
   if(ext == "RData"){
@@ -1076,6 +1151,7 @@ read_file = function(file, inFolder = NULL, showProgress = F, proj.env = get("pr
 #' @export
 source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL, ...){
   #If logging hasn't been started, start it
+  get_proj_env()
   unlock_proj()
   if(proj.env$startSourceLog == F){
     proj.env$startSourceLog = T
@@ -1097,6 +1173,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
 
   #Source the file
   lock_proj()
+  save_proj_env()
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
     invisible(capture.output(suppressMessages(source(proj.env$file, chdir = T, ...))))
@@ -1120,6 +1197,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   setwd(proj.env$root.dir)
 
   #Log the output
+  get_proj_env()
   unlock_proj()
   proj.env$current.dir = proj.env$root.dir
   proj.env$file = NULL
@@ -1148,6 +1226,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   unload.packages(loaded.packages[!loaded.packages %in% unique(c(proj.env$required.packages, proj.env$dont_unload))])
   rm(loaded.packages)
   lock_proj()
+  save_proj_env()
 }
 
 #' A modified sum function
@@ -1187,6 +1266,7 @@ sum_dt = function(x, na.rm = F){
 ggsave2 = function(filename, plot = last_plot(), device = NULL, path = NULL, combine = F,
                   scale = 1, width = NA, height = NA, units = c("in", "cm", "mm"),
                   dpi = 300, limitsize = TRUE, ...){
+  get_proj_env()
   plot_dev = function(device, filename, dpi = 300){
     if(is.function(device)){
       return(device)
@@ -1329,7 +1409,8 @@ ggplot_grid = function(g, plot = TRUE, ...){
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
                 width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot(), doc = F, envir = parent.frame(), proj.env = get("proj.env", .GlobalEnv)){
+                append = F, plot = last_plot(), doc = F, envir = parent.frame()){
+  get_proj_env()
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
   }
@@ -1350,7 +1431,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }
 
   if(is.null(file.override)){
-    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc, proj.env = proj.env), gsub("\\.", "", dirname(file)), sep = "/"))
+    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc), gsub("\\.", "", dirname(file)), sep = "/"))
   }else{
     outputDir = dirname(file)
   }
