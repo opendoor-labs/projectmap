@@ -312,6 +312,7 @@ reset_proj_env = function(build = F, newroot = F){
   if (newroot == T) {
     proj.env$root.dir = NULL
   }
+  Projenviron$initialized = F
   save_proj_env(proj.env)
   return(proj.env)
 }
@@ -507,7 +508,6 @@ get_proj_root = function(proj.env){
     }
   }
 
-  Projenviron$initialized = T
   save_proj_env(proj.env)
   return(proj.env)
 }
@@ -652,7 +652,7 @@ link_to_proj = function(init = F, install = T){
   }
 
   proj.env = get_proj_env()
-  if(Projenviron$wd_set == F){
+  if(Projenviron$initialized == F){
     proj.env = reset_proj_env()
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
@@ -821,6 +821,7 @@ link_to_proj = function(init = F, install = T){
     save_proj_env(proj.env)
     message("\nProject environment set.\n")
   }
+  Projenviron$initialized = T
 }
 
 #' Builds the file cabinet
