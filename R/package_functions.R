@@ -1166,7 +1166,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   }
   #Get the file path and add to the project environment variables so it won't be removed
   unlock_proj()
-  proj.env$file = get_file_path(file, inFolder, proj.env = proj.env)
+  proj.env$file = get_file_path(file, inFolder)
   proj.env$current.dir = dirname(proj.env$file)
   proj.env$dont_unload = dont_unload
   #Prevent file info from being removed
@@ -1187,11 +1187,11 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     if(is.null(docname)){
       invisible(capture.output(suppressMessages(
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
-                          knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T, proj.env = proj.env)))))
+                          knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T)))))
     }else{
       invisible(capture.output(suppressMessages(
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
-                          knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T, proj.env = proj.env)))))
+                          knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T)))))
     }
   # }else if(tools::file_ext(proj.env$file == ".py")){
   #   setwd(proj.env$current.dir)
