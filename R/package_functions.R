@@ -294,6 +294,7 @@ reset_proj_env = function(build = F, newroot = F){
     proj.env$root.dir = NULL
   }
   save_proj_env(proj.env)
+  return(proj.env)
 }
 
 #' Loads the project environment variable
@@ -632,7 +633,7 @@ link_to_proj = function(init = F, install = T){
 
   proj.env = get_proj_env()
   if(!exists("root.dir", proj.env)){
-    reset_proj_env()
+    proj.env = reset_proj_env()
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
     proj.env = get_proj_root(proj.env)
@@ -776,7 +777,7 @@ link_to_proj = function(init = F, install = T){
           rm(in_req, out_req)
           install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
-        if("projectmap" %in% installed_packages & length(packages) > 0){
+        if("projectmap" %in% installed_packages$Package & length(packages) > 0){
           message("Done.")
         }
       }
@@ -1145,7 +1146,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     cat("\n")
     cat(paste0("\n", proj.env$trace.message[[length(proj.env$trace.message)]]), file = paste0(proj.env$logLocation, ".txt"), "\n", append = T)
     update_Rdev_version()
-    reset_proj_env()
+    proj.env = reset_proj_env()
   }
   #Detach all packages except the required packages
   loaded.packages = names(utils::sessionInfo()[["otherPkgs"]])
