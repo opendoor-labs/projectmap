@@ -297,6 +297,7 @@ set_proj_models = function(...){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 execute_proj_model = function(model){
+  get_proj_env()
   return(proj.env$models[[model]])
 }
 
@@ -705,10 +706,12 @@ link_to_proj = function(init = F, install = T){
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
     get_proj_root()
+    get_proj_env()
     setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     set_proj_lib()
+    get_proj_env()
 
     #Create the folder structure
     folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library")
