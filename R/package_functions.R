@@ -349,8 +349,10 @@ reset_proj_env = function(build = F, newroot = F){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 get_proj_env = function(){
-  load(".proj_env.RData")
-  assign("proj.env", proj.env, .GlobalEnv)
+  if(file.exists(".proj_env.RData")){
+    load(".proj_env.RData")
+    assign("proj.env", proj.env, .GlobalEnv)
+  }
 }
 
 #' Save the project environment variable
