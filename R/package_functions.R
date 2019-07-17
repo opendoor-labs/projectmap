@@ -193,11 +193,12 @@ package.depend = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports"
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 lock_proj = function(){
-  proj.env = get("proj.env", envir = parent.frame())
+  ret_env = pryr::where("proj.env")
+  proj.env = get("proj.env", envir = ret_env)
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
   }
-  assign("proj.env", proj.env, parent.frame())
+  assign("proj.env", proj.env, ret_env)
 }
 
 #' Unlock all the project variables
@@ -209,13 +210,14 @@ lock_proj = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 unlock_proj = function(){
-  proj.env = get("proj.env", envir = parent.frame())
+  ret_env = pryr::where("proj.env")
+  proj.env = get("proj.env", envir = ret_env)
   for(i in names(proj.env)){
     if(bindingIsLocked(i, proj.env)){
       unlockBinding(i, proj.env)
     }
   }
-  assign("proj.env", proj.env, parent.frame())
+  assign("proj.env", proj.env, ret_env)
 }
 
 #' Set the project models to be executed from the "Project Master.R" file
@@ -367,9 +369,11 @@ get_proj_env = function(){
 #' save_proj_env(proj.env)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-save_proj_env = function(proj.env){
+save_proj_env = function(){
+  ret_env = pryr::where("proj.env")
+  proj.env = get("proj.env", envir = ret_env)
   save(proj.env, file = ".proj_env.RData")
-  assign("proj.env", proj.env, parent.frame())
+  assign("proj.env", proj.env, ret_env)
   # unlockBinding("proj.env", pryr::where("save_proj_env"))
   # assign("proj.env", proj.env, pryr::where("save_proj_env"))
   # lockBinding("proj.env", pryr::where("save_proj_env"))
