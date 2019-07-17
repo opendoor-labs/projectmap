@@ -369,7 +369,7 @@ save_proj_env = function(proj.env){
   save(proj.env, file = ".proj_env.RData")
   assign("proj.env", proj.env, parent.frame())
   # unlockBinding("proj.env", pryr::where("save_proj_env"))
-  assign("proj.env", proj.env, pryr::where("save_proj_env"))
+  # assign("proj.env", proj.env, pryr::where("save_proj_env"))
   # lockBinding("proj.env", pryr::where("save_proj_env"))
 }
 
