@@ -38,6 +38,8 @@ get_proj_env = function(){
     }
     assign("proj.env", proj.env, ret_env)
     assign("proj.env", proj.env, env_loc)
+    lockBinding("proj.env", ret_env)
+    lockBinding("proj.env", env_loc)
   }else{
     return(NULL)
   }
@@ -270,6 +272,8 @@ package.depend = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports"
 #' @export
 set_proj_models = function(...){
   get_proj_env()
+  unlockBinding("proj.env", environment())
+
   #Assign the models to a named list
   proj.env$models = list(...)
 
@@ -350,6 +354,7 @@ execute_proj_model = function(model){
 #' @export
 reset_proj_env = function(build = F, newroot = F){
   get_proj_env()
+  unlockBinding("proj.env", environment())
   proj.env$startSourceLog = T
   proj.env$current.dir = NULL
   if(!is.null(proj.env$numFiles)){
@@ -379,6 +384,8 @@ reset_proj_env = function(build = F, newroot = F){
 set_proj_env = function(...){
   args = list(...)
   get_proj_env()
+  unlockBinding("proj.env", environment())
+
   for(a in names(args)){
     if(exists(a, proj.env)){
       if(bindingIsLocked(a, proj.env)){
@@ -484,6 +491,7 @@ get_proj_packages = function(files, parallel = T){
 #' @export
 get_proj_root = function(){
   get_proj_env()
+  unlockBinding("proj.env", environment())
 
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
@@ -544,6 +552,7 @@ get_proj_root = function(){
 #' @export
 set_proj_lib = function(){
   get_proj_env()
+  unlockBinding("proj.env", environment())
 
   if(is.null(proj.env$libPath.orig)){
     proj.env$libPath.orig = .libPaths()
@@ -677,6 +686,7 @@ link_to_proj = function(init = F, install = T){
   if(!exists("root.dir", proj.env)){
     reset_proj_env()
     get_proj_env()
+    unlockBinding("proj.env", environment())
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
     get_proj_root()
@@ -837,6 +847,7 @@ link_to_proj = function(init = F, install = T){
     message("\nProject environment set.\n")
   }else{
     get_proj_env()
+    unlockBinding("proj.env", environment())
     get_proj_root()
     setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
@@ -859,6 +870,7 @@ link_to_proj = function(init = F, install = T){
 #' @export
 build_cabinet = function(){
   get_proj_env()
+  unlockBinding("proj.env", environment())
 
   folders = list.dirs(full.names = F, recursive = F)
   folders = folders[!folders %in% c("Library", ".git")]
@@ -891,6 +903,7 @@ build_cabinet = function(){
 #' @export
 add_to_cabinet = function(file){
   get_proj_env()
+  unlockBinding("proj.env", environment())
 
   root = gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", proj.env$root.dir))
   file = gsub(root, "", file)
@@ -916,6 +929,7 @@ add_to_cabinet = function(file){
 #' @export
 remove_file = function(files){
   get_proj_env()
+  unlockBinding("proj.env", environment())
 
   #Files should be full file paths, can be more than 1
   for(i in files){
@@ -1128,6 +1142,7 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL, ...){
   #If logging hasn't been started, start it
   get_proj_env()
+  unlockBinding("proj.env", environment())
   if(proj.env$startSourceLog == F){
     proj.env$startSourceLog = T
     proj.env$trace.message[[length(proj.env$trace.message) + 1]] = paste0("Start Time: ", Sys.time())
@@ -1171,6 +1186,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
 
   #Log the output
   get_proj_env()
+  unlockBinding("proj.env", environment())
   proj.env$current.dir = proj.env$root.dir
   proj.env$file = NULL
   proj.env$trace.message[[length(proj.env$trace.message)]] = paste0(proj.env$trace.message[[length(proj.env$trace.message)]], "Done.")
