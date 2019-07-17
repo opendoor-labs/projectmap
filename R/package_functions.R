@@ -980,7 +980,7 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
-  basefolders = list.dirs(path = getwd(), recursive = F, full.names = F)
+  basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
     path = dirname(proj.env$file)
     path = gsub("//", "/", paste0(proj.env$root.dir, "/", path))
