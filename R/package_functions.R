@@ -31,18 +31,13 @@ get_proj_env = function(){
     ret_env = pryr::where("proj.env")
     print(ret_env)
     load(".proj_env.RData")
-    unlockBinding("proj.env", env_loc)
     if(bindingIsActive("proj.env", ret_env)){
       if(bindingisLocked("proje.env", ret_env)){
         unlockBinding("proj.env", ret_env)
       }
     }
-    if(!identical(ret_env, .GlobalEnv)){
-      assign("proj.env", proj.env, ret_env)
-    }
-    assign("proj.env", proj.env, env_loc)
+    assign("proj.env", proj.env, ret_env)
     lockBinding("proj.env", ret_env)
-    lockBinding("proj.env", env_loc)
   }else{
     return(NULL)
   }
@@ -59,18 +54,13 @@ save_proj_env = function(){
   ret_env = pryr::where("proj.env")
   proj.env = get("proj.env", envir = ret_env)
   save(proj.env, file = ".proj_env.RData")
-  unlockBinding("proj.env", env_loc)
   if(bindingIsActive("proj.env", ret_env)){
     if(bindingisLocked("proje.env", ret_env)){
       unlockBinding("proj.env", ret_env)
     }
   }
-  if(!identical(ret_env, .GlobalEnv)){
-    assign("proj.env", proj.env, ret_env)
-  }
-  assign("proj.env", proj.env, env_loc)
+  assign("proj.env", proj.env, ret_env)
   lockBinding("proj.env", ret_env)
-  lockBinding("proj.env", env_loc)
 }
 save_proj_env()
 
