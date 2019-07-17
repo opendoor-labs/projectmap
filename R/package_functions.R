@@ -1,5 +1,5 @@
 Projenviron = new.env()
-Projenviron$wd_set = F
+Projenviron$initialized = F
 
 #' Redefined library, require, and install.packages functions to only look in the project library
 #' This overwrites the base library function to only look in the user's project library to load a package
@@ -507,7 +507,7 @@ get_proj_root = function(proj.env){
     }
   }
 
-  Projenviron$wd_set = F
+  Projenviron$initialized = T
   save_proj_env(proj.env)
   return(proj.env)
 }
