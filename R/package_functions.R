@@ -361,7 +361,7 @@ get_proj_env = function(){
     if(!identical(parent.frame(), .GlobalEnv)){
       assign("proj.env", proj.env, parent.frame())
     }
-    utils::assignInNamespace("proj.env", ns = "projectmap")
+    utils::assignInNamespace("proj.env", proj.env, ns = "projectmap")
   }else{
     return(NULL)
   }
