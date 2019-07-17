@@ -3,6 +3,7 @@
 export(add_to_cabinet)
 export(build_cabinet)
 export(build_query)
+export(env_loc)
 export(execute_proj_model)
 export(exit_proj)
 export(get_file_folder)
