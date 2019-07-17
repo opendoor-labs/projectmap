@@ -383,6 +383,7 @@ if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
 }
 save_proj_env()
+env_loc = pryr::where("proj.env")
 
 # proj.env$root.dir = eval(parse(text = '
 #                                fxn = function(){
