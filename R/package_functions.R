@@ -899,7 +899,7 @@ remove_file = function(files){
 #' get_file_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F){
+get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F, proj.env = get("proj.env", .GlobalEnv)){
   #Get the file extenstion
   ext = tools::file_ext(file)
   if(ext == ""){
@@ -917,7 +917,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   paths = paths[tools::file_ext(paths) == ext]
   paths = paths[gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", basename(paths))) == file]
   if(is.null(inFolder) & length(paths) > 1){
-    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir()), paths)])
+    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir(proj.env = proj.env))), paths)])
   }
   paths = paths[which.min(nchar(paths))]
   if(length(paths) == 1 | allowMult == T){
@@ -927,7 +927,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
     if(recall == T){
       #If the file is not found, rebuild the cabinet to check if it is there
       build_cabinet()
-      ret = get_file_path(file = file, inFolder = inFolder, recall = F, allowMult = allowMult)
+      ret = get_file_path(file = file, inFolder = inFolder, recall = F, allowMult = allowMult, proj.env = proj.env)
     }else{
       #If the file is still not found
       stop("File not found. Make sure the file exists or check the file name.")
@@ -959,8 +959,8 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
 #' get_folder_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
-  path = get_file_path(file = file, inFolder = inFolder, recall = recall, allowMult = allowMult)
+get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F, proj.env = get("proj.env", .GlobalEnv)){
+  path = get_file_path(file = file, inFolder = inFolder, recall = recall, allowMult = allowMult, proj.env = proj.env)
   return(dirname(path))
 }
 
@@ -978,7 +978,7 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
+get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get("proj.env", .GlobalEnv)){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
@@ -1032,10 +1032,10 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
 #' read_file("Model1.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-read_file = function(file, inFolder = NULL, showProgress = F,
+read_file = function(file, inFolder = NULL, showProgress = F, proj.env = get("proj.env", .GlobalEnv),
                 na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), envir = .GlobalEnv, ...){
   #File needs to be full file path
-  file = get_file_path(file, inFolder)
+  file = get_file_path(file, inFolder, proj.env = proj.env)
   ext = tools::file_ext(file)
 
   if(ext == "RData"){
@@ -1084,7 +1084,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   }
   #Get the file path and add to the project environment variables so it won't be removed
   unlock_proj()
-  proj.env$file = get_file_path(file, inFolder)
+  proj.env$file = get_file_path(file, inFolder, proj.env = proj.env)
   proj.env$current.dir = dirname(proj.env$file)
   proj.env$dont_unload = dont_unload
   #Prevent file info from being removed
@@ -1104,11 +1104,11 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
     if(is.null(docname)){
       invisible(capture.output(suppressMessages(
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
-                          knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T)))))
+                          knit_root_dir = proj.env$root.dir, output_dir = get_output_dir(doc = T, proj.env = proj.env))))))
     }else{
       invisible(capture.output(suppressMessages(
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
-                          knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T)))))
+                          knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T, proj.env = proj.env))))))
     }
   # }else if(tools::file_ext(proj.env$file == ".py")){
   #   setwd(proj.env$current.dir)
@@ -1329,7 +1329,7 @@ ggplot_grid = function(g, plot = TRUE, ...){
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
                 width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot(), doc = F, envir = parent.frame()){
+                append = F, plot = last_plot(), doc = F, envir = parent.frame(), proj.env = get("proj.env", .GlobalEnv)){
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
   }
@@ -1350,7 +1350,7 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
   }
 
   if(is.null(file.override)){
-    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc), gsub("\\.", "", dirname(file)), sep = "/"))
+    outputDir = gsub("//", "/", paste(get_output_dir(doc = doc, proj.env = proj.env)), gsub("\\.", "", dirname(file)), sep = "/"))
   }else{
     outputDir = dirname(file)
   }
