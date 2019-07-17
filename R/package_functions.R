@@ -359,18 +359,6 @@ reset_proj_env = function(build = F, newroot = F){
   save_proj_env()
 }
 
-# #' Exit a project packrat mode
-# #'
-# #' @return No return value
-# #' @description Wrapper for packrat's disable() function
-# #' @examples
-# #' exit_proj()
-# #' @author Alex Hubbard (hubbard.alex@gmail.com)
-# #' @export
-# exit_proj = function(){
-#   packrat::disable()
-# }
-
 #' Loads the project environment variable
 #'
 #' @description An environment variable
@@ -421,7 +409,6 @@ save_proj_env = function(){
   lockBinding("proj.env", ret_env)
   lockBinding("proj.env", env_loc)
 }
-save_proj_env()
 
 #' Updates the project environment
 #'
@@ -445,16 +432,6 @@ set_proj_env = function(...){
   }
   save_proj_env()
 }
-
-# proj.env$root.dir = eval(parse(text = '
-#                                fxn = function(){
-#                                 load(".proj_env.RData")
-#                                 return(proj.env$root.dir)
-#                                }
-#                                fxn()'))
-
-#Lock the project
-lock_proj()
 
 #' Parse out packages to load
 #'
@@ -550,16 +527,16 @@ get_proj_root = function(){
   proj.env$current.dir = proj.env$file
   for(i in rev(frames)){
     proj.env$current.dir = c(proj.env$current.dir, tryCatch(dirname(parent.frame(i)$ofile),
-                                          error = function(err){NULL}))
+                                                            error = function(err){NULL}))
   }
   if(Sys.getenv("RSTUDIO") == "1"){
     proj.env$current.dir = unique(c(proj.env$current.dir,
-                           tryCatch(dirname(rstudioapi::getActiveDocumentContext()$path),
-                                    error = function(err){NULL}),
-                           tryCatch(dirname(rstudioapi::getSourceEditorContext()$path),
-                                    error = function(err){NULL}),
-                           tryCatch(dirname(rstudioapi::getConsoleEditorContext()$path),
-                                    error = function(err){NULL})))
+                                    tryCatch(dirname(rstudioapi::getActiveDocumentContext()$path),
+                                             error = function(err){NULL}),
+                                    tryCatch(dirname(rstudioapi::getSourceEditorContext()$path),
+                                             error = function(err){NULL}),
+                                    tryCatch(dirname(rstudioapi::getConsoleEditorContext()$path),
+                                             error = function(err){NULL})))
   }
   proj.env$current.dir = unique(c(proj.env$current.dir, getwd()))
   if(!all(is.null(proj.env$current.dir))){
@@ -933,8 +910,8 @@ build_cabinet = function(){
   folders = list.dirs(full.names = F, recursive = F)
   folders = folders[!folders %in% c("Library", ".git")]
   cabinet = unlist(lapply(folders, function(x) {
-                              unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
-                            }))
+    unique(list.files(path = x, recursive = T, full.names = T, include.dirs = F))
+  }))
   cabinet = unique(c(cabinet, list.files(path = ".", recursive = F, full.names = T, include.dirs = F, all.files = F)))
   dirs = unique(list.dirs(path = ".", full.names = T, recursive = F))
   cabinet = trimws(cabinet[!cabinet %in% dirs])
@@ -1158,7 +1135,7 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 read_file = function(file, inFolder = NULL, showProgress = F,
-                na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), envir = .GlobalEnv, ...){
+                     na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), envir = .GlobalEnv, ...){
   #File needs to be full file path
   get_proj_env()
   file = get_file_path(file, inFolder)
@@ -1238,10 +1215,10 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
         rmarkdown::render(proj.env$file, quiet = T, clean = T,
                           knit_root_dir = proj.env$root.dir, output_file = docname, output_dir = get_output_dir(doc = T)))))
     }
-  # }else if(tools::file_ext(proj.env$file == ".py")){
-  #   setwd(proj.env$current.dir)
-  #   invisible(capture.output(suppressMessages(reticulate::source_python(file = proj.env$file, ...))))
-  #   setwd(proj.env$root.dir)
+    # }else if(tools::file_ext(proj.env$file == ".py")){
+    #   setwd(proj.env$current.dir)
+    #   invisible(capture.output(suppressMessages(reticulate::source_python(file = proj.env$file, ...))))
+    #   setwd(proj.env$root.dir)
   }else{
     stop("File extension must be either .R, .py, or .Rmd")
   }
@@ -1315,8 +1292,8 @@ sum_dt = function(x, na.rm = F){
 #' See ggplot2 package for examples.
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 ggsave2 = function(filename, plot = last_plot(), device = NULL, path = NULL, combine = F,
-                  scale = 1, width = NA, height = NA, units = c("in", "cm", "mm"),
-                  dpi = 300, limitsize = TRUE, ...){
+                   scale = 1, width = NA, height = NA, units = c("in", "cm", "mm"),
+                   dpi = 300, limitsize = TRUE, ...){
   get_proj_env()
   plot_dev = function(device, filename, dpi = 300){
     if(is.function(device)){
@@ -1459,8 +1436,8 @@ ggplot_grid = function(g, plot = TRUE, ...){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
-                width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot(), doc = F, envir = parent.frame()){
+                     width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
+                     append = F, plot = last_plot(), doc = F, envir = parent.frame()){
   get_proj_env()
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
@@ -1525,11 +1502,11 @@ save_file = function(..., file = NULL, file.override = NULL, row.names = F, show
       #Set paper = "US" for portrait. Defaults to "USr" for landscape. "special" sets paper to width and height.
       if(combine == T & all(sapply(plot, function(x){ggplot2::is.ggplot(x) | grid::is.grob(x)}))){
         ggsave2(filename = basename(file), plot = plot, device = "pdf", path = dirname(file), width = width, height = height, units = units, dpi = res,
-               bg = ifelse(bg == "white", "transparent", bg), fg = fg, pointsize = pointsize, paper = paper, combine = combine, ...)
+                bg = ifelse(bg == "white", "transparent", bg), fg = fg, pointsize = pointsize, paper = paper, combine = combine, ...)
         catch = tryCatch(grDevices::dev.off(), error = function(err){NULL})
       }else{
         grDevices::pdf(file, width = width, height = height, bg = ifelse(bg == "white", "transparent", bg),
-            fg = fg, pointsize = pointsize, paper = paper, ...)
+                       fg = fg, pointsize = pointsize, paper = paper, ...)
         catch = tryCatch(grDevices::dev.off(), error = function(err){NULL})
       }
     }
