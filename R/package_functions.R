@@ -978,7 +978,7 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get("proj.env", .GlobalEnv)){
+get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
