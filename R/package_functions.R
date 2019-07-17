@@ -304,9 +304,16 @@ reset_proj_env = function(build = F, newroot = F){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 get_proj_env = function(...){
+  proj.env = new.env()
+  proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate", "pryr",
+                                 "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
+  if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
+    warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
+  }
+
   if(file.exists(".proj_env.RData")){
     args = list(...)
-    assign("proj.env", load(".proj_env.RData"))
+    load(".proj_env.RData")
     if(length(list) == 0){
       return(proj.env)
     }else{
@@ -317,12 +324,7 @@ get_proj_env = function(...){
       return(env)
     }
   }else{
-    proj.env = new.env()
-    proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readxl", "writexl", "tools", "devtools", "reticulate", "pryr",
-                                   "ggplot2", "data.table", "parallel", "doSNOW", "foreach", "grDevices", "rmarkdown", "projectmap", "versions")
-    if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
-      warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
-    }
+
     return(proj.env)
   }
 }
