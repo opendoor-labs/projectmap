@@ -899,7 +899,7 @@ remove_file = function(files){
 #' get_file_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F, proj.env = get("proj.env", envir = envir = as.environment(pos))){
+get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F, proj.env = get("proj.env", envir = as.environment(pos))){
   #Get the file extenstion
   ext = tools::file_ext(file)
   if(ext == ""){
@@ -959,7 +959,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
 #' get_folder_path("Model.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F, proj.env = get("proj.env", envir = envir = as.environment(pos))){
+get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F, proj.env = get("proj.env", envir = as.environment(pos))){
   path = get_file_path(file = file, inFolder = inFolder, recall = recall, allowMult = allowMult, proj.env = proj.env)
   return(dirname(path))
 }
@@ -978,7 +978,7 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F, pro
 #' get_output_dir(doc = T)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get("proj.env", envir = envir = as.environment(pos))){
+get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get("proj.env", envir = as.environment(pos))){
   #folder should be the full file path to the folder not including its name
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
@@ -1032,7 +1032,7 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL, proj.env = get(
 #' read_file("Model1.R", inFolder = "Codes")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-read_file = function(file, inFolder = NULL, showProgress = F, proj.env = get("proj.env", envir = envir = as.environment(pos)),
+read_file = function(file, inFolder = NULL, showProgress = F, proj.env = get("proj.env", envir = as.environment(pos)),
                 na.strings = c("NULL","NA","na","N/A","n/a","<NA>","NONE","-",".",""," ","NaN","nan","Inf","-Inf"), envir = .GlobalEnv, ...){
   #File needs to be full file path
   file = get_file_path(file, inFolder, proj.env = proj.env)
@@ -1329,7 +1329,7 @@ ggplot_grid = function(g, plot = TRUE, ...){
 #' @export
 save_file = function(..., file = NULL, file.override = NULL, row.names = F, showProgress = F, paper = "USr", combine = F,
                 width = 9, height = 5, units = "in", pointsize = 12, bg = "white", fg = "black", res = 300,
-                append = F, plot = last_plot(), doc = F, envir = parent.frame(), proj.env = get("proj.env", envir = envir = as.environment(pos))){
+                append = F, plot = last_plot(), doc = F, envir = parent.frame(), proj.env = get("proj.env", envir = as.environment(pos))){
   if(is.null(file) & is.null(file.override)){
     stop("No file given.")
   }
