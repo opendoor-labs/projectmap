@@ -37,6 +37,7 @@ get_proj_env = function(){
       }
     }
     assign("proj.env", proj.env, ret_env)
+    assign("proj.env", proj.env, env_loc)
     lockBinding("proj.env", ret_env)
   }else{
     return(NULL)
