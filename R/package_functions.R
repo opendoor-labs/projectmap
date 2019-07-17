@@ -10,6 +10,7 @@
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 library = function(..., lib.loc = proj.env$libPath){
+  get_proj_env()
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
@@ -33,6 +34,7 @@ library = function(..., lib.loc = proj.env$libPath){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 require = function(..., lib.loc = proj.env$libPath, recursive = F){
+  get_proj_env()
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
@@ -56,6 +58,7 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
+  get_proj_env()
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     if(is.null(versions)){
@@ -107,6 +110,7 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 remove.packages = function(..., lib = proj.env$libPath){
+  get_proj_env()
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     for(i in unlist(list(...))){
@@ -224,6 +228,7 @@ unlock_proj = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 set_proj_models = function(...){
+  get_proj_env()
   unlock_proj()
   #Assign the models to a named list
   proj.env$models = list(...)
@@ -274,6 +279,7 @@ set_proj_models = function(...){
   proj.env$trace.message = list()
   proj.env$startSourceLog = F
   lock_proj()
+  save_proj_env(proj.env)
 }
 
 #' Return boolean of project model to be executed from the Project Master.R file.
@@ -355,7 +361,7 @@ get_proj_env = function(){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 save_proj_env = function(proj.env){
-  save(proj.env, ".proj_env.RData")
+  save(proj.env, file = ".proj_env.RData")
   assign("proj.env", proj.env, .GlobalEnv)
 }
 
