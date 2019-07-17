@@ -225,7 +225,6 @@ unlock_proj = function(){
     unlockBinding("proj.env", ret_env)
   }
   assign("proj.env", proj.env, ret_env)
-  lockBinding("proj.env", ret_env)
 }
 
 #' Set the project models to be executed from the "Project Master.R" file
