@@ -351,7 +351,7 @@ reset_proj_env = function(build = F, newroot = F){
 get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
     load(".proj_env.RData")
-    assign("proj.env", proj.env, .GlobalEnv)
+    assign("proj.env", proj.env, parent.frame())
   }
 }
 
@@ -364,7 +364,7 @@ get_proj_env = function(){
 #' @export
 save_proj_env = function(proj.env){
   save(proj.env, file = ".proj_env.RData")
-  assign("proj.env", proj.env, .GlobalEnv)
+  assign("proj.env", proj.env, parent.frame())
 }
 
 #' Updates the project environment
