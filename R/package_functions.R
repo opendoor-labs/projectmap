@@ -286,6 +286,23 @@ execute_proj_model = function(model){
   return(proj.env$models[[model]])
 }
 
+#' Unlock the project environment
+#'
+#' @return No return value
+#' @description Resets the project environment to its default values.
+#' @examples
+#' unlock(proj.env)
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+unlock = function(proj.env){
+  for(i in names(proj.env)){
+    if(bindingIsLocked(i, proj.env)){
+      unlockBinding(i, proj.env)
+    }
+  }
+  return(proj.env)
+}
+
 #' Reset the project environment
 #'
 #' @param build Boolean (T, F) indicator of whether to rebuild the cabinet or not. Default is F.
@@ -298,7 +315,7 @@ execute_proj_model = function(model){
 #' @export
 reset_proj_env = function(build = F, newroot = F){
   proj.env = get_proj_env()
-  unlockBinding("proj.env", environment())
+  proj.env = unlock(proj.env)
   proj.env$startSourceLog = T
   proj.env$current.dir = NULL
   if(!is.null(proj.env$numFiles)){
