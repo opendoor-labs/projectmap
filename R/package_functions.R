@@ -312,9 +312,22 @@ reset_proj_env = function(build = F, newroot = F){
   if (newroot == T) {
     proj.env$root.dir = NULL
   }
-  Projenviron$initialized = F
   save_proj_env(proj.env)
   return(proj.env)
+}
+
+#' Reset initializations tate
+#'
+#' @param build Boolean (T, F) indicator of whether to rebuild the cabinet or not. Default is F.
+#' @param newroot Boolean (T, F) indicator of whether to reset root.dir
+#' @return No return value
+#' @description Resets the project environment to its default values.
+#' @examples
+#' reset_init()
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+reset_init = function(){
+  Projenviron$initialized = F
 }
 
 #' Loads the project environment variable
@@ -335,15 +348,15 @@ get_proj_env = function(...){
   if(file.exists(".proj_env.RData")){
     args = list(...)
     load(".proj_env.RData")
-    # if(length(list) == 0){
+    if(length(list) == 0){
       return(proj.env)
-    # }else{
-    #   env = new.env
-    #   for(a in args){
-    #     assign(a, proj.env[[a]], env)
-    #   }
-    #   return(env)
-    # }
+    }else{
+      env = new.env
+      for(a in args){
+        assign(a, proj.env[[a]], env)
+      }
+      return(env)
+    }
   }else{
     return(proj.env)
   }
