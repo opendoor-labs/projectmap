@@ -4,7 +4,7 @@
 \alias{save_proj_env}
 \title{Save the project environment variable}
 \usage{
-save_proj_env()
+save_proj_env(proj.env)
 }
 \description{
 An environment variable
