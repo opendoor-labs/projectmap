@@ -318,6 +318,7 @@ reset_proj_env = function(build = F, newroot = F){
 get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
     ret_env = pryr::where("proj.env")
+    cat(ret_env, "\n")
     load(".proj_env.RData")
     unlockBinding("proj.env", env_loc)
     if(bindingIsActive("proj.env", ret_env)){
