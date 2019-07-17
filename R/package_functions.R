@@ -285,7 +285,7 @@ set_proj_models = function(...){
   proj.env$trace.message = list()
   proj.env$startSourceLog = F
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Return boolean of project model to be executed from the Project Master.R file.
@@ -333,7 +333,7 @@ reset_proj_env = function(build = F, newroot = F){
     proj.env$root.dir = NULL
   }
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 # #' Exit a project packrat mode
@@ -366,7 +366,7 @@ get_proj_env = function(){
 #'
 #' @description An environment variable
 #' @examples
-#' save_proj_env(proj.env)
+#' save_proj_env()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 save_proj_env = function(){
@@ -399,7 +399,7 @@ set_proj_env = function(...){
     proj.env[[a]] = args[[a]]
     lockBinding(a, proj.env)
   }
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Creates a project environment variable
@@ -415,7 +415,7 @@ proj.env$required.packages = c("rstudioapi", "R.utils", "utils", "stats", "readx
 if("3.5.0" != paste(R.Version()$major, R.Version()$minor, sep = ".")){
   warning.message = paste0("projectmap was built under R version 3.5.0. Your current R version is ", paste(R.Version()$major, R.Version()$minor, sep = "."), ".")
 }
-save_proj_env(proj.env)
+save_proj_env()
 
 # proj.env$root.dir = eval(parse(text = '
 #                                fxn = function(){
@@ -563,7 +563,7 @@ get_proj_root = function(){
   }
 
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Set the path to the project library
@@ -586,7 +586,7 @@ set_proj_lib = function(){
   message("Project package library path set to ", .libPaths()[1], ".\n")
 
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Exit a project
@@ -871,7 +871,7 @@ link_to_proj = function(init = F, install = T){
     proj.env$startSourceLog = F
 
     lock_proj()
-    save_proj_env(proj.env)
+    save_proj_env()
     message("\nProject environment set.\n")
   }else{
     get_proj_env()
@@ -883,7 +883,7 @@ link_to_proj = function(init = F, install = T){
     #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     set_proj_lib()
     lock_proj()
-    save_proj_env(proj.env)
+    save_proj_env()
     message("\nProject environment set.\n")
   }
 }
@@ -918,7 +918,7 @@ build_cabinet = function(){
   proj.env$cabinet = cabinet
   write(proj.env$cabinet, file = "./Functions/.file_cabinet.txt")
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Adds a file to the file cabinet
@@ -943,7 +943,7 @@ add_to_cabinet = function(file){
   proj.env$cabinet = cabinet
 
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Removes a file from the project directory and the file cabinet
@@ -975,7 +975,7 @@ remove_file = function(files){
   proj.env$cabinet = cabinet
 
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' Get a file path relative to the root directory
@@ -1195,7 +1195,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
 
   #Source the file
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
     invisible(capture.output(suppressMessages(source(proj.env$file, chdir = T, ...))))
@@ -1248,7 +1248,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   unload.packages(loaded.packages[!loaded.packages %in% unique(c(proj.env$required.packages, proj.env$dont_unload))])
   rm(loaded.packages)
   lock_proj()
-  save_proj_env(proj.env)
+  save_proj_env()
 }
 
 #' A modified sum function
