@@ -386,7 +386,11 @@ save_proj_env = function(){
   ret_env = pryr::where("proj.env")
   proj.env = get("proj.env", envir = ret_env)
   save(proj.env, file = ".proj_env.RData")
+  if(bindingIsLocked("proj.env", ret_env)){
+    unlockBinding("proj.env", ret_env)
+  }
   assign("proj.env", proj.env, ret_env)
+  lockBinding("proj.env", ret_env)
   # unlockBinding("proj.env", pryr::where("save_proj_env"))
   # assign("proj.env", proj.env, pryr::where("save_proj_env"))
   # lockBinding("proj.env", pryr::where("save_proj_env"))
