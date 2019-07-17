@@ -196,6 +196,7 @@ lock_proj = function(){
   for(i in names(proj.env)){
     lockBinding(i, proj.env)
   }
+  assign("proj.env", proj.env, parent.frame())
 }
 
 #' Unlock all the project variables
@@ -212,6 +213,7 @@ unlock_proj = function(){
       unlockBinding(i, proj.env)
     }
   }
+  assign("proj.env", proj.env, parent.frame())
 }
 
 #' Set the project models to be executed from the "Project Master.R" file
