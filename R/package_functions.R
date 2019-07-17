@@ -9,8 +9,11 @@
 #' library(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-library = function(..., lib.loc = proj.env$libPath){
+library = function(..., lib.loc = NULL){
   proj.env = get_proj_env()
+  if(is.null(lib.loc)){
+    lib.loc = proj.env$libPath
+  }
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
@@ -33,8 +36,11 @@ library = function(..., lib.loc = proj.env$libPath){
 #' require(projectmap)
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-require = function(..., lib.loc = proj.env$libPath, recursive = F){
+require = function(..., lib.loc = NULL, recursive = F){
   proj.env = get_proj_env()
+  if(is.null(lib.loc)){
+    lib.loc = proj.env$libPath
+  }
   if(!is.null(proj.env$current.dir)){
     if(proj.env$current.dir != proj.env$root.dir){
       #If set project directory to the project directory, only look in project library
@@ -57,8 +63,11 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
+install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs = F, ...){
   proj.env = get_proj_env()
+  if(is.null(lib)){
+    lib = proj.env$libPath
+  }
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     if(is.null(versions)){
@@ -109,8 +118,11 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
 #' remove.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-remove.packages = function(..., lib = proj.env$libPath){
+remove.packages = function(..., lib = NULL){
   proj.env = get_proj_env()
+  if(is.null(lib)){
+    lib = proj.env$libPath
+  }
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     for(i in unlist(list(...))){
@@ -167,7 +179,11 @@ load.packages = function(..., packages = NULL, character.only = F){
 #' packages_dependencies("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-package.depend = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports", "Depends", "Suggests")){
+package.depend = function(pkgs, lib.loc = NULL, fields = c("Imports", "Depends", "Suggests")){
+  proj.env = get_proj_env()
+  if(is.null(lib.loc)){
+    lib.loc = proj.env$libPath
+  }
   ret = NULL
   for(i in pkgs){
     out = utils::packageDescription(i, lib.loc = lib.loc)
