@@ -731,6 +731,7 @@ link_to_proj = function(init = F, install = T){
         packages_to_keep = unique(c(packages,
                                     package.depend(packages[!packages %in% installed.packages(priority = "base")]),
                                     proj.env$required.packages))
+        cat("removing packages2\n")
         packages_to_remove = installed_packages$Package[!installed_packages$Package %in% packages_to_keep]
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
