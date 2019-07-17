@@ -10,7 +10,7 @@ update_Rdev_version()
 No return value
 }
 \description{
-Overwrites the stored R Version with the current R Version in .projectmaproot
+Overwrites the stored R Version with the current R Version in .projectroot
 }
 \examples{
 update_Rdev_version()

@@ -469,7 +469,7 @@ get_proj_root = function(proj.env){
     for(i in proj.env$current.dir){
       proj.env$root.dir = i
       for(j in 1:(length(gregexpr("/", i)[[1]]) + 1)){
-        if(file.exists(paste0(proj.env$root.dir, "/.projectmaproot"))){
+        if(file.exists(paste0(proj.env$root.dir, "/.projectroot"))){
           found_wd = T
           proj.env$current.dir = i
           break
@@ -576,18 +576,18 @@ install_req_packages = function(){
 #' Update stored R Development Version
 #'
 #' @return No return value
-#' @description Overwrites the stored R Version with the current R Version in .projectmaproot
+#' @description Overwrites the stored R Version with the current R Version in .projectroot
 #' @examples
 #' update_Rdev_version()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 update_Rdev_version = function(){
-  RDevVersion = readLines(".projectmaproot")
+  RDevVersion = readLines(".projectroot")
   RVersionTest = sapply(RDevVersion, function(x){
     eval(parse(text = paste0("R.Version()$", trimws(gsub("[[:punct:]]|[[:digit:]]", "", x))))) >= as.numeric(trimws(gsub("[[:alpha:]]|\\:", "", x)))
   })
   if(all(RVersionTest == T)){
-    write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
+    write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectroot")
   }
   update_req_packages()
 }
@@ -664,10 +664,10 @@ link_to_proj = function(init = F, install = T){
       if(!file.exists("server.R")){
         write(x = serverR, file = "server.R")
       }
-      if(!file.exists(".projectmaproot")){
-        write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectmaproot")
+      if(!file.exists(".projectroot")){
+        write(paste("major:", R.Version()$major, "\nminor:", R.Version()$minor), file = ".projectroot")
       }else{
-        RDevVersion = readLines(".projectmaproot")
+        RDevVersion = readLines(".projectroot")
         RVersionTest = sapply(RDevVersion, function(x){
           eval(parse(text = paste0("R.Version()$", trimws(gsub("[[:punct:]]|[[:digit:]]", "", x))))) == as.numeric(trimws(gsub("[[:alpha:]]|\\:", "", x)))
         })
