@@ -1,3 +1,6 @@
+Projenviron = new.env()
+Projenviron$wd_set = F
+
 #' Redefined library, require, and install.packages functions to only look in the project library
 #' This overwrites the base library function to only look in the user's project library to load a package
 #'
@@ -504,6 +507,7 @@ get_proj_root = function(proj.env){
     }
   }
 
+  Projenviron$wd_set = F
   save_proj_env(proj.env)
   return(proj.env)
 }
@@ -648,7 +652,7 @@ link_to_proj = function(init = F, install = T){
   }
 
   proj.env = get_proj_env()
-  if(!exists("root.dir", proj.env)){
+  if(Projenviron$wd_set == F){
     proj.env = reset_proj_env()
 
     #Finds the enclosing folder of the "Master.R" file and sets it as the working directory
@@ -742,24 +746,20 @@ link_to_proj = function(init = F, install = T){
       }
 
       if(!is.null(packages)){
-        cat("removing packages\n")
         #Clean up package library
         packages_to_keep = unique(c(packages,
                                     package.depend(packages[!packages %in% installed.packages(priority = "base")]),
                                     proj.env$required.packages))
-        cat("removing packages2\n")
         packages_to_remove = installed_packages$Package[!installed_packages$Package %in% packages_to_keep]
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
         #Check if packages are of the correct version
         if(!file.exists("./Functions/required_packages.csv")){
-          cat("update_req\n")
           update_req_packages()
         }
         proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
 
         if(nrow(installed_packages) > 0){
-          cat("version_check\n")
           version_check = sapply(1:nrow(installed_packages), function(x){
             if(nrow(proj_req_pkgs[proj_req_pkgs$Package == installed_packages[x, ]$Package, ]) > 0){
               return(!any(proj_req_pkgs[proj_req_pkgs$Package == installed_packages[x, ]$Package, ]$Version %in% installed_packages[x, ]$Version))
