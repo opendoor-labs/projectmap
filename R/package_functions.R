@@ -358,13 +358,7 @@ reset_proj_env = function(build = F, newroot = F){
 get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
     load(".proj_env.RData")
-    if(bindingIsActive("proj.env", parent.frame())){
-      if(bindingIsLocked("proj.env", parent.frame())){
-        unlockBinding("proj.env", parent.frame())
-      }
-    }
     assign("proj.env", proj.env, parent.frame())
-    lockBinding("proj.env", parent.frame())
   }else{
     return(NULL)
   }
