@@ -630,6 +630,7 @@ link_to_proj = function(init = F, install = T){
     warning("Should be using RStudio.")
   }
 
+  save_proj_env(get_proj_env())
   if(!exists("root.dir", proj.env)){
     reset_proj_env()
     proj.env = get_proj_env()
