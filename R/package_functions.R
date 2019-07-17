@@ -318,8 +318,7 @@ reset_proj_env = function(build = F, newroot = F){
 #' @export
 get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
-    assign("proj.env", load(".proj_env.RData"))
-    return(proj.env)
+    return(load(".proj_env.RData"))
   }else{
     return(NULL)
   }
