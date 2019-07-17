@@ -298,6 +298,7 @@ execute_proj_model = function(model){
 #' @export
 reset_proj_env = function(build = F, newroot = F){
   proj.env = get_proj_env()
+  unlockBinding("proj.env", environment())
   proj.env$startSourceLog = T
   proj.env$current.dir = NULL
   if(!is.null(proj.env$numFiles)){
