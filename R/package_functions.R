@@ -319,10 +319,10 @@ reset_proj_env = function(build = F, newroot = F){
 get_proj_env = function(...){
   if(file.exists(".proj_env.RData")){
     args = list(...)
-    assign("proj.env", load(".proj_env.RData"))
     if(length(list) == 0){
-      return(proj.env)
+      return(load(".proj_env.RData"))
     }else{
+      assign("proj.env", load(".proj_env.RData"))
       env = new.env
       for(a in args){
         assign(a, proj.env[[a]], env)
