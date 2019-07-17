@@ -10,7 +10,7 @@ save_proj_env(proj.env)
 An environment variable
 }
 \examples{
-save_proj_env()
+save_proj_env(proj.env)
 }
 \author{
 Alex Hubbard (hubbard.alex@gmail.com)

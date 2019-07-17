@@ -5,7 +5,7 @@
 \title{Redefined library, require, and install.packages functions to only look in the project library
 This overwrites the base library function to only look in the user's project library to load a package}
 \usage{
-library(..., lib.loc = proj.env$libPath)
+library(..., lib.loc = NULL)
 }
 \arguments{
 \item{...}{First, package name, then other named arguments passed to the base library function}

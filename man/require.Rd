@@ -5,7 +5,7 @@
 \title{This overwrites the base require function to only look in the user's project library to load a package
 for package version control}
 \usage{
-require(..., lib.loc = proj.env$libPath, recursive = F)
+require(..., lib.loc = NULL, recursive = F)
 }
 \arguments{
 \item{...}{First, package name, then other named arguments passed to the base require function}
