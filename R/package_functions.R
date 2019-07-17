@@ -319,14 +319,17 @@ get_proj_env = function(){
   if(file.exists(".proj_env.RData")){
     ret_env = pryr::where("proj.env")
     load(".proj_env.RData")
-    return(bindingIsActive("proj.env", ret_env))
-    # if (bindingIsActive("proj.env", ret_env)) {
-    #   if (bindingisLocked("proje.env", ret_env)) {
-    #     unlockBinding("proj.env", ret_env)
-    #   }
-    # }
-    # assign("proj.env", proj.env, ret_env)
-    # lockBinding("proj.env", ret_env)
+    if(bindingIsActive("proj.env", ret_env)){
+      if (bindingisLocked("proje.env", ret_env)){
+        unlockBinding("proj.env", ret_env)
+      }
+    }
+    if(!identical(ret_env, .GlobalEnv)){
+      assign("proj.env", proj.env, ret_env)
+    }else{
+      assign("proj.env", proj.env, env_loc)
+    }
+    lockBinding("proj.env", ret_env)
   }else{
     return(NULL)
   }
