@@ -434,10 +434,10 @@ get_proj_packages = function(files, parallel = T){
 
 #' Find the project root directory
 #'
-#' @return No return value
-#' @description Updates the project environment with the root and current directories
+#' @return List containing root.dir, current.dir, and found_wd
+#' @description Finds important project directories
 #' @examples
-#' get_proj_root()
+#' finds_dirs()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 find_dirs = function(){
