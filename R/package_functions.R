@@ -1128,8 +1128,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   save_proj_env(proj.env)
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
-    # invisible(capture.output(suppressMessages(source(proj.env$file, chdir = F, ...))))
-    source(proj.env$file, chdir = F, ...)
+    invisible(capture.output(suppressMessages(source(proj.env$file, chdir = F, ...))))
   }else if(tools::file_ext(proj.env$file) == "Rmd"){
     if(is.null(docname)){
       invisible(capture.output(suppressMessages(
