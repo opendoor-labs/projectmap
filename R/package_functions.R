@@ -816,6 +816,7 @@ link_to_proj = function(init = F, install = T){
     message("\nProject environment set.\n")
   }else{
     proj.env = get_proj_env()
+    cat(names(proj.env), sep = "\n")
     proj.env = get_proj_root(proj.env)
     setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
