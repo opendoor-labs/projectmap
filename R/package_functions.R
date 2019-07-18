@@ -444,9 +444,6 @@ get_proj_root = function(){
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
   found_wd = F
-  if(!exists("proj.env")){
-    proj.env = new.env()
-  }
   proj.env$current.dir = proj.env$file
   for(i in rev(frames)){
     proj.env$current.dir = c(proj.env$current.dir, tryCatch(dirname(parent.frame(i)$ofile),
@@ -693,7 +690,7 @@ link_to_proj = function(init = F, install = T){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!file.exists(".file_cabinet.txt") | init == T){
+    if(!file.exists("./Functions/cabinet.RData") | init == T){
       #If the file cabinet does not exist, create it
       message("Building project file cabinet...")
       build_cabinet()
@@ -709,9 +706,13 @@ link_to_proj = function(init = F, install = T){
     #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
     if(install == T){
       message("Checking required packages...")
+      unlock_proj()
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[which(tools::file_ext(proj.env$cabinet) %in% c("R", "Rmd") &
                                         !grepl("Project Master.R", proj.env$cabinet))]
+      rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
+                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")]
+      rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
         packages = unique(c(packages, get_proj_packages(rfiles, parallel = T)))
@@ -749,7 +750,7 @@ link_to_proj = function(init = F, install = T){
           })
           names(version_check) = installed_packages$Package
           if(any(version_check[!is.na(version_check)] == T)){
-            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
+            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate required_packages.csv or install the required versions.")
           }
           rm(version_check)
         }
@@ -777,13 +778,12 @@ link_to_proj = function(init = F, install = T){
           rm(in_req, out_req)
           install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
-        if("projectmap" %in% installed_packages$Package & length(packages) > 0){
+        if("projectmap" %in% installed_packages & length(packages) > 0){
           message("Done.")
         }
       }
       rm(packages, packages_to_keep, packages_to_remove, installed_packages, proj_req_pkgs)
     }
-
 
     #Create the location of the master log and define the progress bar variables
     unlock_proj()
@@ -906,8 +906,6 @@ remove_file = function(files){
 get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F){
   #Get the file extenstion
   ext = tools::file_ext(file)
-  cabinet = readLines(".file_cabinet.txt")
-  # cabinet = proj.env$cabinet
   if(ext == ""){
     stop("No extension included in file. File must end in '.ext'.")
   }
@@ -915,15 +913,15 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   #Find all the paths that contain the file name in its name
   if(!is.null(inFolder)){
     #Find the correct drawer in the file cabinet
-    drawer = unique(cabinet[grepl(inFolder, cabinet)])
+    drawer = unique(proj.env$cabinet[grepl(inFolder, proj.env$cabinet)])
     paths = unique(drawer[grepl(file, drawer)])
   }else{
-    paths = unique(cabinet[grepl(file, cabinet)])
+    paths = unique(proj.env$cabinet[grepl(file, proj.env$cabinet)])
   }
   paths = paths[tools::file_ext(paths) == ext]
   paths = paths[gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", basename(paths))) == file]
   if(is.null(inFolder) & length(paths) > 1){
-    paths = unique(paths[grepl(gsub(getwd(), ".", get_output_dir()), paths)])
+    paths = unique(paths[grepl(gsub(proj.env$root.dir, ".", get_output_dir()), paths)])
   }
   paths = paths[which.min(nchar(paths))]
   if(length(paths) == 1 | allowMult == T){
@@ -948,7 +946,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
   if(full == F){
     return(gsub("//", "/", ret))
   }else{
-    return(gsub("//", "/", paste0(getwd(), "/", ret)))
+    return(gsub("//", "/", paste0(proj.env$root.dir, "/", ret)))
   }
 }
 
@@ -986,12 +984,6 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
-  if(!exists("proj.env")){
-    proj.env = new.env()
-  }
-  if(is.null(proj.env$root.dir) | is.null(proj.env$current.dir)){
-    get_proj_root()
-  }
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
     path = dirname(proj.env$file)
