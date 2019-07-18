@@ -8,7 +8,7 @@ save_file(..., file = NULL, file.override = NULL, row.names = F,
   showProgress = F, paper = "USr", combine = F, width = 9,
   height = 5, units = "in", pointsize = 12, bg = "white",
   fg = "black", res = 300, append = F, plot = last_plot(),
-  doc = F, envir = parent.frame())
+  doc = F)
 }
 \arguments{
 \item{...}{An object to be saved, including any other arguments to be passed to the save function associated with the file extension.}

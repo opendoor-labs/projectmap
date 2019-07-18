@@ -4,8 +4,8 @@
 \alias{package.depend}
 \title{This function gets package dependencies}
 \usage{
-package.depend(pkgs, lib.loc = NULL, fields = c("Imports", "Depends",
-  "Suggests"))
+package.depend(pkgs, lib.loc = proj.env$libPath, fields = c("Imports",
+  "Depends", "Suggests"))
 }
 \arguments{
 \item{pkgs}{Character vector of package names}

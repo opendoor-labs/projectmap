@@ -4,7 +4,7 @@
 \alias{get_output_dir}
 \title{Get the desired output directory}
 \usage{
-get_output_dir(file = NULL, inFolder = NULL, doc = F)
+get_output_dir(doc = F, file = NULL, inFolder = NULL)
 }
 \arguments{
 \item{doc}{Boolean (T, F) indicator of whether to set the output directory to the "Output" folder (used for R scripts calling the function) or the "Documentation" folder (used for Rmd scripts calling the function).}

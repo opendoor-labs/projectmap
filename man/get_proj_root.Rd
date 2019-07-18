@@ -4,7 +4,7 @@
 \alias{get_proj_root}
 \title{Get the project root directory}
 \usage{
-get_proj_root(proj.env)
+get_proj_root()
 }
 \value{
 No return value

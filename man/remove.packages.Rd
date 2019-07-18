@@ -5,7 +5,7 @@
 \title{This overwrites the base remove.packages function to only remove the function in the user's project library
 for package version control}
 \usage{
-remove.packages(..., lib = NULL)
+remove.packages(..., lib = proj.env$libPath)
 }
 \arguments{
 \item{...}{First, package name, then other named arguments passed to the base install.packages function}
