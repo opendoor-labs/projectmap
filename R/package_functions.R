@@ -656,7 +656,6 @@ link_to_proj = function(init = F, install = T){
     warning("Should be using RStudio.")
   }
 
-  proj.env = get_proj_env()
   if(Projenviron$initialized == F){
     proj.env = reset_proj_env()
 
@@ -821,7 +820,6 @@ link_to_proj = function(init = F, install = T){
     setwd(proj.env$root.dir)
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
-    #packrat::packrat_mode(on = T, auto.snapshot = F, clean.search.path = F)
     proj.env = set_proj_lib(proj.env)
     save_proj_env(proj.env)
     message("\nProject environment set.\n")
