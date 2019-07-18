@@ -405,7 +405,7 @@ get_proj_packages = function(files, parallel = T){
       if(length(lines) > 0){
         lines = paste(lines, collapse = " ")
         loc1 = gregexpr(pkg_ids, lines)[[1]]
-        if(length(loc1) > 0){
+        if(loc1[[1]] > 0){
           loc2 = gregexpr("\\)", lines)[[1]]
           loc2 = sapply(loc1, function(x){min(loc2[which(loc2 > x)])})
 
@@ -416,7 +416,6 @@ get_proj_packages = function(files, parallel = T){
             pkgs = unique(c(pkgs, temp))
           }
         }
-        pkgs = pkgs[!grepl("[[:punct:]]", pkgs)]
         return(pkgs)
       }else{
         return(NULL)
