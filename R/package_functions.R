@@ -816,15 +816,13 @@ link_to_proj = function(init = F, install = T){
     message("\nProject environment set.\n")
   }else{
     proj.env = get_proj_env()
-    cat(names(proj.env), sep = "\n")
-    # proj.env = get_proj_root(proj.env)
-    # setwd(proj.env$root.dir)
-    # message("Project root directory set to ", getwd(), ".\n")
-    # message("Directory of current script is ", proj.env$current.dir, ".\n")
-    # proj.env = set_proj_lib(proj.env)
-    # cat(names(proj.env), sep = "\n")
-    # save_proj_env(proj.env)
-    # message("\nProject environment set.\n")
+    proj.env = get_proj_root(proj.env)
+    setwd(proj.env$root.dir)
+    message("Project root directory set to ", getwd(), ".\n")
+    message("Directory of current script is ", proj.env$current.dir, ".\n")
+    proj.env = set_proj_lib(proj.env)
+    save_proj_env(proj.env)
+    message("\nProject environment set.\n")
   }
   Projenviron$initialized = T
 }
@@ -1130,7 +1128,6 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   save_proj_env(proj.env)
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
-    cat(names(proj.env), sep = "\n")
     # invisible(capture.output(suppressMessages(source(proj.env$file, chdir = F, ...))))
     source(proj.env$file, chdir = F, ...)
   }else if(tools::file_ext(proj.env$file) == "Rmd"){
