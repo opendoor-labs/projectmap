@@ -432,7 +432,7 @@ get_proj_packages = function(files, parallel = T){
   return(packages)
 }
 
-#' Find the project root directory
+#' Finds the root and current directories
 #'
 #' @return List containing root.dir, current.dir, and found_wd
 #' @description Finds important project directories
@@ -496,44 +496,6 @@ get_proj_root = function(){
   proj.env$root.dir = dirs$root.dir
   proj.env$current.dir = dirs$current.dir
   found_wd = dirs$found_wd
-  # frames = unique(sys.parents())
-  # frames = seq(min(frames), max(frames), 1)
-  # found_wd = F
-  # proj.env$current.dir = proj.env$file
-  # for(i in rev(frames)){
-  #   proj.env$current.dir = c(proj.env$current.dir, tryCatch(dirname(parent.frame(i)$ofile),
-  #                                         error = function(err){NULL}))
-  # }
-  # if(Sys.getenv("RSTUDIO") == "1"){
-  #   proj.env$current.dir = unique(c(proj.env$current.dir,
-  #                          tryCatch(dirname(rstudioapi::getActiveDocumentContext()$path),
-  #                                   error = function(err){NULL}),
-  #                          tryCatch(dirname(rstudioapi::getSourceEditorContext()$path),
-  #                                   error = function(err){NULL}),
-  #                          tryCatch(dirname(rstudioapi::getConsoleEditorContext()$path),
-  #                                   error = function(err){NULL})))
-  # }
-  # proj.env$current.dir = unique(c(proj.env$current.dir, getwd()))
-  # if(!all(is.null(proj.env$current.dir))){
-  #   for(i in proj.env$current.dir){
-  #     proj.env$root.dir = i
-  #     for(j in 1:(length(gregexpr("/", i)[[1]]) + 1)){
-  #       if(file.exists(paste0(proj.env$root.dir, "/.projectroot"))){
-  #         found_wd = T
-  #         proj.env$current.dir = i
-  #         break
-  #       }else{
-  #         proj.env$root.dir = dirname(proj.env$root.dir)
-  #       }
-  #     }
-  #     if(found_wd == T){
-  #       if(proj.env$root.dir == "."){
-  #         proj.env$root.dir = getwd()
-  #       }
-  #       break
-  #     }
-  #   }
-  # }
   if(found_wd == F){
     unlock_proj()
     if(Sys.getenv("RSTUDIO") == "1"){
@@ -544,8 +506,6 @@ get_proj_root = function(){
   }
   lock_proj()
 }
-
-
 
 #' Set the path to the project library
 #'
@@ -957,13 +917,6 @@ remove_file = function(files){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full = F){
-  if(!exists("proj.env")){
-    proj.env = new.env()
-    dirs = find_dirs()
-    proj.env$root.dir = dirs$root.dir
-    proj.env$current.dir = dirs$current.dir
-    proj.env$cabinet = readLines(".file_cabinet.txt")
-  }
   #Get the file extenstion
   ext = tools::file_ext(file)
   if(ext == ""){
@@ -1044,12 +997,6 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
-  if(!exists("proj.env")){
-    proj.env = new.env()
-    dirs = find_dirs()
-    proj.env$root.dir = dirs$root.dir
-    proj.env$current.dir = dirs$current.dir
-  }
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
     path = dirname(proj.env$file)
