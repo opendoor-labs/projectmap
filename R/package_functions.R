@@ -721,8 +721,8 @@ link_to_proj = function(init = F, install = T){
 
     #Find the R files to parse for required packages
     #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
+    unlock_proj()
     if(install == T){
-      unlock_proj()
       message("Checking required packages...")
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[which(tools::file_ext(proj.env$cabinet) %in% c("R", "Rmd") &
