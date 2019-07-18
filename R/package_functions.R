@@ -66,7 +66,7 @@ install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs =
       versions = rep(NA, length(pkgs))
     }
     if(update_req_pkgs == T){
-      proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
+      proj_req_pkgs = data.table::fread(file = "required_packages.csv")
     }
     for(i in pkgs){
       if(is.na(versions[which(pkgs == i)])){
@@ -96,7 +96,7 @@ install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs =
     }
   }
   if(update_req_pkgs == T){
-    data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
+    data.table::fwrite(proj_req_pkgs, file = "required_packages.csv")
   }
 }
 
@@ -736,10 +736,10 @@ link_to_proj = function(init = F, install = T){
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
         #Check if packages are of the correct version
-        if(!file.exists("./Functions/required_packages.csv")){
+        if(!file.exists("required_packages.csv")){
           update_req_packages()
         }
-        proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
+        proj_req_pkgs = data.table::fread(file = "required_packages.csv")
 
         if(nrow(installed_packages) > 0){
           version_check = sapply(1:nrow(installed_packages), function(x){
@@ -751,7 +751,7 @@ link_to_proj = function(init = F, install = T){
           })
           names(version_check) = installed_packages$Package
           if(any(version_check[!is.na(version_check)] == T)){
-            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
+            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate required_packages.csv or install the required versions.")
           }
           rm(version_check)
         }
