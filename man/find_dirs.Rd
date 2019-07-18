@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_functions.R
 \name{find_dirs}
 \alias{find_dirs}
-\title{Find the project root directory}
+\title{Finds the root and current directories}
 \usage{
 find_dirs()
 }
