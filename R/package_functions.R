@@ -706,13 +706,9 @@ link_to_proj = function(init = F, install = T){
     #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
     if(install == T){
       message("Checking required packages...")
-      unlock_proj()
       proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
       rfiles = proj.env$cabinet[which(tools::file_ext(proj.env$cabinet) %in% c("R", "Rmd") &
                                         !grepl("Project Master.R", proj.env$cabinet))]
-      rfiles = rfiles[unique(c(which(substr(rfiles, nchar(rfiles) - 1, nchar(rfiles)) == ".R"),
-                               which(substr(rfiles, nchar(rfiles) - 3, nchar(rfiles)) == ".Rmd")]
-      rfiles = rfiles[!basename(rfiles) %in% c(paste0(proj.env$project.name, "Master.R"), paste(proj.env$project.name, "Mapping.R"))]
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
         packages = unique(c(packages, get_proj_packages(rfiles, parallel = T)))
@@ -750,7 +746,7 @@ link_to_proj = function(init = F, install = T){
           })
           names(version_check) = installed_packages$Package
           if(any(version_check[!is.na(version_check)] == T)){
-            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate required_packages.csv or install the required versions.")
+            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate ./Functions/required_packages.csv or install the required versions.")
           }
           rm(version_check)
         }
@@ -778,7 +774,7 @@ link_to_proj = function(init = F, install = T){
           rm(in_req, out_req)
           install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
         }
-        if("projectmap" %in% installed_packages & length(packages) > 0){
+        if("projectmap" %in% installed_packages$Package & length(packages) > 0){
           message("Done.")
         }
       }
