@@ -55,14 +55,18 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
+install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs = F, ...){
+  proj.env = get_proj_env()
+  if(is.null(lib)){
+    lib = proj.env$libPath
+  }
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     if(is.null(versions)){
       versions = rep(NA, length(pkgs))
     }
     if(update_req_pkgs == T){
-      proj_req_pkgs = data.table::fread(file = "required_packages.csv")
+      proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
     }
     for(i in pkgs){
       if(is.na(versions[which(pkgs == i)])){
@@ -92,7 +96,7 @@ install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, updat
     }
   }
   if(update_req_pkgs == T){
-    data.table::fwrite(proj_req_pkgs, file = "required_packages.csv")
+    data.table::fwrite(proj_req_pkgs, file = "./Functions/required_packages.csv")
   }
 }
 
@@ -732,10 +736,10 @@ link_to_proj = function(init = F, install = T){
         remove.packages(packages_to_remove, lib = proj.env$libPath)
 
         #Check if packages are of the correct version
-        if(!file.exists("required_packages.csv")){
+        if(!file.exists("./Functions/required_packages.csv")){
           update_req_packages()
         }
-        proj_req_pkgs = data.table::fread(file = "required_packages.csv")
+        proj_req_pkgs = data.table::fread(file = "./Functions/required_packages.csv")
 
         if(nrow(installed_packages) > 0){
           version_check = sapply(1:nrow(installed_packages), function(x){
@@ -783,7 +787,6 @@ link_to_proj = function(init = F, install = T){
     }
 
     #Create the location of the master log and define the progress bar variables
-    unlock_proj()
     proj.env$logLocation = paste("./Logs", paste(proj.env$project.name, "Master Log", Sys.Date()), sep = "/")
     proj.env$startSourceLog = F
 
@@ -981,6 +984,8 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
+  proj.env = new.env()
+  get_proj_root()
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
     path = dirname(proj.env$file)
