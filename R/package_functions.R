@@ -56,7 +56,6 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs = F, ...){
-  proj.env = get_proj_env()
   if(is.null(lib)){
     lib = proj.env$libPath
   }
@@ -984,8 +983,8 @@ get_file_folder = function(file, inFolder = NULL, recall = T, allowMult = F){
 #' @export
 get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
   #folder should be the full file path to the folder not including its name
-  proj.env = new.env()
-  get_proj_root()
+  # proj.env = new.env()
+  # get_proj_root()
   basefolders = list.dirs(path = proj.env$root.dir, recursive = F, full.names = F)
   if(!is.null(proj.env$file)){
     path = dirname(proj.env$file)
