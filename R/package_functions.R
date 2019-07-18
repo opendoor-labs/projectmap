@@ -821,6 +821,7 @@ link_to_proj = function(init = F, install = T){
     message("Project root directory set to ", getwd(), ".\n")
     message("Directory of current script is ", proj.env$current.dir, ".\n")
     proj.env = set_proj_lib(proj.env)
+    cat(names(proj.env), sep = "\n")
     save_proj_env(proj.env)
     message("\nProject environment set.\n")
   }
@@ -1107,7 +1108,6 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL, ...){
   #If logging hasn't been started, start it
   proj.env = get_proj_env()
-  cat(names(proj.env), sep = "\n")
   if(proj.env$startSourceLog == F){
     proj.env$startSourceLog = T
     proj.env$trace.message[[length(proj.env$trace.message) + 1]] = paste0("Start Time: ", Sys.time())
