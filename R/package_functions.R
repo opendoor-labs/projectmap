@@ -817,14 +817,14 @@ link_to_proj = function(init = F, install = T){
   }else{
     proj.env = get_proj_env()
     cat(names(proj.env), sep = "\n")
-    proj.env = get_proj_root(proj.env)
-    setwd(proj.env$root.dir)
-    message("Project root directory set to ", getwd(), ".\n")
-    message("Directory of current script is ", proj.env$current.dir, ".\n")
-    proj.env = set_proj_lib(proj.env)
-    cat(names(proj.env), sep = "\n")
-    save_proj_env(proj.env)
-    message("\nProject environment set.\n")
+    # proj.env = get_proj_root(proj.env)
+    # setwd(proj.env$root.dir)
+    # message("Project root directory set to ", getwd(), ".\n")
+    # message("Directory of current script is ", proj.env$current.dir, ".\n")
+    # proj.env = set_proj_lib(proj.env)
+    # cat(names(proj.env), sep = "\n")
+    # save_proj_env(proj.env)
+    # message("\nProject environment set.\n")
   }
   Projenviron$initialized = T
 }
