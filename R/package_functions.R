@@ -1107,6 +1107,7 @@ read_file = function(file, inFolder = NULL, showProgress = F,
 source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL, ...){
   #If logging hasn't been started, start it
   proj.env = get_proj_env()
+  cat(names(proj.env), sep = "\n")
   if(proj.env$startSourceLog == F){
     proj.env$startSourceLog = T
     proj.env$trace.message[[length(proj.env$trace.message) + 1]] = paste0("Start Time: ", Sys.time())
@@ -1128,6 +1129,7 @@ source_file = function(file, inFolder = NULL, docname = NULL, dont_unload = NULL
   save_proj_env(proj.env)
   assign("last.warning", NULL, envir = baseenv())
   if(tools::file_ext(proj.env$file) == "R"){
+    cat(names(proj.env), sep = "\n")
     invisible(capture.output(suppressMessages(source(proj.env$file, chdir = T, ...))))
   }else if(tools::file_ext(proj.env$file) == "Rmd"){
     if(is.null(docname)){
