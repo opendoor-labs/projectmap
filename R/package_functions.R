@@ -466,6 +466,7 @@ get_proj_packages = function(files, parallel = T){
 #' @examples
 #' get_proj_root()
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
 get_proj_root = function(proj.env){
   frames = unique(sys.parents())
   frames = seq(min(frames), max(frames), 1)
