@@ -213,11 +213,11 @@ unlock_proj = function(){
   }
 }
 
-#' Set the project models to be executed from the "Project Master.R" file
+#' Set the project models to be executed from the "main.R" file
 #'
 #' @param ... The names and boolean values assigned to each model (i.e. set_proj_models(Model1 = T, model2 = F, ...))
 #' @return No return value
-#' @description Assign a name and boolean (T, F) indicator to the project models you want to run when you source "Project Master.R".
+#' @description Assign a name and boolean (T, F) indicator to the project models you want to run when you source "main.R".
 #' @examples
 #' link_to_proj()
 #' set_proj_models(
@@ -231,9 +231,9 @@ set_proj_models = function(...){
   #Assign the models to a named list
   proj.env$models = list(...)
 
-  #Read in the Project Master.R file and parse out all the execute_proj_model statuements
+  #Read in the main.R file and parse out all the execute_proj_model statuements
   #to find those that are set to T or F and count the number of source_file statements
-  lines = readLines(paste0(proj.env$root.dir, "/Project Master.R"))
+  lines = readLines(paste0(proj.env$root.dir, "/main.R"))
   lines = unname(sapply(lines, function(x){
     if(grepl("#", x)){
       loc = gregexpr("#", x)[[1]][1]
@@ -279,11 +279,11 @@ set_proj_models = function(...){
   lock_proj()
 }
 
-#' Return boolean of project model to be executed from the Project Master.R file.
+#' Return boolean of project model to be executed from the main.R file.
 #'
 #' @param ... The names and boolean values assigned to each model (i.e. set_proj_models(Model1 = T, model2 = F, ...))
 #' @return Boolean (T,F) indicator
-#' @description Returns a boolean (T, F) indicator used as a flag telling "Project Master.R" whether to run a group of R scripts.
+#' @description Returns a boolean (T, F) indicator used as a flag telling "main.R" whether to run a group of R scripts.
 #' @examples
 #' if(execute_proj_model("Model1")){
 #'   source_file("Model1.R", inFolder = "Codes")
@@ -363,7 +363,7 @@ lock_proj()
 #' @return A vector of character strings representing package names
 #' @description Parse out packages from library and require function calls in R scripts
 #' @examples
-#' get_proj_packages("Project Master.R")
+#' get_proj_packages("main.R")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
 get_proj_packages = function(files, parallel = T){
@@ -608,11 +608,11 @@ update_Rdev_version = function(){
 #' @param install Boolean (T, F) indicator of whether to install packages
 #' @return No return value
 #' @description Link an R (or Rmd) script to the project environment so that it will be integrated with the
-#' "Project Master.R" script created at the set up of the project.
+#' "main.R" script created at the set up of the project.
 #' @details This is the most important function in the package. It first looks for the project root by
-#' looking for the folder path to "Project Master.R". If it does not find this file, it will prompt the
-#' user to specify a path. Once the user specifies the path, the "Project Master.R" file will be
-#' automatically created in that folder along with "Example File.R". It then stores this folder as
+#' looking for the folder path to "main.R". If it does not find this file, it will prompt the
+#' user to specify a path. Once the user specifies the path, the "main.R" file will be
+#' automatically created in that folder along with "example.R". It then stores this folder as
 #' "root.dir" in the package environment. It also creates a ".gitignore" file and initializes the root
 #' directory for git in case the user would like to use git features.
 #'
@@ -622,7 +622,7 @@ update_Rdev_version = function(){
 #' by other R scripts. Those should be stored in "Functions". All input data used R scripts should
 #' be store in "Input". All output data and images should be stored in "Output". All documenation
 #' files created by Rmd scripts should be stored in "Documentation". "Logs" will contain output
-#' information created after sourcing "Project Master.R".
+#' information created after sourcing "main.R".
 #'
 #' Next, the file cabinet is built and saved in the "Functions" folder. If the cabinet already exists,
 #' it will load it into the project environment.
@@ -659,11 +659,11 @@ link_to_proj = function(init = F, install = T){
     #Create the folder structure
     folders = c("./Codes", "./Functions", "./Input", "./Output", "./Documentation", "./Logs", "./Library")
     if(!basename(proj.env$root.dir) %in% gsub("\\./", "", folders)){
-      if(!file.exists("Example File.R")){
-        write(x = exampleFile, file = "Example File.R")
+      if(!file.exists("example.R")){
+        write(x = exampleFile, file = "example.R")
       }
-      if(!file.exists("Project Master.R")){
-        write(x = masterFile, file = "Project Master.R")
+      if(!file.exists("main.R")){
+        write(x = masterFile, file = "main.R")
       }
       if(!file.exists("global.R")){
         write(x = globalR, file = "global.R")
@@ -720,13 +720,13 @@ link_to_proj = function(init = F, install = T){
     }
 
     #Find the R files to parse for required packages
-    #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("Project Master.R")){
+    #if(!(file.exists("global.R") & file.exists("ui.R") & file.exists("server.R")) | file.exists("main.R")){
     unlock_proj()
     if(install == T){
       message("Checking required packages...")
-      proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("Project Master.R", parallel = F)))
+      proj.env$required.packages = unique(c(proj.env$required.packages, get_proj_packages("main.R", parallel = F)))
       rfiles = proj.env$cabinet[which(tools::file_ext(proj.env$cabinet) %in% c("R", "Rmd") &
-                                        !grepl("Project Master.R", proj.env$cabinet))]
+                                        !grepl("main.R", proj.env$cabinet))]
       packages = proj.env$required.packages
       if(length(rfiles) > 0){
         packages = unique(c(packages, get_proj_packages(rfiles, parallel = T)))
@@ -904,7 +904,7 @@ remove_file = function(files){
 
 #' Get a file path relative to the root directory
 #'
-#' @param file A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").
+#' @param file A character string giving the name of the file to get the full folder path for (i.e. "main.R").
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param recall A boolean (T, F) indicator specifying whether to rebuild the cabinet if the file was not found the first time. The default is T.
 #' @param allowMult A boolean (T, F) indicator specifying whether to allow multiple file paths upon return. The default is F.
@@ -965,7 +965,7 @@ get_file_path = function(file, inFolder = NULL, recall = T, allowMult = F, full 
 
 #' Get a full folder path
 #'
-#' @param file A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").
+#' @param file A character string giving the name of the file to get the full folder path for (i.e. "main.R").
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param recall A boolean (T, F) indicator specifying whether to rebuild the cabinet if the file was not found the first time. The default is T.
 #' @param allowMult A boolean (T, F) indicator specifying whether to allow multiple file paths upon return. The default is F.
@@ -1035,7 +1035,7 @@ get_output_dir = function(doc = F, file = NULL, inFolder = NULL){
 
 #' Read in a file in a standardized way
 #'
-#' @param file A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").
+#' @param file A character string giving the name of the file to get the full folder path for (i.e. "main.R").
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param showProgress A boolean (T, F) indicator specifying whether to show the read in progress if using data.table's fread.
 #' @param na.strings A vector of character strings to convert to NA
@@ -1068,15 +1068,15 @@ read_file = function(file, inFolder = NULL, showProgress = F,
   }
 }
 
-#' Source a file for the Project Master.R file execution.
+#' Source a file for the main.R file execution.
 #'
-#' @param file A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").
+#' @param file A character string giving the name of the file to get the full folder path for (i.e. "main.R").
 #' @param inFolder An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").
 #' @param dont_unload A character list of packages names to prevent from being unloaded
 #' @param ... Additional parameters to pass to source
 #' @return No return value
 #' @description A wrapper function for the base source command but also perfoms some backend functions to track the progress of the
-#' files executed in "Project Master.R" as well as updating the project progress bar. This function should only be used in the "Project Master.R" script.
+#' files executed in "main.R" as well as updating the project progress bar. This function should only be used in the "main.R" script.
 #' @examples
 #' link_to_proj()
 #' set_proj_models(
@@ -1733,10 +1733,10 @@ set_proj_models(
 
 #Run the selected files
 if(execute_proj_model("Example")){
-  source_file("Example File.R", inFolder = NULL)
+  source_file("example.R", inFolder = NULL)
 }
 if(execute_proj_model("DeployApp")){
-  rsconnect::deployApp(appFiles = c(proj.env$cabinet[grepl("Codes/|Functions/|Input/|Output/|www/", proj.env$cabinet)], "ui.R", "server.R", "global.R", "Project Master.R"),
+  rsconnect::deployApp(appFiles = c(proj.env$cabinet[grepl("Codes/|Functions/|Input/|Output/|www/", proj.env$cabinet)], "ui.R", "server.R", "global.R", "main.R"),
 upload = T, appName = "AppName", launch.browser = F, forceUpdate = T)
 }
 
