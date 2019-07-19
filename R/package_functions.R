@@ -707,7 +707,7 @@ link_to_proj = function(init = F, install = T){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!file.exists("./Functions/cabinet.RData") | init == T){
+    if(!file.exists(".file_cabinet.RData") | init == T){
       #If the file cabinet does not exist, create it
       message("Building project file cabinet...")
       build_cabinet()
