@@ -2,13 +2,13 @@
 % Please edit documentation in R/package_functions.R
 \name{source_file}
 \alias{source_file}
-\title{Source a file for the Project Master.R file execution.}
+\title{Source a file for the main.R file execution.}
 \usage{
 source_file(file, inFolder = NULL, docname = NULL,
   dont_unload = NULL, ...)
 }
 \arguments{
-\item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
+\item{file}{A character string giving the name of the file to get the full folder path for (i.e. "main.R").}
 
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
 
@@ -21,7 +21,7 @@ No return value
 }
 \description{
 A wrapper function for the base source command but also perfoms some backend functions to track the progress of the
-files executed in "Project Master.R" as well as updating the project progress bar. This function should only be used in the "Project Master.R" script.
+files executed in "main.R" as well as updating the project progress bar. This function should only be used in the "main.R" script.
 }
 \examples{
 link_to_proj()

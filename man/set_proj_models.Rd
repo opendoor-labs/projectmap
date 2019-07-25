@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_functions.R
 \name{set_proj_models}
 \alias{set_proj_models}
-\title{Set the project models to be executed from the "Project Master.R" file}
+\title{Set the project models to be executed from the "main.R" file}
 \usage{
 set_proj_models(...)
 }
@@ -13,7 +13,7 @@ set_proj_models(...)
 No return value
 }
 \description{
-Assign a name and boolean (T, F) indicator to the project models you want to run when you source "Project Master.R".
+Assign a name and boolean (T, F) indicator to the project models you want to run when you source "main.R".
 }
 \examples{
 link_to_proj()

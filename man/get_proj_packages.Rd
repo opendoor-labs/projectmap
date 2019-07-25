@@ -16,7 +16,7 @@ A vector of character strings representing package names
 Parse out packages from library and require function calls in R scripts
 }
 \examples{
-get_proj_packages("Project Master.R")
+get_proj_packages("main.R")
 }
 \author{
 Alex Hubbard (hubbard.alex@gmail.com)

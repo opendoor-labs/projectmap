@@ -7,7 +7,7 @@
 get_file_folder(file, inFolder = NULL, recall = T, allowMult = F)
 }
 \arguments{
-\item{file}{A character string giving the name of the file to get the full folder path for (i.e. "Project Master.R").}
+\item{file}{A character string giving the name of the file to get the full folder path for (i.e. "main.R").}
 
 \item{inFolder}{An identifer to narrow the search in case there are multiple files with same name but in different folders (i.e. "Codes/Model1").}
 

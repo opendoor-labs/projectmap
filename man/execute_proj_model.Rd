@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_functions.R
 \name{execute_proj_model}
 \alias{execute_proj_model}
-\title{Return boolean of project model to be executed from the Project Master.R file.}
+\title{Return boolean of project model to be executed from the main.R file.}
 \usage{
 execute_proj_model(model)
 }
@@ -13,7 +13,7 @@ execute_proj_model(model)
 Boolean (T,F) indicator
 }
 \description{
-Returns a boolean (T, F) indicator used as a flag telling "Project Master.R" whether to run a group of R scripts.
+Returns a boolean (T, F) indicator used as a flag telling "main.R" whether to run a group of R scripts.
 }
 \examples{
 if(execute_proj_model("Model1")){

@@ -16,13 +16,13 @@ No return value
 }
 \description{
 Link an R (or Rmd) script to the project environment so that it will be integrated with the
-"Project Master.R" script created at the set up of the project.
+"main.R" script created at the set up of the project.
 }
 \details{
 This is the most important function in the package. It first looks for the project root by
-looking for the folder path to "Project Master.R". If it does not find this file, it will prompt the
-user to specify a path. Once the user specifies the path, the "Project Master.R" file will be
-automatically created in that folder along with "Example File.R". It then stores this folder as
+looking for the folder path to "main.R". If it does not find this file, it will prompt the
+user to specify a path. Once the user specifies the path, the "main.R" file will be
+automatically created in that folder along with "example.R". It then stores this folder as
 "root.dir" in the package environment. It also creates a ".gitignore" file and initializes the root
 directory for git in case the user would like to use git features.
 
@@ -32,7 +32,7 @@ You should store all your R scripts in "Codes" except R scripts containing funct
 by other R scripts. Those should be stored in "Functions". All input data used R scripts should
 be store in "Input". All output data and images should be stored in "Output". All documenation
 files created by Rmd scripts should be stored in "Documentation". "Logs" will contain output
-information created after sourcing "Project Master.R".
+information created after sourcing "main.R".
 
 Next, the file cabinet is built and saved in the "Functions" folder. If the cabinet already exists,
 it will load it into the project environment.
