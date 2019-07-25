@@ -55,10 +55,7 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs = F, ...){
-  if(is.null(lib)){
-    lib = proj.env$libPath
-  }
+install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     if(is.null(versions)){
@@ -798,7 +795,7 @@ link_to_proj = function(init = F, install = T){
             packages = c(in_req)
           }
           rm(in_req, out_req)
-          install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, dependencies = T, lib = proj.env$libPath)
+          install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, lib = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages$Package & length(packages) > 0){
           message("Done.")
