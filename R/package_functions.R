@@ -776,8 +776,9 @@ link_to_proj = function(init = F, install = T){
         }
 
         #Install the packages
-        packages = unique(c(packages, package.depend(packages)))
-        packages = packages[!packages %in% c("projectmap", installed_packages$Package)]
+        packages = packages[sapply(lapply(packages, package.depend), function(x){
+          any(!x %in% unique(c(installed_packages$Package, installed.packages(lib.loc = proj.env$libPath.orig))))
+        })]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
