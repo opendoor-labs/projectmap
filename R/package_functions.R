@@ -69,12 +69,12 @@ install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs =
     }
     for(i in pkgs){
       if(is.na(versions[which(pkgs == i)])){
-        tryCatch(utils::install.packages(i, lib = lib, ...),
+        tryCatch(utils::install.packages(i, lib = lib, dependencies = T, ...),
                  error = function(err){
                    warning(paste("Package", i, "could not be installed."))
                  })
       }else{
-        tryCatch(versions::install.versions(pkgs = i, versions = as.character(versions[which(pkgs == i)]), lib = lib),
+        tryCatch(versions::install.versions(pkgs = i, versions = as.character(versions[which(pkgs == i)]), lib = lib, dependencies = T),
                  error = function(err){
                    warning(paste("Package", i, versions[which(pkgs == i)], "could not be installed."))
                  })
@@ -89,9 +89,9 @@ install.packages = function(pkgs, versions = NULL, lib = NULL, update_req_pkgs =
     }
   }else{
     if(!is.null(versions)){
-      utils::install.packages(pkgs, lib = lib, ...)
+      utils::install.packages(pkgs, lib = lib, dependencies = T, ...)
     }else{
-      versions::install.version(pkgs = pkgs, versions = versions, lib = lib, ...)
+      versions::install.version(pkgs = pkgs, versions = versions, lib = lib, dependencies = T, ...)
     }
   }
   if(update_req_pkgs == T){
@@ -737,6 +737,9 @@ link_to_proj = function(init = F, install = T){
       installed_packages = data.table::data.table(installed.packages(lib.loc = proj.env$libPath))[, c("Package", "Version")]
       if(!"projectmap" %in% installed_packages$Package){
         #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
+        if(!"devtools" %in% installed_packages$Package){
+          base::install.packages("devtools")
+        }
         devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
       }
 
