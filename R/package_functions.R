@@ -779,6 +779,7 @@ link_to_proj = function(init = F, install = T){
         packages = packages[!packages %in% c("projectmap", installed_packages$Package)]
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
+        packages = unique(c(packages, package.depend(packages)))
         if(length(packages) > 0){
           message("Installing packages...")
 
