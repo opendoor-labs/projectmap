@@ -740,7 +740,7 @@ link_to_proj = function(init = F, install = T){
         if(!"devtools" %in% installed_packages$Package){
           utils::install.packages("devtools")
         }
-        devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
+        devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath, force = T)
       }
 
       if(!is.null(packages)){
