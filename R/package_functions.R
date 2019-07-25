@@ -738,7 +738,7 @@ link_to_proj = function(init = F, install = T){
       if(!"projectmap" %in% installed_packages$Package){
         #key = readline(prompt = "Enter auth token for opendoor-labs/projectmap: ")
         if(!"devtools" %in% installed_packages$Package){
-          base::install.packages("devtools")
+          utils::install.packages("devtools")
         }
         devtools::install_github("opendoor-labs/projectmap", quiet = F, verbose = F, dependencies = T, reload = F, lib = proj.env$libPath)
       }
