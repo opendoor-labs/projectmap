@@ -749,7 +749,10 @@ link_to_proj = function(init = F, install = T){
                                     package.depend(packages[!packages %in% installed.packages(priority = "base")]),
                                     proj.env$required.packages))
         packages_to_remove = installed_packages$Package[!installed_packages$Package %in% packages_to_keep]
-        remove.packages(packages_to_remove, lib = proj.env$libPath)
+        packages_to_remove = packages_to_remove[!packages_to_remove %in% unique(package.depend(packages_to_keep))]
+        if(length(packages_to_remove) > 0){
+          remove.packages(packages_to_remove, lib = proj.env$libPath)
+        }
 
         #Check if packages are of the correct version
         if(!file.exists("required_packages.csv")){
