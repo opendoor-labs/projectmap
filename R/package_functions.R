@@ -782,7 +782,7 @@ link_to_proj = function(init = F, install = T){
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
-          message(paste(packages, collapse = ", "), "need to be installed.\n")
+          message(paste(packages, collapse = ", "), " need to be installed.\n")
           message("Installing packages...")
 
           #Check if packages to install are in the required list and get the version, otherwise just install the package
