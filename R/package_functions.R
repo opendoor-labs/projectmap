@@ -48,6 +48,9 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' This overwrites the base install.packages function to only install the function in the user's project library
 #' for package version control
 #'
+#' @param pkgs Vector of package names
+#' @param versions Vector of versions aligned with the packages
+#' @param sources Vector of sources to install each package: i.e. "CRAN", "Github user/package_name".
 #' @param lib Path to users package library
 #' @param ... First, package name, then other named arguments passed to the base install.packages function
 #' @return No return value
@@ -55,32 +58,53 @@ require = function(..., lib.loc = proj.env$libPath, recursive = F){
 #' install.packages("packageName")
 #' @author Alex Hubbard (hubbard.alex@gmail.com)
 #' @export
-install.packages = function(pkgs, versions = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
+install.packages = function(pkgs, versions = NULL, sources = NULL, lib = proj.env$libPath, update_req_pkgs = F, ...){
   if(!is.null(proj.env$root.dir)){
     #If set project directory to the project directory, only look in project library
     if(is.null(versions)){
       versions = rep(NA, length(pkgs))
+    }
+    if(is.null(sources)){
+      sources = rep("CRAN", length(pkgs))
     }
     if(update_req_pkgs == T){
       proj_req_pkgs = data.table::fread(file = "required_packages.csv")
     }
     for(i in pkgs){
       if(is.na(versions[which(pkgs == i)])){
-        tryCatch(utils::install.packages(i, lib = lib, dependencies = T, ...),
-                 error = function(err){
-                   warning(paste("Package", i, "could not be installed."))
-                 })
+        if(grepl("CRAN", sources[which(pkgs == i)])){
+          tryCatch(utils::install.packages(i, lib = lib, dependencies = T, ...),
+                   error = function(err){
+                     warning(paste("Package", i, "could not be installed."))
+                   })
+        }else if(grepl("Github", sources[which(pkgs == i)])){
+          tryCatch(devtools::install_github(gsub("Github| |\\(|\\)", "", sources[which(pkgs == i)]), lib = lib, dependencies = T, ...),
+                   error = function(err){
+                     warning(paste("Package", i, "could not be installed."))
+                   })
+        }else{
+          warning(paste("Package", i, "could not be installed."))
+        }
       }else{
-        tryCatch(versions::install.versions(pkgs = i, versions = as.character(versions[which(pkgs == i)]), lib = lib, dependencies = T),
-                 error = function(err){
-                   warning(paste("Package", i, versions[which(pkgs == i)], "could not be installed."))
-                 })
+        if(grepl("CRAN", sources[which(pkgs == i)])){
+          tryCatch(versions::install.versions(pkgs = i, versions = as.character(versions[which(pkgs == i)]), lib = lib, dependencies = T),
+                   error = function(err){
+                     warning(paste("Package", i, versions[which(pkgs == i)], "could not be installed."))
+                   })
+        }else if(grepl("Github", sources[which(pkgs == i)])){
+          tryCatch(devtools::install_github(gsub("Github| |\\(|\\)", "", sources[which(pkgs == i)]), lib = lib, dependencies = T, ...),
+                   error = function(err){
+                     warning(paste("Package", i, "could not be installed."))
+                   })
+        }else{
+          warning(paste("Package", i, "could not be installed."))
+        }
       }
       if(update_req_pkgs == T){
         if(nrow(proj_req_pkgs[Package == i, ]) > 0){
-          proj_req_pkgs[Package == i, "Version" := data.table::data.table(installed.packages()[, c("Package", "Version")])[Package == i, ][Version == max(Version), ]$Version]
+          proj_req_pkgs[Package == i, "Version" := unique(data.table::data.table(installed.packages()[, c("Package", "Version")])[Package == i, ][Version == max(Version), ]$Version)]
         }else{
-          proj_req_pkgs = rbind(proj_req_pkgs, data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")])
+          proj_req_pkgs = rbind(proj_req_pkgs, cbind(unique(data.table(installed.packages()[, c("Package", "Version")])[Package == i, c("Package", "Version")][Version == max(Version), ]), source = sources[which(pkgs == i)]))
         }
       }
     }
@@ -166,7 +190,7 @@ load.packages = function(..., packages = NULL, character.only = F){
 package.depend = function(pkgs, lib.loc = proj.env$libPath, fields = c("Imports", "Depends", "Suggests")){
   ret = NULL
   for(i in pkgs){
-    out = utils::packageDescription(i, lib.loc = lib.loc)
+    out = suppressWarnings(utils::packageDescription(i, lib.loc = lib.loc))
     out = unname(unlist(lapply(out[intersect(names(out), fields)], function(x){
       x = unlist(strsplit(x, ",\\s*"))
       return(unname(sapply(x, function(y){
@@ -556,6 +580,7 @@ exit_proj = function(reset_lib = T){
 #' @export
 update_req_packages = function(){
   proj_req_pkgs = unique(data.table::data.table(installed.packages(lib = proj.env$libPath)[, c("Package", "Version")]))
+  proj_req_pkgs = merge(proj_req_pkgs, data.table::data.table(devtools::package_info(proj_req_pkgs$Package))[, c("package", "source")], by.x = "Package", by.y = "package")
   data.table::fwrite(proj_req_pkgs, file = "required_packages.csv")
 }
 
@@ -704,7 +729,7 @@ link_to_proj = function(init = F, install = T){
     suppressWarnings(rm(folders, i))
 
     #Build the file cabinet
-    if(!file.exists(".file_cabinet.RData") | init == T){
+    if(!file.exists(".file_cabinet.txt") | init == T){
       #If the file cabinet does not exist, create it
       message("Building project file cabinet...")
       build_cabinet()
@@ -743,7 +768,7 @@ link_to_proj = function(init = F, install = T){
       if(!is.null(packages)){
         #Clean up package library
         packages_to_keep = unique(c(packages,
-                                    package.depend(packages[!packages %in% installed.packages(priority = "base")]),
+                                    package.depend(packages[!packages %in% rownames(installed.packages(priority = "base"))]),
                                     proj.env$required.packages))
         packages_to_remove = installed_packages$Package[!installed_packages$Package %in% packages_to_keep]
         packages_to_remove = packages_to_remove[!packages_to_remove %in% unique(package.depend(packages_to_keep))]
@@ -767,15 +792,15 @@ link_to_proj = function(init = F, install = T){
           })
           names(version_check) = installed_packages$Package
           if(any(version_check[!is.na(version_check)] == T)){
-            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate required_packages.csv or install the required versions.")
+            warning("Installed versions of ", paste(names(version_check[!is.na(version_check)][version_check[!is.na(version_check)] == T]), collapse = ", "), " do not match the required version.\n\nUpdate required_packages.csv or install the required versions. You can call install_req_packages() to do this.")
           }
           rm(version_check)
         }
 
         #Install the packages
-        packages = unique(c(packages, package.depend(packages)))
-        packages = packages[!packages %in% data.table::data.table(installed.packages())$Package]
+        packages = unique(c(packages, package.depend(packages[!packages %in% rownames(installed.packages(priority = "base"))])))
         packages = packages[!packages %in% rownames(installed.packages(priority = "base"))]
+        packages = packages[!packages %in% data.table::data.table(installed.packages())$Package]
         packages = packages[!packages %in% c("T, F", "TRUE", "FALSE")]
         if(length(packages) > 0){
           message(paste(packages, collapse = ", "), " need to be installed.\n")
@@ -785,17 +810,21 @@ link_to_proj = function(init = F, install = T){
           in_req = packages[packages %in% proj_req_pkgs$Package]
           versions = c(proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Version)
           names(versions) = proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Package
+          sources = c(proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$source)
+          names(sources) = proj_req_pkgs[proj_req_pkgs$Package %in% in_req, ]$Package
           in_req = names(versions)
           out_req = packages[!packages %in% proj_req_pkgs$Package]
           if(length(out_req) > 0){
             versions = c(versions, rep(NA, length(out_req)))
             names(versions)[names(versions) == ""] = out_req
+            sources = c(sources, rep("CRAN", length(out_req)))
+            names(sources)[names(sources) == ""] = out_req
             packages = c(in_req, out_req)
           }else{
             packages = c(in_req)
           }
           rm(in_req, out_req)
-          install.packages(pkgs = packages, versions = versions, quiet = T, verbose = F, lib = proj.env$libPath)
+          install.packages(pkgs = packages, versions = versions, sources = sources, quiet = T, verbose = F, lib = proj.env$libPath)
         }
         if("projectmap" %in% installed_packages$Package & length(packages) > 0){
           message("Done.")

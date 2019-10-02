@@ -5,10 +5,16 @@
 \title{This overwrites the base install.packages function to only install the function in the user's project library
 for package version control}
 \usage{
-install.packages(pkgs, versions = NULL, lib = NULL,
-  update_req_pkgs = F, ...)
+install.packages(pkgs, versions = NULL, sources = NULL,
+  lib = proj.env$libPath, update_req_pkgs = F, ...)
 }
 \arguments{
+\item{pkgs}{Vector of package names}
+
+\item{versions}{Vector of versions aligned with the packages}
+
+\item{sources}{Vector of sources to install each package: i.e. "CRAN", "Github user/package_name".}
+
 \item{lib}{Path to users package library}
 
 \item{...}{First, package name, then other named arguments passed to the base install.packages function}
