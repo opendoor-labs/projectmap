@@ -1712,6 +1712,30 @@ git_commit = function(message){
   message(paste(system(paste0("git commit -m '", message, "'"), intern = T), collapse = "\n"))
 }
 
+#' Build a query for Google BigQuery from a text string
+#'
+#' @param query A character string written in SQL language.
+#' @param standard Appends "#standardSQL" to the top if set to T. Default is F.
+#' @param limit Appends "LIMIT = 1000", for example, or whatever integer value limit is set to. Default is NULL and will not append anything.
+#' @param show A boolean (T, F) indicator of whether to print the query to the console for visualization.
+#' @return A character string.
+#' @description Takes a character string and concatenates some optional lines
+#' @examples
+#' query = "SELECT * FROM table"
+#' build_query(query, standard = T, limit = 1000, show = T)
+#' @author Alex Hubbard (hubbard.alex@gmail.com)
+#' @export
+build_query = function(query, standard = T, limit = NULL, show = F){
+  standard = ifelse(standard == T, "#standardSQL", "")
+  limit = ifelse(!is.null(limit), paste("LIMIT", limit), "")
+  ret = paste0(standard, "\n", query, "\n", limit)
+  if(show == T){
+    cat(ret)
+  }else{
+    return(ret)
+  }
+}
+
 masterFile = '###############################################################################
 #Project Master
 #

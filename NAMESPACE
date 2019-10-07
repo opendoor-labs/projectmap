@@ -2,6 +2,7 @@
 
 export(add_to_cabinet)
 export(build_cabinet)
+export(build_query)
 export(execute_proj_model)
 export(exit_proj)
 export(find_dirs)
